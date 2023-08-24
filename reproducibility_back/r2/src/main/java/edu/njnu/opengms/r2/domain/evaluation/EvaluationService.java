@@ -1,7 +1,7 @@
-package edu.njnu.opengms.common.domain.container.evaluation;
+package edu.njnu.opengms.r2.domain.evaluation;
 
 
-import edu.njnu.opengms.common.domain.container.evaluation.support.EvaluationInfo;
+import edu.njnu.opengms.r2.domain.evaluation.support.EvaluationInfo;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,6 +1,6 @@
 package edu.njnu.opengms.container.domain.evaluation.vo;
 
-import edu.njnu.opengms.common.domain.container.evaluation.support.EvaluationTypeEnum;
+import edu.njnu.opengms.r2.domain.evaluation.support.EvaluationTypeEnum;
 import lombok.Data;
 
 import java.util.Date;

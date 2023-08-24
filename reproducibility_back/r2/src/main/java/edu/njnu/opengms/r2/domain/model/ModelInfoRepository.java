@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,8 +16,8 @@ import java.util.Optional;
  */
 public interface ModelInfoRepository extends MongoRepository<ModelInfo,String> {
     Optional<ModelInfo> findById(String id);
-    Optional<ModelInfo> findByIdAndCreatorId(String id,String userId);
-    Page<ModelInfo> findByPrivacyInOrCreatorId(List<String> privacyList, String creatorId, Pageable pageable);
+//    Optional<ModelInfo> findByIdAndCreatorId(String id,String userId);
+//    Page<ModelInfo> findByPrivacyInOrCreatorId(List<String> privacyList, String creatorId, Pageable pageable);
     Page<ModelInfo> findByPrivacy(String privacy, Pageable pageable);
 //    Page<ModelServiceVO> getByNameContainsIgnoreCase(String name, Pageable pageable);
 }

@@ -36,7 +36,7 @@ public class ModelInfoController {
         return ResultUtils.success(modelInfoRepository.insert(modelInfo));
     }
 
-    @RequestMapping(value = "/getProjectsPage/{currentPage}/{pageSize}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getPublicModels/{currentPage}/{pageSize}", method = RequestMethod.GET)
     public JsonResult getPublicModels(@PathVariable int currentPage, @PathVariable int pageSize) {
         PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
         Page<ModelInfo> modelList = modelInfoRepository.findByPrivacy("public", pageable);

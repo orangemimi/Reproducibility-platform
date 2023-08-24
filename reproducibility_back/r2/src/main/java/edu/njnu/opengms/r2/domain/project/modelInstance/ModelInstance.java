@@ -1,6 +1,6 @@
 package edu.njnu.opengms.r2.domain.project.modelInstance;
 
-import edu.njnu.opengms.common.domain.container.model.ModelInfo;
+import edu.njnu.opengms.r2.domain.model.ModelInfo;
 import lombok.Data;
 
 /**

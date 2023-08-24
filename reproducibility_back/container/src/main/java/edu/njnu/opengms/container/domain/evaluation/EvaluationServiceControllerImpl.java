@@ -1,7 +1,7 @@
 package edu.njnu.opengms.container.domain.evaluation;
 
 import edu.njnu.opengms.common.controller.BaseController;
-import edu.njnu.opengms.common.domain.container.evaluation.EvaluationService;
+import edu.njnu.opengms.r2.domain.evaluation.EvaluationService;
 import edu.njnu.opengms.common.dto.SplitPageDTO;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.CopyUtils;

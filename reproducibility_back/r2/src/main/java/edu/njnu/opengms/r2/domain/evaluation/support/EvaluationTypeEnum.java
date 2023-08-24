@@ -1,4 +1,4 @@
-package edu.njnu.opengms.common.domain.container.evaluation.support;
+package edu.njnu.opengms.r2.domain.evaluation.support;
 
 /**
  * @EnumName EvaluationTypeEnum

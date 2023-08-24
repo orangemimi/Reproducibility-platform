@@ -1,7 +1,7 @@
 package edu.njnu.opengms.container.domain.evaluation.dto;
 
-import edu.njnu.opengms.common.domain.container.evaluation.EvaluationService;
-import edu.njnu.opengms.common.domain.container.evaluation.support.EvaluationBehavior;
+import edu.njnu.opengms.r2.domain.evaluation.EvaluationService;
+import edu.njnu.opengms.r2.domain.evaluation.support.EvaluationBehavior;
 import edu.njnu.opengms.common.dto.ToDomainConverter;
 import lombok.Data;
 

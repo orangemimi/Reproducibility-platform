@@ -1,6 +1,6 @@
 package edu.njnu.opengms.container.domain.evaluation;
 
-import edu.njnu.opengms.common.domain.container.evaluation.EvaluationService;
+import edu.njnu.opengms.r2.domain.evaluation.EvaluationService;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
