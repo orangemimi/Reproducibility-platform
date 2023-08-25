@@ -1,6 +1,7 @@
 package edu.njnu.opengms.container.domain.model.dto;
 
-import edu.njnu.opengms.container.domain.model.ModelInfo;
+//import edu.njnu.opengms.container.domain.model.ModelInfo;
+import edu.njnu.opengms.r2.domain.model.ModelInfo;
 import edu.njnu.opengms.r2.domain.model.support.ModelBehavior;
 import edu.njnu.opengms.common.dto.ToDomainConverter;
 import lombok.Data;

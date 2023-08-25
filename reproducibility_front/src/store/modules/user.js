@@ -81,6 +81,7 @@ const actions = {
           commit("setToken", response.token);
           commit("setName", response.name);
           commit("setUserId", response.userId);
+          localStorage.setItem("userInfo", { name: response.name, userId: response.userId, token: response.token });
           // commit('setEmail', response.email);
           // commit('setUnreadApplynum', response.unreadApply);
           // commit('setUnreadReplynum', response.unreadReply);

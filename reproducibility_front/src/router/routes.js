@@ -14,6 +14,14 @@ export default [
     },
     component: () => import("@/views/error-page/404.vue"),
   },
+  {
+    path: "/test/programOnLine",
+    name: "programol",
+    meta: {
+      title: "Reproducibility | programOnLine",
+    },
+    component: () => import("@/views/test/ProgramOL.vue"),
+  },
 
   {
     path: "/test/mavon",

@@ -10,7 +10,7 @@ import "mavon-editor/dist/css/index.css";
 // import "@/router/permission"; // permission control
 
 import "./assets/iconfont/iconfont.css";
-import "./assets/variable.scss";
+// import "./assets/variable.scss";
 
 import vuescroll from "vuescroll";
 

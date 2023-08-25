@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JsonResult<T> {
+
     private Integer code;
 
     private String msg;

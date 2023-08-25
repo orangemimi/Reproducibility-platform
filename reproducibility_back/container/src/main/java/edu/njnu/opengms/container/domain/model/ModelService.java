@@ -1,5 +1,6 @@
 package edu.njnu.opengms.container.domain.model;
 
+import edu.njnu.opengms.r2.domain.model.ModelInfo;
 import edu.njnu.opengms.r2.domain.model.support.Dependency;
 import edu.njnu.opengms.r2.domain.model.support.ModelBehavior;
 import edu.njnu.opengms.common.dto.ToDomainConverter;

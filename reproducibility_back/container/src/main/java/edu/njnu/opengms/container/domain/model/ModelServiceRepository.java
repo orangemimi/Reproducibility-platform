@@ -1,5 +1,6 @@
 package edu.njnu.opengms.container.domain.model;
 
+import edu.njnu.opengms.r2.domain.model.ModelInfo;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
