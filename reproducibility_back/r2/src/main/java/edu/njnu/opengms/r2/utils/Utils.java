@@ -2,6 +2,10 @@ package edu.njnu.opengms.r2.utils;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import edu.njnu.opengms.r2.domain.model.support.ModelBehavior;
+import edu.njnu.opengms.r2.domain.model.support.ModelEvent;
+import edu.njnu.opengms.r2.domain.model.support.Parameter;
+import edu.njnu.opengms.r2.domain.model.support.State;
 import edu.njnu.opengms.r2.domain.project.Project;
 import edu.njnu.opengms.r2.domain.user.User;
 import org.springframework.data.domain.Page;
@@ -14,27 +18,149 @@ import java.util.*;
 
 public class Utils {
     public static JSONObject convertMdl(JSONObject data){
+        if (!data.containsKey("mdlJson")) {
+            return null;
+        }
+
+        JSONObject jsonObject = data.getJSONObject("mdlJson");
+        JSONObject result = new JSONObject();
+        result.put("name", data.getStr("name"));
+        result.put("md5", data.getStr("md5"));
+        result.put("description", data.getStr("overview"));
+        result.put("behavior", new JSONObject());
+//        result.put("behavior", new JSONArray());
+//        result.put("states",new JSONArray());
+
+        JSONArray states = new JSONArray();
+        JSONArray jsonStates = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0).getJSONArray("States").getJSONObject(0).getJSONArray("State");
+            JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
+
+            for (int j = 0; j < jsonStates.size(); j++) {
+                JSONObject stateJson = new JSONObject();
+                stateJson.put("stateId", jsonStates.getJSONObject(j).getStr("id"));
+                stateJson.put("name", jsonStates.getJSONObject(j).getStr("name"));
+                stateJson.put("description", jsonStates.getJSONObject(j).getStr("description"));
+                stateJson.put("inputs", new JSONArray());
+                stateJson.put("outputs", new JSONArray());
+                stateJson.put("parameters", new JSONArray());
+
+                for (int i = 0; i < jsonStates.getJSONObject(j).getJSONArray("Event").size(); i++) {
+                    JSONObject temp = new JSONObject();
+                    JSONObject event = (JSONObject) jsonStates.getJSONObject(j).getJSONArray("Event").get(i);
+
+                    temp.put("eventId", UUID.randomUUID().toString());
+                    temp.put("name", event.getStr("name"));
+                    temp.put("description", event.getStr("description"));
+//                    temp.put("optional", event.getStr("optional"));
+                    if (!event.containsKey("optional")) {
+                        temp.put("isOptional", true);
+                    }else{
+                        if (event.getStr("optional").equals("False") || event.getStr("optional").equals(false)) {
+                            temp.put("isOptional", false);
+                        }
+                        if (event.getStr("optional").equals("True") || event.getStr("optional").equals(true)) {
+                            temp.put("isOptional", true);
+                        }
+                    }
+
+
+                    if (event.containsKey("ResponseParameter")) {
+                        String datasetReference = ((JSONObject) event.getJSONArray("ResponseParameter").get(0)).getStr("datasetReference");
+                        for (int a = 0; a < datasetItem.size(); a++) {
+                            JSONObject item = (JSONObject) datasetItem.get(a);
+                            //新增是否为参数or文件
+                            item = Utils.judgeIsParam(item);
+                            if (item.getStr("name").equals(datasetReference)) {
+                                event.put("datasetItem", item);
+                            }
+                        }
+                    }
+
+                    if (event.containsKey("DispatchParameter")) {
+                        String datasetReference = ((JSONObject) event.getJSONArray("DispatchParameter").get(0)).getStr("datasetReference");
+                        for (int a = 0; a < datasetItem.size(); a++) {
+                            JSONObject item = (JSONObject) datasetItem.get(a);
+                            if (item.getStr("name").equals(datasetReference)) {
+                                event.put("datasetItem", item);
+                            }
+                        }
+                    }
+
+                    if (event.containsKey("ControlParameter")) {
+                        String datasetReference = ((JSONObject) event.getJSONArray("ControlParameter").get(0)).getStr("datasetReference");
+                        for (int a = 0; a < datasetItem.size(); a++) {
+                            JSONObject item = (JSONObject) datasetItem.get(a);
+                            //新增是否为参数or文件
+                            item = Utils.judgeIsParam(item);
+                            if (item.getStr("name").equals(datasetReference)) {
+                                event.put("datasetItem", item);
+                            }
+                        }
+                    }
+
+
+                    if (event.getStr("type").equals("response")) {
+                        if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
+                            temp.put("tooltip", event.getJSONObject("datasetItem").getStr("datasetReference"));
+                            stateJson.getJSONArray("parameters").add(temp);//judge input
+                        } else {
+                            stateJson.getJSONArray("inputs").add(temp);//judge input
+                        }
+                    }
+
+                    if (event.getStr("type").equals("noresponse")) {
+                        stateJson.getJSONArray("outputs").add(temp);//judge parameter
+                    }
+                }
+
+                states.add(stateJson);
+            }
+            result.put("behavior",states);
+
+//            result.getJSONObject("behavior").put(states);
+            return result;
+
+
+    }
+
+    public static JSONObject convertMdlNew(JSONObject data){
         JSONObject jsonObject = data.getJSONObject("mdlJson");
 
         JSONObject result = new JSONObject();
+//        Model modelResult = new ;
         result.put("name", data.getStr("name"));
         result.put("md5",data.getStr("md5"));
         result.put("description",data.getStr("overview"));
-        result.put("states",new JSONArray());
+        result.put("behavior", new ModelBehavior());
+
+
+        ModelBehavior behavior = new ModelBehavior();
+        List<State> states = new ArrayList<>();
+//        stateJson.setStates();
+
+
+//        result.put("states",new JSONArray());
 
         JSONArray jsonStates = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0).getJSONArray("States").getJSONObject(0).getJSONArray("State");
         JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
-
         for (int j = 0; j < jsonStates.size(); j++) {
-            JSONObject stateJson = new JSONObject();
-            stateJson.put("stateId",  jsonStates.getJSONObject(j).getStr("id"));
-            stateJson.put("name",  jsonStates.getJSONObject(j).getStr("name"));
-            stateJson.put("description",  jsonStates.getJSONObject(j).getStr("description"));
-            stateJson.put("inputs", new JSONArray());
-            stateJson.put("outputs", new JSONArray());
-            stateJson.put("parameters", new JSONArray());
+            State stateJson = new State();
+            stateJson.setStateId( jsonStates.getJSONObject(j).getStr("id"));
+            stateJson.setName( jsonStates.getJSONObject(j).getStr("name"));
+            stateJson.setDescription( jsonStates.getJSONObject(j).getStr("description"));
+//            stateJson.setInputs();
+
+
+            List<ModelEvent> inputs = new ArrayList<>();
+            List<ModelEvent> outputs = new ArrayList<>();
+            List<Parameter> parameters = new ArrayList<>();
 
             for (int i = 0; i < jsonStates.getJSONObject(j).getJSONArray("Event").size(); i++) {
+                ModelEvent inputEvent = new ModelEvent();
+                ModelEvent outputEvent = new ModelEvent();
+                Parameter parameterEvent = new Parameter();
+
+
                 JSONObject temp = new JSONObject();
                 JSONObject event = (JSONObject) jsonStates.getJSONObject(j).getJSONArray("Event").get(i);
 
@@ -44,11 +170,13 @@ public class Utils {
                 temp.put("optional", event.getStr("optional"));
 
                 if (event.getStr("optional").equals("False") || event.getStr("optional").equals(false)) {
-                    temp.put("optional", "false");
+                    temp.put("optional", false);
                 }
                 if (event.getStr("optional").equals("True") || event.getStr("optional").equals(true)) {
-                    temp.put("optional", "true");
+                    temp.put("optional", true);
                 }
+
+
 
                 if (event.containsKey("ResponseParameter")) {
                     String datasetReference = ((JSONObject) event.getJSONArray("ResponseParameter").get(0)).getStr("datasetReference");
@@ -85,22 +213,46 @@ public class Utils {
 
                 if (event.getStr("type").equals("response")) {
                     if(event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")){
-                        temp.put("tooltip",event.getJSONObject("datasetItem").getStr("datasetReference"));
-                        stateJson.getJSONArray("parameters").add(temp);//judge input
+                        parameterEvent.setEventId(UUID.randomUUID().toString());
+                        parameterEvent.setDescription(event.getStr("description"));
+                        parameterEvent.setName(event.getStr("name"));
+                        parameterEvent.setIsOptional(temp.getBool("optional"));
+                        parameterEvent.setTooltip(event.getJSONObject("datasetItem").getStr("datasetReference"));
+
                     }else{
-                        stateJson.getJSONArray("inputs").add(temp);//judge input
+                        inputEvent.setEventId(UUID.randomUUID().toString());
+                        inputEvent.setDescription(event.getStr("description"));
+                        inputEvent.setName(event.getStr("name"));
+                        inputEvent.setIsOptional(temp.getBool("optional"));
+
+//                        inputEvent.setEventId();
                     }
                 }
 
                 if (event.getStr("type").equals("noresponse")) {
-                    stateJson.getJSONArray("outputs").add(temp);//judge parameter
+                    outputEvent.setEventId(UUID.randomUUID().toString());
+                    outputEvent.setDescription(event.getStr("description"));
+                    outputEvent.setName(event.getStr("name"));
+                    outputEvent.setIsOptional(temp.getBool("optional"));
                 }
+
+                inputs.add(inputEvent);
+                outputs.add(outputEvent);
+                parameters.add(parameterEvent);
             }
-            result.getJSONArray("states").add(stateJson);
+
+            stateJson.setInputs(inputs);
+            stateJson.setOutputs(outputs);
+            stateJson.setParameters(parameters);
+            states.add(stateJson);
+
         }
+        behavior.setStates(states);
+
         return result;
 
     }
+
 
     public static JSONObject judgeIsParam(JSONObject datasetItem){
         boolean flag = datasetItem.containsKey("UdxDeclaration");

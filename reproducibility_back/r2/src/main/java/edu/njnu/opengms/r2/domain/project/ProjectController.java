@@ -22,7 +22,6 @@ public class ProjectController {
     @Autowired
     ProjectService projectService;
 
-
     //create one project
     @RequestMapping(value = "", method = RequestMethod.POST)
     public JsonResult create(@JwtTokenParser(key = "userId") String userId, @RequestBody JSONObject jsonObject) {

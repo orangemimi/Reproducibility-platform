@@ -1,6 +1,6 @@
 package edu.njnu.opengms.r2.domain.project.modelInstance;
 
-import edu.njnu.opengms.r2.domain.model.ModelInfo;
+import edu.njnu.opengms.r2.domain.model.Model;
 import lombok.Data;
 
 /**
@@ -11,6 +11,6 @@ import lombok.Data;
  */
 @Data
 public class ModelInstance {
-    ModelInfo modelResource;
+    Model modelResource;
 //    String
 }

@@ -1,23 +1,56 @@
 <template>
   <div>
     <el-card class="box-card" v-if="type != 'Model'">
-      <img :src="imgPath(item.snapshot, item.name)" />
-      <div class="content">
-        <h3 class="title" :title="item.name">{{ item.name }}</h3>
-        <p class="desc" :title="item.des">{{ item.description }}</p>
-      </div>
-      <el-button class="config-btn" type="text" @click="view(item.id)">View</el-button>
+      <el-col :span="4">
+        <img :src="imgPath(item.snapshot, item.name)" />
+      </el-col>
+      <el-col :span="20">
+        <div class="content">
+          <h3 class="title" :title="item.name">{{ item.name }}</h3>
+          <p class="desc" :title="item.description">{{ item.description }}</p>
+        </div>
+        <el-button
+          class="config-btn"
+          type="success"
+          @click="view(item.id)"
+          icon="el-icon-shopping-cart-2"
+        ></el-button>
+      </el-col>
     </el-card>
 
-    <el-card class="box-card" v-if="type == 'Model'" :style="select ? 'box-shadow: 0px 0px 20px #666;' : ''">
-      <img :src="'http://geomodeling.njnu.edu.cn' + item.image" v-if="item.image != ''" />
-      <img src="http://geomodeling.njnu.edu.cn/static/img/model/model.png" alt="" v-else />
-      <div class="content">
-        <h3 class="title" :title="item.name">{{ item.name }}</h3>
-        <p class="desc" :title="item.des">{{ item.description }}</p>
-      </div>
-      <el-button class="config-btn" type="text" @click="modelView">View</el-button>
-      <el-button type="text primary" @click="selectClick" :style="select ? 'float: right;color: red;' : 'float: right'">
+    <el-card
+      class="box-card"
+      v-if="type == 'Model'"
+      :style="select ? 'box-shadow: 0px 0px 20px #666;' : ''"
+    >
+      <el-col :span="6">
+        <img
+          :src="'http://geomodeling.njnu.edu.cn' + item.snapshot"
+          v-if="item.snapshot != '' && item.snapshot != null"
+        />
+        <!-- <img src="@/assets/images/model.png" alt="" v-else /> -->
+        <img :src="imgPath(item.snapshot, item.name)" v-else />
+      </el-col>
+      <el-col :span="18">
+        <div class="content">
+          <h4 class="title" :title="item.name">{{ item.name }}</h4>
+          <div class="desc" :title="item.description">
+            {{ item.description }}
+          </div>
+        </div>
+        <el-button
+          class="config-btn"
+          @click="view(item.id)"
+          icon="el-icon-shopping-cart-2"
+          circle
+        ></el-button>
+      </el-col>
+
+      <el-button
+        type="text primary"
+        @click="selectClick"
+        :style="select ? 'float: right;color: red;' : 'float: right'"
+      >
         <i class="iconfont icon-gouwuche" v-if="select == false"></i>
         <el-badge :value="badgeNum" :max="10" class="item" v-else>
           <i class="iconfont icon-gouwuche"></i>
@@ -26,42 +59,52 @@
     </el-card>
     <el-dialog :visible.sync="dialogVisible" width="30%">
       <el-row :gutter="20">
-        <el-col :span="6" v-for="(model, index) in computableModels" :key="index">
+        <el-col
+          :span="6"
+          v-for="(model, index) in computableModels"
+          :key="index"
+        >
           <div
             :class="selectNum == index ? 'modelCard select' : 'modelCard'"
             @click="getDescription(index)"
-            :style="selectNumArr[index] == 1 ? 'background-color: #D0FF00;' : ''"
+            :style="
+              selectNumArr[index] == 1 ? 'background-color: #D0FF00;' : ''
+            "
           >
             {{ model.name }}
           </div>
         </el-col>
       </el-row>
-      <div class="des">
+      <div class="description">
         {{ description }}
       </div>
       <div class="btn">
-        <el-button type="primary" plain size="mini" @click="confirm">confirm</el-button>
-        <el-button type="primary" plain size="mini" @click="cancel">cancel</el-button>
+        <el-button type="primary" plain size="mini" @click="confirm"
+          >confirm</el-button
+        >
+        <el-button type="primary" plain size="mini" @click="cancel"
+          >cancel</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { imgBase64 } from '@/lib/utils';
-import { getComputableModels } from '@/api/request';
+import { imgBase64 } from "@/lib/utils";
+import { getComputableModels } from "@/api/request";
 export default {
-  props: ['item', 'type'],
+  props: ["item", "type"],
   data() {
     return {
       select: false,
       computableModels: [],
       dialogVisible: false,
-      description: '',
+      description: "",
       selectNum: -1,
       selectNumArr: [],
       selectArr: [],
-      badgeNum: 0
+      badgeNum: 0,
     };
   },
   watch: {
@@ -76,23 +119,26 @@ export default {
             this.select = false;
           }
         }
-      }
+      },
     },
-    '$store.state.user.selectNum': {
+    "$store.state.user.selectNum": {
       handler(val) {
         if (val == 0) {
           this.select = false;
           this.badgeNum = 0;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     init() {
       if (localStorage.selectModels != undefined) {
         let temp = JSON.parse(localStorage.selectModels);
         for (let i = 0; i < temp.modelItem.length; i++) {
-          if (this.item.oid == temp.modelItem[i].id && temp.modelItem[i].count > 0) {
+          if (
+            this.item.oid == temp.modelItem[i].id &&
+            temp.modelItem[i].count > 0
+          ) {
             this.select = true;
             this.badgeNum = temp.modelItem[i].count;
             break;
@@ -107,13 +153,12 @@ export default {
         return imgBase64(name);
       }
     },
-    view(id) {
-      this.$router.push({
-        path: `/resource/${id}/${this.type}`
-      });
-    },
+
     modelView() {
-      window.open('http://geomodeling.njnu.edu.cn/modelItem/' + this.item.oid, '_blank');
+      window.open(
+        "http://geomodeling.njnu.edu.cn/modelItem/" + this.item.oid,
+        "_blank"
+      );
     },
     async selectClick() {
       await this.getComputableModels();
@@ -140,9 +185,9 @@ export default {
           this.dialogVisible = true;
         } else {
           this.$notify({
-            title: 'Warning',
-            message: 'The model has no computing resources!',
-            type: 'warning'
+            title: "Warning",
+            message: "The model has no computing resources!",
+            type: "warning",
           });
         }
       }
@@ -155,7 +200,7 @@ export default {
       this.selectNum = index;
       if (this.selectNumArr[index] == 1) {
         this.selectNumArr.splice(index, 1, -1);
-        this.description = '';
+        this.description = "";
       } else {
         this.selectNumArr.splice(index, 1, 1);
         this.description = this.computableModels[index].description;
@@ -168,11 +213,11 @@ export default {
           this.selectArr.push(this.computableModels[index]);
         }
       });
-      let temp = '';
+      let temp = "";
       if (localStorage.selectModels == undefined) {
         temp = {
           modelItem: [],
-          computableModels: []
+          computableModels: [],
         };
       } else {
         temp = JSON.parse(localStorage.selectModels);
@@ -200,25 +245,28 @@ export default {
           temp.computableModels.push({
             name: this.selectArr[i].name,
             doi: this.selectArr[i].doi,
-            image: this.item.image,
-            md5: this.selectArr[i].md5
+            snapshot: this.item.snapshot,
+            md5: this.selectArr[i].md5,
           });
         }
         if (this.badgeNum == 0) {
           temp.modelItem.push({
             id: this.item.oid,
-            count: this.selectArr.length
+            count: this.selectArr.length,
           });
         } else {
-          temp.modelItem.forEach(item => {
+          temp.modelItem.forEach((item) => {
             if (item.id == this.item.oid) {
               item.count = this.selectArr.length;
             }
           });
         }
       }
-      localStorage.setItem('selectModels', JSON.stringify(temp));
-      this.$store.state.user.selectNum = this.$store.state.user.selectNum + this.selectArr.length - this.badgeNum;
+      localStorage.setItem("selectModels", JSON.stringify(temp));
+      this.$store.state.user.selectNum =
+        this.$store.state.user.selectNum +
+        this.selectArr.length -
+        this.badgeNum;
       if (this.selectArr.length > 0) {
         this.select = true;
         this.badgeNum = this.selectArr.length;
@@ -231,38 +279,42 @@ export default {
     },
     cancel() {
       this.dialogVisible = false;
-    }
+    },
   },
   mounted() {
     this.init();
     // console.log(this.item)
     // console.log(this.item.snapshot)
-  }
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .box-card {
   margin: 10px 2%;
-  width: 300px;
-  min-height: 275px;
+  width: 95%;
   transition: box-shadow 0.1s ease;
 
-  .el-card__body {
-    padding: 0;
+  height: 120px;
+  /* 相对定位 */
+  position: relative;
+  /deep/.el-card__body {
+    padding: 10px;
   }
   .content {
-    padding: 10px 18px;
+    padding: 5px;
     word-wrap: break-word;
-    min-height: 115px;
-    max-height: 115px;
+    width: 86%;
+    min-height: 40px;
+    max-height: 40px;
     .title,
     .desc {
-      max-height: 44px;
+      max-height: 40px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
+      font-size: 8px;
     }
   }
 
@@ -272,11 +324,20 @@ export default {
   img {
     width: 100%;
     object-fit: cover;
-    height: 200px;
+    height: 100px;
   }
   .config-btn {
-    float: right;
-    margin: 0px 20px;
+    margin-bottom: 0;
+    height: 40px;
+    /* 绝对定位 */
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    // position: relative; //将button按钮固定在页面底部，注意，：和；是英文的哦，一定不要写成中文哦。
+    // bottom: 5px;
+    // float: ;
+    // margin: 0px 0px;
+    // padding: 10px;
   }
 }
 .modelCard {
@@ -292,13 +353,13 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
-  font-size: 10px;
+  font-size: 8px;
   padding: 0px 5px;
 }
 .modelCard:hover {
   cursor: pointer;
 }
-.des {
+.description {
   margin-top: 20px;
 }
 .select {

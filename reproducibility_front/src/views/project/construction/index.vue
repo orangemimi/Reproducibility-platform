@@ -18,7 +18,7 @@
 // import recordList from '_com/RecordList';
 import EchartFlow from "./EchartFlow/index";
 
-import { getProjectAndUsers, getPerformanceByProjectId } from "@/api/request";
+import { getProjectAndUsers } from "@/api/request";
 import { dateFormat } from "@/utils/utils";
 export default {
   components: {
@@ -40,7 +40,6 @@ export default {
   methods: {
     async init() {
       await this.getProjectInfo();
-      await this.getPerformance();
       // await this.judgeRole(this.projectInfo);
     },
 
@@ -52,10 +51,6 @@ export default {
       this.members = data.members;
     },
 
-    async getPerformance() {
-      let data = await getPerformanceByProjectId(this.projectId);
-      this.completion = data.completion;
-    },
     dateFormat(time) {
       if (time == null) {
         return "You have not do any operation";

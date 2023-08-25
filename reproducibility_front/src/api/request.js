@@ -81,9 +81,9 @@ export async function getUserProjects() {
 //----------------------------------------------------projects-----------------------------------------
 
 //获取project的star数
-export async function getStarredCount(projectId) {
-  return await get(`/projects/getStarredCount/${projectId}`);
-}
+// export async function getStarredCount(projectId) {
+//   return await get(`/projects/getStarredCount/${projectId}`);
+// }
 
 export async function getProjectAndUsers(projectId) {
   return await get(`/projects/user/${projectId}`);
@@ -554,12 +554,20 @@ export async function getUserFileByFidAndStorey(fid, storey) {
 
 //-------------------------------------------modelitems--------------------------------------------------
 
-export async function getAllModelItems(currentPage, pagesize) {
-  return await get(`/modelItems/${currentPage}/${pagesize}`);
+export async function getModelsByPrivacy(privacy, currentPage, pagesize) {
+  return await get(
+    `/models/getPublicModels/${privacy}/${currentPage}/${pagesize}`
+  );
 }
 
-export async function getModelItemsByPrivacy(privacy, currentPage, pagesize) {
-  return await get(`/modelItems/${privacy}/${currentPage}/${pagesize}`);
+export async function getAllPublicModels() {
+  return await get(`/models/allPublic`);
+}
+
+//---
+
+export async function getAllModelItems(currentPage, pagesize) {
+  return await get(`/modelItems/${currentPage}/${pagesize}`);
 }
 
 export async function getModelItemsByProvider(currentPage, pagesize) {

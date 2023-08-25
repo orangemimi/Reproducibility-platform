@@ -1,10 +1,10 @@
 import Identicon from "identicon.js";
 import jsSHA from "jssha";
 
-export const getParams = url => {
+export const getParams = (url) => {
   const keyValueArr = url.split("?")[1].split("&");
   let paramObj = {};
-  keyValueArr.forEach(item => {
+  keyValueArr.forEach((item) => {
     const keyValue = item.split("=");
     paramObj[keyValue[0]] = keyValue[1];
   });
@@ -42,7 +42,7 @@ export const getUnion = (arr1, arr2) => {
  * @description 判断要查询的数组是否至少有一个元素包含在目标数组中
  */
 export const hasOneOf = (targetarr, arr) => {
-  return targetarr.some(_ => arr.indexOf(_) > -1);
+  return targetarr.some((_) => arr.indexOf(_) > -1);
 };
 
 /**
@@ -119,7 +119,7 @@ export const objEqual = (obj1, obj2) => {
   if (keysArr1.length !== keysArr2.length) return false;
   else if (keysArr1.length === 0 && keysArr2.length === 0) return true;
   /* eslint-disable-next-line */ else
-    return !keysArr1.some(key => obj1[key] != obj2[key]);
+    return !keysArr1.some((key) => obj1[key] != obj2[key]);
 };
 
 export const dateFormat = (date, format) => {
@@ -133,7 +133,7 @@ export const dateFormat = (date, format) => {
     "m+": dateObj.getMinutes(), //分
     "s+": dateObj.getSeconds(), //秒
     "q+": Math.floor((dateObj.getMonth() + 3) / 3), //季度
-    S: dateObj.getMilliseconds() //毫秒
+    S: dateObj.getMilliseconds(), //毫秒
   };
   if (/(y+)/.test(fmt))
     fmt = fmt.replace(
@@ -149,7 +149,7 @@ export const dateFormat = (date, format) => {
   return fmt;
 };
 
-export const imgBase64 = name => {
+export const imgBase64 = (name) => {
   let shaObj = new jsSHA("SHA-512", "TEXT");
   shaObj.update(name);
   var hash = shaObj.getHash("HEX");

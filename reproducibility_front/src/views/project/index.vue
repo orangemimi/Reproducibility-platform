@@ -13,10 +13,11 @@
             }}</el-breadcrumb-item>
           </el-breadcrumb>
         </el-col>
-        <el-col class="info-btn" :span="14">
+        <!-- TODO-zzy -->
+        <!-- <el-col class="info-btn" :span="14">
           <star-btn class="star"></star-btn>
           <watch-btn :count="projectInfo.watchCount" class="watch"></watch-btn>
-        </el-col>
+        </el-col> -->
       </div>
 
       <div class="menu">
@@ -35,16 +36,20 @@
 
 <script>
 import { getProjectAndUsers, forkProject } from "@/api/request";
-import { judgeRole } from "@/api/requestVuex";
-import watchBtn from "_com/PageHeaderBtn/WatchBtn";
-import starBtn from "_com/PageHeaderBtn/StarBtn";
+// import { judgeRole } from "@/api/requestVuex";
+// import watchBtn from "_com/PageHeaderBtn/WatchBtn";
+// import starBtn from "_com/PageHeaderBtn/StarBtn";
 // import folkBtn from "_com/PageHeaderBtn/FolkBtn";
 import builderMenu from "./components/BuilderMenu";
 import reBuilderMenu from "./components/ReBuilderMenu";
 import { mapState } from "vuex";
 
 export default {
-  components: { watchBtn, starBtn, builderMenu, reBuilderMenu },
+  components: {
+    // watchBtn, starBtn,
+    builderMenu,
+    reBuilderMenu,
+  },
 
   async beforeRouteUpdate(to, from, next) {
     this.projectId = to.params.id;
@@ -68,7 +73,13 @@ export default {
   methods: {
     async init() {
       await this.getProjectInfo();
-      await judgeRole(this.projectInfo, this.user.userId);
+      await this.judgeRole(this.projectInfo, this.user.userId);
+    },
+    async judgeRole(project, userId) {
+      await this.$store.dispatch("permission/getRole", {
+        project: project,
+        userId: userId,
+      });
     },
 
     async getProjectInfo() {

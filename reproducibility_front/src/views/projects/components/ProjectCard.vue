@@ -7,7 +7,7 @@
 
     <el-card class="box-card">
       <div @click="judgeRole(project)">
-        <img :src="imgPath(project.picture, project.name)" />
+        <!-- <img :src="imgPath(project.picture, project.name)" /> -->
 
         <div class="content">
           <h3 class="title" :title="project.name">{{ project.name }}</h3>
@@ -93,14 +93,10 @@ export default {
     },
 
     async judgeRole(project) {
-      // console.log(this.role);
-      // await this.$store.dispatch("permission/getRole", {
-      //   project: project,
-      //   userId: this.userId,
-      // });
-      // console.log(this.role);
-
-      this.$router.push({ path: `/project/${project.id}/info` });
+      await this.$store.dispatch("permission/getRole", {
+        project: project,
+        userId: this.userId,
+      });
     },
   },
 

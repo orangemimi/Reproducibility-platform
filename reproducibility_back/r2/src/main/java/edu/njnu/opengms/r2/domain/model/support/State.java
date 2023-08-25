@@ -18,5 +18,4 @@ public class State {
     List<ModelEvent> inputs;
     List<ModelEvent> outputs;
     List<Parameter> parameters;
-
 }

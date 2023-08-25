@@ -11,7 +11,7 @@ const mutations = {
 
 const actions = {
   getRole({ commit }, { project, userId }) {
-    debugger;
+    // debugger;
     return new Promise((resolve) => {
       // debugger;
       if (project.creatorId == userId) {

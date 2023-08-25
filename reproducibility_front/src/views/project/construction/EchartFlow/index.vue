@@ -7,16 +7,17 @@
     ></div>
 
     <el-dialog
-      title="Resource selection"
+      title="Public resource selection"
       :visible.sync="resourceCollectVisible"
       width="60%"
     >
-      <div class="main-container">
+      <TransferPage :group="2" :districtListMock="modelList"></TransferPage>
+      <!-- <div class="main-container">
         <template>
           <h4>Data services</h4>
 
           <el-transfer
-            v-model="resourceCollectWithId.dataServices"
+            v-model="resourceCollectWithId.dataList"
             :data="allDataServices"
             :titles="['All', 'Selected']"
             :filter-method="filterMethod"
@@ -31,7 +32,7 @@
           <el-divider></el-divider>
           <h4>Model services</h4>
           <el-transfer
-            v-model="resourceCollectWithId.modelServices"
+            v-model="resourceCollectWithId.modelList"
             :data="allModelServices"
             :titles="['All', 'Selected']"
             :filter-method="filterMethod"
@@ -43,7 +44,7 @@
             "
           ></el-transfer>
         </template>
-      </div>
+      </div> -->
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="resourceCollectVisible = false">Cancle</el-button>
@@ -59,20 +60,25 @@
 import config from "@/config";
 import { get, put } from "@/axios";
 import echarts from "echarts";
+import TransferPage from "../components/TransferPage.vue";
 import { mapState } from "vuex";
-import { getProjectById } from "@/api/request";
+import { getProjectById, getAllPublicModels } from "@/api/request";
 export default {
+  components: {
+    TransferPage,
+  },
+
   data() {
     return {
-      id: this.$route.params.id,
+      id: this.$route.params.id, //projectId
       project: {},
       active: 0,
       avtiveTab: "manage",
-      resourceCollect: {},
+      resourceCollection: {},
       resourceCollectVisible: false,
       evaluationVisible: false,
       evaluationService: {},
-      modelServices: [],
+      modelList: [],
       contextDefine: {
         theme: {
           name: null,
@@ -85,16 +91,10 @@ export default {
         },
       },
       contextVisible: false,
-      typeList: [
-        // "Context definition",
-        // "Geographic simulation construction",
-        "Resource collection",
-        "Computational process construction",
-        // "Simulation  evaluation"
-      ],
+      typeList: ["Resource collection", "Computational process construction"],
       chart: {},
       contentHeight: window.innerHeight - 200,
-      dataServices: [],
+      dataList: [],
       choosenDataServices: [],
       ops: {
         bar: {
@@ -107,8 +107,8 @@ export default {
       selectedDataServices: [],
       selectedModelServices: [],
       resourceCollectWithId: {
-        modelServices: [],
-        dataServices: [],
+        modelList: [],
+        dataList: [],
       },
     };
   },
@@ -121,9 +121,9 @@ export default {
     },
     selectChange(value, type) {
       if (type == "data") {
-        this.resourceCollect.dataServices = value;
+        this.resourceCollection.dataList = value;
       } else {
-        this.resourceCollect.modelServices = value;
+        this.resourceCollection.modelList = value;
       }
     },
 
@@ -237,19 +237,20 @@ export default {
     },
 
     async getModelServices() {
-      this.resourceCollectWithId.modelServices = this.resourceCollect.modelServices;
+      if (this.resourceCollection != null) {
+        this.resourceCollectWithId.modelList = this.resourceCollection.modelList;
+      }
 
       try {
-        let { data } = await get("/model_service/all", null, null, false);
-
+        let data = await getAllPublicModels();
         data.forEach((item) => {
           item.label = item.name;
           item.key = item.id;
 
-          if (this.resourceCollect.modelServices == null) {
+          if (this.resourceCollection.modelList == null) {
             item.isSelected = false;
           } else {
-            this.resourceCollect.modelServices.forEach((select) => {
+            this.resourceCollection.modelList.forEach((select) => {
               if (select.id == item.id) {
                 item.isSelected = true;
               } else {
@@ -268,14 +269,14 @@ export default {
 
     async getDataServices() {
       //Todo 后面直接g2s就应该包含这些信息
-      let dataServices = await get("/project/{id}/dataServices", null, {
+      let dataList = await get("/project/{id}/dataList", null, {
         id: this.id,
       });
 
-      if (dataServices != null) {
-        if (dataServices.originalDataServices != null) {
-          dataServices.originalDataServices.forEach((el) => {
-            this.dataServices.push({
+      if (dataList != null) {
+        if (dataList.originalDataServices != null) {
+          dataList.originalDataServices.forEach((el) => {
+            this.dataList.push({
               key: el.id,
               label: el.name,
               id: el.id,
@@ -285,9 +286,9 @@ export default {
           });
         }
 
-        if (dataServices.intermediateDataServices != null) {
-          dataServices.intermediateDataServices.forEach((el) => {
-            this.dataServices.push({
+        if (dataList.intermediateDataServices != null) {
+          dataList.intermediateDataServices.forEach((el) => {
+            this.dataList.push({
               key: el.id,
               label: el.name,
               id: el.id,
@@ -297,9 +298,9 @@ export default {
         }
       }
 
-      this.resourceCollect.dataServices = this.dataServices;
+      this.resourceCollection.dataList = this.dataList;
 
-      this.resourceCollectWithId.dataServices = this.dataServices.map(
+      this.resourceCollectWithId.dataList = this.dataList.map(
         (item) => item.key
       );
 
@@ -308,7 +309,7 @@ export default {
         item.label = item.name;
         item.key = item.id;
 
-        this.resourceCollect.dataServices.forEach((select) => {
+        this.resourceCollection.dataList.forEach((select) => {
           if (select.id == item.id) {
             item.isSelected = true;
           } else {
@@ -335,7 +336,7 @@ export default {
       this.project = await put(
         "/project/{id}",
         {
-          resourceCollect: this.resourceCollectWithId,
+          resourceCollection: this.resourceCollectWithId,
         },
         {
           id: this.id,
@@ -350,17 +351,18 @@ export default {
   },
   async mounted() {
     this.project = await getProjectById(this.$route.params.id);
-    if (this.project.contextDefine !== null) {
-      this.contextDefine = this.project.contextDefine;
-    }
-    if (this.project.resourceCollect != null) {
-      this.resourceCollect = this.project.resourceCollect;
+    // console.log(this.project);
+    if (
+      this.project.workspace != null &&
+      this.project.workspace.resourceCollection != null
+    ) {
+      this.resourceCollection = this.project.workspace.resourceCollection;
     }
     this.initEchart();
+    this.getModelServices();
 
     this.getDataServices();
     // this.getData();
-    this.getModelServices();
   },
 };
 </script>

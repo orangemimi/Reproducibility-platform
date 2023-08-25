@@ -2,6 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "@/router";
 import ElementUI from "element-ui";
+import locale from "element-ui/lib/locale/lang/en"; //修改成英文
 import store from "@/store";
 import "element-ui/lib/theme-chalk/index.css";
 import { errorHandler } from "@/lib/error";
@@ -15,7 +16,7 @@ import "./assets/variable.scss";
 import vuescroll from "vuescroll";
 
 Vue.config.productionTip = false;
-Vue.use(ElementUI);
+Vue.use(ElementUI, { locale });
 Vue.use(mavonEditor);
 Vue.use(vuescroll);
 

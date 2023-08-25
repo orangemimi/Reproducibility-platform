@@ -2,9 +2,9 @@ package edu.njnu.opengms.r2.domain.model.dto;
 
 import edu.njnu.opengms.common.dto.ToDomainConverter;
 import edu.njnu.opengms.common.entity.AgentInfo;
-import edu.njnu.opengms.r2.domain.model.ModelInfo;
+import edu.njnu.opengms.r2.domain.model.Model;
 import edu.njnu.opengms.r2.domain.model.support.Dependency;
-import edu.njnu.opengms.r2.domain.model.support.ModelBehavior;
+import edu.njnu.opengms.r2.domain.model.support.State;
 import lombok.Data;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  * @Version 1.0.0
  */
 @Data
-public class AddModelInfoDTO implements ToDomainConverter<ModelInfo> {
+public class AddModelInfoDTO implements ToDomainConverter<Model> {
     String name;
     String description;
 
@@ -36,8 +36,10 @@ public class AddModelInfoDTO implements ToDomainConverter<ModelInfo> {
 
 
     //service
-    ModelBehavior behavior;
+//    ModelBehavior behavior;
+    List<State> behavior;
     String md5;
+    String serviceId;
     String sponsor;
 
     //code

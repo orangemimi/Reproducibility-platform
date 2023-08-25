@@ -33,27 +33,35 @@
         </el-row>
       </div>
     </div>
+    <div style="text-align: center;">
+      <el-pagination
+        layout="prev, pager, next, jumper"
+        :total="total"
+        small
+        :pager-count="5"
+        :page-size="20"
+        :current-page="1"
+        @current-change="currentChange"
+      ></el-pagination>
+
+      <!-- <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="currentPage3"
+      :page-size="100"
+      layout="prev, pager, next, jumper"
+      :total="1000">
+    </el-pagination> -->
+    </div>
 
     <div class="main">
       <div class="main-container">
         <el-row>
-          <el-col :span="4" v-for="(item, index) in data" :key="index">
-            <serviceCard :item="item" type="Model"></serviceCard>
+          <el-col :span="6" v-for="(item, index) in data" :key="index">
+            <serviceCard :item="item" type="Model" @click="view"></serviceCard>
           </el-col>
         </el-row>
       </div>
-    </div>
-    <div style="text-align: center;">
-      <el-pagination
-        layout="prev, pager, next"
-        :total="total"
-        background
-        small
-        :pager-count="5"
-        :page-size="12"
-        :current-page="1"
-        @current-change="currentChange"
-      ></el-pagination>
     </div>
 
     <!-- add model -->
@@ -69,7 +77,7 @@
 </template>
 
 <script>
-import { getAllModelItems, getModelList } from "@/api/request";
+import { getAllModelItems, getModelsByPrivacy } from "@/api/request";
 import serviceCard from "_com/Cards/ServiceCard";
 import createModel from "./create";
 export default {
@@ -97,36 +105,32 @@ export default {
     },
   },
   methods: {
-    async getModelList() {
-      let params = {
-        page: 0,
-        pageSize: 12,
-        searchText: "",
-      };
-      let result = await getModelList(params);
-      this.total = result.data.total;
-      this.data = result.data.list;
+    view(item) {
+      this.$router.push({
+        path: `/resource/${item}/${this.type}`,
+      });
+    },
+    async getPublicModels(val) {
+      let data = await getModelsByPrivacy("public", val, 20);
+      console.log(data);
+      this.total = data.totalElements;
+      this.data = data.content;
     },
     init() {
-      this.getModelList();
+      this.getPublicModels(0);
     },
     async currentChange(val) {
-      let params = {
-        page: val - 1,
-        pageSize: 12,
-        searchText: "",
-      };
-      this.data = (await getModelList(params)).data.list;
+      this.data = (await getModelsByPrivacy("public", val - 1, 20)).content;
     },
     async searchData() {
       // this.pageFilter.page = 0;
       // this.getData();
       let params = {
         page: 0,
-        pageSize: 12,
+        pageSize: 20,
         searchText: this.value,
       };
-      let result = await getModelList(params);
+      let result = await getModelsByPrivacy(params);
       (this.total = result.data.total), (this.data = result.data.list);
     },
 
@@ -175,7 +179,7 @@ export default {
           object-fit: cover;
           //obackground-size: cover;
           width: 100%;
-          height: calc(100vh - 500px);
+          height: calc(100vh - 800px);
           filter: brightness(0.8);
         }
       }
@@ -184,7 +188,7 @@ export default {
     .top-info {
       position: absolute;
       left: 50%;
-      top: 45%;
+      top: 50%;
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;

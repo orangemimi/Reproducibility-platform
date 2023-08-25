@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 public class ResourceCollection {
-    List<String> dataResourceList;
-    List<String> modelResourceList;
+    List<String> dataList;
+    List<String> modelList;
 //    List<String> reproducedDataResourceList;
 }

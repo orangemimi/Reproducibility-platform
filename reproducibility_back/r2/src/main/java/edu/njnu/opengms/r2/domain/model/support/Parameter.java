@@ -21,6 +21,8 @@ import lombok.Data;
 })
 public class Parameter {
     public String name;
+    public String eventId;
+    public Boolean isOptional=false;
     public String type;
     public String description;
     public String tooltip;
