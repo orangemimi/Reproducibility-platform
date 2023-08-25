@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="box" style="width: 900px; height: 1200px">
-      <programol></programol>
-    </div>
+    <el-card class="card"> <programol></programol></el-card>
   </div>
 </template>
 
@@ -15,5 +13,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less" scoped>
+.card {
+  width: 900px;
+  margin-left: 500px;
+}
 </style>
