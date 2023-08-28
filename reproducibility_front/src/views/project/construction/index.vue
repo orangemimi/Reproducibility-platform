@@ -7,8 +7,13 @@
       :lg="{ span: 18, offset: 3 }"
     >
     </el-col>
-    <el-row>
-      <echart-flow></echart-flow>
+    <el-row v-show="!showProcessesPage">
+      <echart-flow @getProcessesPageFlag="getProcessesPageFlag"></echart-flow>
+    </el-row>
+    <el-row v-show="showProcessesPage">
+      <computational-processes
+        @getProcessesPageFlag="getProcessesPageFlag"
+      ></computational-processes>
     </el-row>
   </div>
 </template>
@@ -18,11 +23,14 @@
 // import recordList from '_com/RecordList';
 import EchartFlow from "./EchartFlow/index";
 
+import ComputationalProcesses from "./Compute";
+
 import { getProjectAndUsers } from "@/api/request";
 import { dateFormat } from "@/utils/utils";
 export default {
   components: {
     EchartFlow,
+    ComputationalProcesses,
   },
   data() {
     return {
@@ -33,6 +41,7 @@ export default {
       resource: {},
       scenario: {},
       results: {},
+      showProcessesPage: false,
       // cardInfos: [{ btnType: 'Context Definition' }, { btnType: 'Resource Collection' }]
     };
   },
@@ -56,6 +65,9 @@ export default {
         return "You have not do any operation";
       }
       return dateFormat(time);
+    },
+    getProcessesPageFlag(val) {
+      this.showProcessesPage = val;
     },
   },
   mounted() {

@@ -1,4 +1,4 @@
-package edu.njnu.opengms.container.domain.data;
+package edu.njnu.opengms.r2.data;
 
 import lombok.Builder;
 import lombok.Data;

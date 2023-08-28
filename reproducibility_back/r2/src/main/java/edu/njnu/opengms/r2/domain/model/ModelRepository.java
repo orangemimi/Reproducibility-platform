@@ -1,10 +1,12 @@
 package edu.njnu.opengms.r2.domain.model;
 
+import edu.njnu.opengms.r2.domain.model.vo.ModelVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +21,8 @@ import java.util.Optional;
 public interface ModelRepository extends MongoRepository<Model,String> {
     Optional<Model> findById(String id);
     Optional<Model> findByServiceId(String id);
+    List<ModelVO> findByPrivacyInAndNameContainsIgnoreCase(String privacy, String name);
+    List<Model> findByNameContainsIgnoreCase(String name);
 //    Optional<ModelInfo> findByIdAndCreatorId(String id,String userId);
 //    Page<ModelInfo> findByPrivacyInOrCreatorId(List<String> privacyList, String creatorId, Pageable pageable);
     Page<Model> findByPrivacy(String privacy, Pageable pageable);

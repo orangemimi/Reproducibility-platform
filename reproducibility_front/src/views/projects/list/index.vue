@@ -25,18 +25,6 @@
               :key="index"
               style="display: flex; margin-bottom: 5px"
             >
-              <el-avatar
-                :src="item.picture"
-                :size="30"
-                style="margin-right: 5px"
-                v-if="item.picture != '' && item.picture != undefined"
-              ></el-avatar>
-              <el-avatar
-                :src="imgBase64(item.projectName)"
-                :size="30"
-                style="margin-right: 5px"
-                v-else
-              ></el-avatar>
               <router-link
                 tag="div"
                 :to="{ path: `/project/${item.projectId}/info` }"

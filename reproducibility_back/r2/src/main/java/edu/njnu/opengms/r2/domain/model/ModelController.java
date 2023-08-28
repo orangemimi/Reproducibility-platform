@@ -101,4 +101,10 @@ public class ModelController {
         return ResultUtils.success();
     }
 
+    @RequestMapping(value = "/getPublicModelListByIgnoreName/{text}", method = RequestMethod.GET)
+    public JsonResult getPublicModelListByIgnoreName(@JwtTokenParser(key = "userId") String userId,@PathVariable String text) {
+//        PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+        return ResultUtils.success(modelRepository.findByNameContainsIgnoreCase(text));
+    }
+
 }

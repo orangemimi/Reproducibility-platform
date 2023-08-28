@@ -72,7 +72,7 @@ export default {
           break;
         case "4":
           {
-            this.$router.push({ name: "data" });
+            this.$router.push({ name: "Data" });
           }
           break;
 

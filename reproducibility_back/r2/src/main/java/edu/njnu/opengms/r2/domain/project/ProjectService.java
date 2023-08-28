@@ -160,4 +160,24 @@ public class ProjectService {
     }
 
 
+    public Project updateWorkspace(String projectId,String type, String userId, List<String> modelList) {
+        Project project = projectRepository.findByIdAndCreatorId(projectId, userId).orElseThrow(MyException::noObject);
+        Workspace workspace = null;
+        if(type.equals("modelList")){
+            workspace=Workspace.builder().modelList(modelList).build();
+            if(project.workspace!=null){
+                if(project.workspace.dataList!=null){
+                    workspace.dataList=project.workspace.dataList;
+                }
+                if(project.workspace.task!=null){
+                    workspace.task=project.workspace.task;
+                }
+            }
+        }
+        project.setWorkspace(workspace);
+
+        return projectRepository.save(project);
+
+
+    }
 }

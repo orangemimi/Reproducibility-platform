@@ -98,6 +98,16 @@ export async function getProjectById(projectId) {
   return await get(`/projects/info/${projectId}`);
 }
 
+export async function updateProjectWorkspace(projectId, type, form) {
+  let data = await patch(`/projects/workspace/${projectId}/${type}`, form);
+  if (data != null) {
+    successNotification("update", "project");
+  }
+  return data;
+}
+
+//---------------
+
 export async function updateProject(projectId, form) {
   let data = await patch(`/projects/${projectId}`, form);
   if (data != null) {
@@ -172,28 +182,6 @@ export async function getRecordsByMyself(projectId) {
 
 export async function updateCitation(projectId, jsonData) {
   return await patch(`/projects/updateCitation/${projectId}`, jsonData);
-}
-
-//---------------------------------------------------contextDefinition------------------------------------------
-
-// export async function updateContexByProjectId(projectId) {
-//   return await get(`/context/${projectId}`);
-// }
-
-export async function saveContext(form) {
-  return await post(`/context`, form);
-}
-
-export async function updateContexByProjectId(projectId, form) {
-  let data = await patch(`/context/${projectId}`, form);
-  if (data != null) {
-    successNotification("update", "context definition");
-  }
-  return data;
-}
-
-export async function getContextByProjectId(projectId) {
-  return await get(`/context/${projectId}`);
 }
 
 //---------------------------------------------------projectResources------------------------------------------
@@ -562,6 +550,10 @@ export async function getModelsByPrivacy(privacy, currentPage, pagesize) {
 
 export async function getAllPublicModels() {
   return await get(`/models/allPublic`);
+}
+
+export async function getPublicModelListByIgnoreName(text) {
+  return await get(`/models/getPublicModelListByIgnoreName/${text}`);
 }
 
 //---

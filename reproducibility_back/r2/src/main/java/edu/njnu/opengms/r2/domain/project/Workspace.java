@@ -1,5 +1,6 @@
 package edu.njnu.opengms.r2.domain.project;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -11,7 +12,10 @@ import java.util.List;
  * @version: 1.0.0
  */
 @Data
+@Builder
 public class Workspace {
-    ResourceCollection resourceCollection;
-    List<String> taskList;//selected tasks;
+//    ResourceCollection resourceCollection;
+    List<String> dataList;
+    List<String> modelList;
+    String task;//selected tasks;
 }

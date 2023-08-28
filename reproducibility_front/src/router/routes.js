@@ -75,6 +75,19 @@ export default [
         },
       },
       {
+        path: "/data",
+        name: "Data",
+        meta: {
+          title: "Community data",
+          requireAuth: true,
+        },
+        components: {
+          header: () => import("_com/layout/MyHeader.vue"),
+          main: () => import("@/views/data/index.vue"),
+          footer: () => import("_com/layout/MyFooter.vue"),
+        },
+      },
+      {
         path: "/project/:id",
         name: "Project",
         meta: {
@@ -94,12 +107,6 @@ export default [
             component: () => import("@/views/project/information"),
             meta: {
               requireAuth: true,
-              // roles: [
-              //   "builder",
-              //   "rebuilder_explorer",
-              //   "rebuilder_operator",
-              //   "visitor",
-              // ], // or you can only set roles in sub nav
             },
           },
           {
@@ -108,14 +115,27 @@ export default [
             component: () => import("@/views/project/construction/index.vue"),
             meta: {
               requireAuth: true,
-              // roles: [
-              //   "builder",
-              //   "rebuilder_explorer",
-              //   "rebuilder_operator",
-              //   "visitor",
-              // ], // or you can only set roles in sub nav
             },
+            // children: [
+            //   {
+            //     path: "compute",
+            //     name: "Processes",
+            //     component: () => import("@/views/project/construction/Compute"),
+            //   },
+            // ],
           },
+          // {
+          //   path: "compute",
+          //   name: "Processes",
+          //   meta: {
+          //     requireAuth: true,
+          //   },
+          //   components: {
+          //     header: () => import("_com/layout/MyHeader.vue"),
+          //     main: () => import("@/views/project/construction/Compute"),
+          //     footer: () => import("_com/layout/MyFooter.vue"),
+          //   },
+          // },
           // {
           //   path: "contributor",
           //   name: "Contributor",
@@ -255,7 +275,7 @@ export default [
 
       {
         path: "/resource/data",
-        name: "data",
+        name: "data2",
         meta: {
           title: "Reproducibility | data",
         },

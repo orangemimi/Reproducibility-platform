@@ -9,48 +9,65 @@
     <el-dialog
       title="Public resource selection"
       :visible.sync="resourceCollectVisible"
+      :close-on-click-modal="false"
       width="60%"
     >
-      <TransferPage :group="2" :districtListMock="modelList"></TransferPage>
-      <!-- <div class="main-container">
-        <template>
-          <h4>Data services</h4>
+      <el-row>
+        <el-col :span="10">
+          <el-input
+            placeholder="Search by name"
+            v-model="keyword"
+            class="input-with-select"
+            size="small"
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="searchModelByName"
+              v-if="!isSearching"
+            ></el-button>
+            <el-button
+              slot="append"
+              icon="el-icon-close"
+              @click="clearSearch"
+              v-else
+            ></el-button>
+          </el-input>
+        </el-col>
+      </el-row>
 
-          <el-transfer
-            v-model="resourceCollectWithId.dataList"
-            :data="allDataServices"
-            :titles="['All', 'Selected']"
-            :filter-method="filterMethod"
-            filterable
-            @change="
-              (value) => {
-                selectChange(value, 'data');
-              }
-            "
-          ></el-transfer>
-
-          <el-divider></el-divider>
-          <h4>Model services</h4>
-          <el-transfer
-            v-model="resourceCollectWithId.modelList"
-            :data="allModelServices"
-            :titles="['All', 'Selected']"
-            :filter-method="filterMethod"
-            filterable
-            @change="
-              (value) => {
-                selectChange(value, 'model');
-              }
-            "
-          ></el-transfer>
-        </template>
-      </div> -->
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resourceCollectVisible = false">Cancle</el-button>
-        <el-button type="primary" @click="setResourceCollect()"
-          >Submit</el-button
+      <div class="transfer">
+        <el-transfer
+          class="mainContainer"
+          v-model="selectedModelsWithId"
+          @change="
+            (value) => {
+              selectChange(value, 'model');
+            }
+          "
+          :titles="['Public models', 'Selected models']"
+          :data="currentModelList"
         >
+        </el-transfer>
+        <el-pagination
+          layout="prev, pager, next"
+          :total="total"
+          small
+          :pager-count="5"
+          :page-size="20"
+          :current-page="1"
+          @current-change="currentModelChange"
+          class="pageClass"
+          v-show="!isSearching"
+        ></el-pagination>
+        <div class="dialog-footer">
+          <el-button @click="resourceCollectVisible = false" size="mini"
+            >Cancle</el-button
+          >
+          <el-button type="primary" @click="setResourceCollect()" size="mini"
+            >Submit</el-button
+          >
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -58,72 +75,112 @@
 
 <script>
 import config from "@/config";
-import { get, put } from "@/axios";
 import echarts from "echarts";
-import TransferPage from "../components/TransferPage.vue";
 import { mapState } from "vuex";
-import { getProjectById, getAllPublicModels } from "@/api/request";
+import {
+  getProjectById,
+  getModelsByPrivacy,
+  updateProjectWorkspace,
+  getPublicModelListByIgnoreName,
+} from "@/api/request";
 export default {
-  components: {
-    TransferPage,
-  },
-
   data() {
     return {
-      id: this.$route.params.id, //projectId
+      projectId: this.$route.params.id, //projectId
       project: {},
-      active: 0,
-      avtiveTab: "manage",
-      resourceCollection: {},
       resourceCollectVisible: false,
-      evaluationVisible: false,
-      evaluationService: {},
       modelList: [],
-      contextDefine: {
-        theme: {
-          name: null,
-        },
-        object: {
-          name: null,
-        },
-        boundary: {
-          name: null,
-        },
-      },
-      contextVisible: false,
-      typeList: ["Resource collection", "Computational process construction"],
+
       chart: {},
       contentHeight: window.innerHeight - 200,
-      dataList: [],
-      choosenDataServices: [],
+
       ops: {
         bar: {
           background: "#808695",
           keepShow: true,
         },
       },
-      allDataServices: [],
-      allModelServices: [],
-      selectedDataServices: [],
-      selectedModelServices: [],
-      resourceCollectWithId: {
-        modelList: [],
-        dataList: [],
+      selectedModelsWithId: [],
+      currentModelList: [],
+      pageFilter: {
+        pageSize: 8,
+        page: 0,
       },
+      total: 0,
+      keyword: "",
+      isSearching: false,
     };
   },
   computed: {
     ...mapState(["user"]),
   },
   methods: {
-    filterMethod(query, item) {
-      return item.label.indexOf(query) > -1;
+    // transfer----------
+    async currentModelChange(val) {
+      await this.getPublicModels(val - 1);
     },
+    async getPublicModels(val) {
+      let data = await getModelsByPrivacy("public", val, 20);
+
+      this.total = data.totalElements;
+      this.modelList = data.content;
+
+      var currentModelList = this.modelList.map((value) => {
+        return {
+          label: value.name,
+          key: value.id,
+          obj: value,
+        };
+      });
+      // 初始化数据
+      this.currentModelList = currentModelList;
+    },
+
+    // 穿梭搜索
+    async searchModelByName() {
+      let data = await getPublicModelListByIgnoreName(this.keyword);
+      this.modelList = data;
+      var currentModelList = this.modelList.map((value) => {
+        return {
+          label: value.name,
+          key: value.id,
+          obj: value,
+        };
+      });
+      // 初始化数据
+      this.currentModelList = currentModelList;
+      this.isSearching = true;
+    },
+    clearSearch() {
+      this.keyword = "";
+      this.init();
+      this.isSearching = false;
+    },
+
+    async filterQueryModel(text, val) {
+      let data = await getPublicModelListByIgnoreName(text, val, 20);
+      console.log(data);
+      this.total = data.totalElements;
+      this.modelList = data.content;
+
+      var currentModelList = this.modelList.map((value) => {
+        return {
+          label: value.name,
+          key: value.id,
+          obj: value,
+        };
+      });
+      // 初始化数据
+      this.currentModelList = currentModelList;
+    },
+
+    init() {
+      this.getPublicModels(0);
+    },
+
     selectChange(value, type) {
-      if (type == "data") {
-        this.resourceCollection.dataList = value;
-      } else {
-        this.resourceCollection.modelList = value;
+      if (type == "model") {
+        this.modelList = value;
       }
     },
 
@@ -226,126 +283,24 @@ export default {
             break;
           case "Computational process construction":
             {
-              let routeUrl = this.$router.resolve({
-                path: `/project/${this.id}/compute`,
-              });
-              window.open(routeUrl.href, "_blank");
+              this.$emit("getProcessesPageFlag", true);
+              // let routeUrl = this.$router.resolve({
+              //   path: `/project/${this.projectId}/construction/compute`,
+              // });
+              // window.open(routeUrl.href, "_blank");
             }
             break;
         }
       });
     },
 
-    async getModelServices() {
-      if (this.resourceCollection != null) {
-        this.resourceCollectWithId.modelList = this.resourceCollection.modelList;
-      }
-
-      try {
-        let data = await getAllPublicModels();
-        data.forEach((item) => {
-          item.label = item.name;
-          item.key = item.id;
-
-          if (this.resourceCollection.modelList == null) {
-            item.isSelected = false;
-          } else {
-            this.resourceCollection.modelList.forEach((select) => {
-              if (select.id == item.id) {
-                item.isSelected = true;
-              } else {
-                item.isSelected = false;
-              }
-            });
-          }
-        });
-        this.allModelServices = data;
-
-        // console.log(test, "test");
-      } catch (error) {
-        this.$throw(error);
-      }
-    },
-
-    async getDataServices() {
-      //Todo 后面直接g2s就应该包含这些信息
-      let dataList = await get("/project/{id}/dataList", null, {
-        id: this.id,
-      });
-
-      if (dataList != null) {
-        if (dataList.originalDataServices != null) {
-          dataList.originalDataServices.forEach((el) => {
-            this.dataList.push({
-              key: el.id,
-              label: el.name,
-              id: el.id,
-              description: el.description,
-              isIntermediate: false,
-            });
-          });
-        }
-
-        if (dataList.intermediateDataServices != null) {
-          dataList.intermediateDataServices.forEach((el) => {
-            this.dataList.push({
-              key: el.id,
-              label: el.name,
-              id: el.id,
-              isIntermediate: true,
-            });
-          });
-        }
-      }
-
-      this.resourceCollection.dataList = this.dataList;
-
-      this.resourceCollectWithId.dataList = this.dataList.map(
-        (item) => item.key
+    async setResourceCollect() {
+      let data = await updateProjectWorkspace(
+        this.projectId,
+        "modelList",
+        this.selectedModelsWithId
       );
-
-      let { data } = await get("/data_service/all", null, null, false);
-      this.allDataServices = data.filter((item) => {
-        item.label = item.name;
-        item.key = item.id;
-
-        this.resourceCollection.dataList.forEach((select) => {
-          if (select.id == item.id) {
-            item.isSelected = true;
-          } else {
-            item.isSelected = false;
-          }
-        });
-        return item.isIntermediate == false;
-      });
-    },
-
-    async publish() {
-      this.project = await put(
-        "/project/{id}",
-        {
-          isPublish: this.project.isPublish,
-        },
-        {
-          id: this.id,
-        }
-      );
-    },
-
-    async update() {
-      this.project = await put(
-        "/project/{id}",
-        {
-          resourceCollection: this.resourceCollectWithId,
-        },
-        {
-          id: this.id,
-        }
-      );
-    },
-
-    setResourceCollect() {
-      this.update();
+      this.project = data;
       this.resourceCollectVisible = false;
     },
   },
@@ -354,20 +309,18 @@ export default {
     // console.log(this.project);
     if (
       this.project.workspace != null &&
-      this.project.workspace.resourceCollection != null
+      this.project.workspace.modelList != null
     ) {
-      this.resourceCollection = this.project.workspace.resourceCollection;
+      this.selectedModelsWithId = this.project.workspace.modelList;
     }
+    this.init();
     this.initEchart();
-    this.getModelServices();
-
-    this.getDataServices();
     // this.getData();
   },
 };
 </script>
 
-<style>
+<style scoped>
 .time {
   font-size: 13px;
   color: #999;
@@ -396,5 +349,36 @@ export default {
 
 .clearfix:after {
   clear: both;
+}
+>>> .el-dialog__body {
+  padding: 5px 20px 40px 20px;
+  margin: 20px;
+}
+.mainContainer >>> .el-transfer-panel {
+  width: 300px;
+}
+.mainContainer >>> .el-transfer-panel__body {
+  height: 480px;
+}
+.mainContainer >>> .el-transfer-panel__list {
+  height: 450px;
+}
+.mainContainer >>> .el-transfer-panel__list.is-filterable {
+  height: 400px;
+}
+.mainContainer >>> .el-transfer__buttons .el-button {
+  display: block;
+  margin-left: 0;
+}
+.dialog-footer {
+  float: right;
+
+  /* margin-bottom: 10px; */
+}
+
+.pageClass {
+  position: relative;
+  bottom: 30px;
+  left: 50px;
 }
 </style>

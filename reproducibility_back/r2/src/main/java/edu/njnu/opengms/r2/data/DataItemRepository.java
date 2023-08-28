@@ -1,6 +1,5 @@
-package edu.njnu.opengms.container.domain.data;
+package edu.njnu.opengms.r2.data;
 
-import edu.njnu.opengms.common.domain.container.data.DataService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -14,6 +13,6 @@ import org.springframework.stereotype.Repository;
  * @Version 1.0.0
  */
 @Repository
-public interface DataRepository extends MongoRepository<DataService,String> {
-    Page<DataService> findAllByDescriptionIsNotNull(Pageable pageable);
+public interface DataItemRepository extends MongoRepository<DataItem,String> {
+    Page<DataItem> findAllByDescriptionIsNotNull(Pageable pageable);
 }

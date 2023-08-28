@@ -75,7 +75,7 @@ export default {
     },
     view(id) {
       this.$router.push({
-        path: `/resource/${id}/${this.type}`,
+        path: `/project/${id}/info`,
       });
     },
     async joinProjectCommand() {
@@ -97,6 +97,7 @@ export default {
         project: project,
         userId: this.userId,
       });
+      this.view(project.id);
     },
   },
 
