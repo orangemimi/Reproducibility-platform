@@ -47,53 +47,16 @@ public class UserController {
         return ResultUtils.success(userService.login(email, password));
     }
 
-//    @RequestMapping (value = "", method = RequestMethod.PATCH)
-//    public JsonResult update(@JwtTokenParser(key="userId") String userId, @RequestBody UpdateUserDTO update, @JwtTokenParser(key = "email") String email, @JwtTokenParser(key = "password") String password) throws IllegalAccessException {
-//        return ResultUtils.success(userService.updateByUserId(userId, update, email, password));
-//    }
-
-    @RequestMapping (value = "/join", method = RequestMethod.PATCH)
-    public JsonResult updateJoinedProjects( @JwtTokenParser(key="userId") String userId, @RequestBody  String update) {
-        return ResultUtils.success(userService.updateJoinedProjects(userId,update));
-    }
     @RequestMapping (value = "/create", method = RequestMethod.PATCH)
     public JsonResult updateCreatedProjects(@JwtTokenParser(key="userId") String userId, @RequestBody String update) {
         return ResultUtils.success(userService.updateCreatedProjects(userId,update));
     }
 
-    @RequestMapping (value = "/folk", method = RequestMethod.PATCH)
-    public JsonResult updateFolkedProjects(@JwtTokenParser(key="userId") String userId, @RequestBody String update) {
-        return ResultUtils.success(userService.updateFolkedProjects(userId,update));
-    }
-
-    //忘记密码，通过邮箱修改
-    @RequestMapping (value = "/{email}/{code}/{password}", method = RequestMethod.PATCH)
-    public JsonResult forgetPasswordByEmail(@PathVariable String email,@PathVariable String code, @PathVariable String password) {
-        return ResultUtils.success(userService.forgetPassword(email, password, code));
-    }
-
-    //修改密码
-    @RequestMapping (value = "/changePWD/{oldPWD}/{newPWD}", method = RequestMethod.PATCH)
-    public JsonResult updatePassword(@PathVariable String oldPWD,@PathVariable String newPWD, @JwtTokenParser(key = "email") String email) {
-        return ResultUtils.success(userService.updatePassword(oldPWD, newPWD, email));
-    }
-
-    //发送邮件，获取验证码
-    @RequestMapping (value = "/sendEmail/{email}", method = RequestMethod.GET)
-    public JsonResult sendCodeEmail(@PathVariable String email) {
-        return ResultUtils.success(userService.sendCodeEmail(email));
-    }
 
     //调用远程服务器，获取用户基本信息
     @RequestMapping (value = "/getuserinfo", method = RequestMethod.GET)
     public JsonResult getUserinfo(@JwtTokenParser(key = "email") String email, @JwtTokenParser(key = "password") String password) {
         return ResultUtils.success(userService.getUserinfoByUserService(email, password));
-    }
-
-    //判断用户是否star了项目
-    @RequestMapping(value = "/isSart/{projectId}", method = RequestMethod.GET)
-    public JsonResult isStarProject(@JwtTokenParser(key = "userId") String userId, @PathVariable String projectId) {
-        return ResultUtils.success(userService.isSartedProject(userId, projectId));
     }
 
     //获取本地和远程数据库的用户信息

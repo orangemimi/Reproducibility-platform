@@ -4,6 +4,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
+import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
 import edu.njnu.opengms.r2.domain.user.User;
 import edu.njnu.opengms.r2.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,24 +161,9 @@ public class ProjectService {
     }
 
 
-    public Project updateWorkspace(String projectId,String type, String userId, List<String> modelList) {
+    public Object update(String projectId, String userId, UpdateProjectDTO update) {
         Project project = projectRepository.findByIdAndCreatorId(projectId, userId).orElseThrow(MyException::noObject);
-        Workspace workspace = null;
-        if(type.equals("modelList")){
-            workspace=Workspace.builder().modelList(modelList).build();
-            if(project.workspace!=null){
-                if(project.workspace.dataList!=null){
-                    workspace.dataList=project.workspace.dataList;
-                }
-                if(project.workspace.task!=null){
-                    workspace.task=project.workspace.task;
-                }
-            }
-        }
-        project.setWorkspace(workspace);
-
+        update.updateTo(project);
         return projectRepository.save(project);
-
-
     }
 }

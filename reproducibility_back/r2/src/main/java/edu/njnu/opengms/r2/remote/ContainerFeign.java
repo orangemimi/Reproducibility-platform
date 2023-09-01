@@ -27,11 +27,26 @@ import java.util.List;
 @Primary
 public interface ContainerFeign {
 
-    @RequestMapping (value = "/model_service",method = RequestMethod.GET)
+    @RequestMapping (value = "/model_services",method = RequestMethod.GET)
     JsonResult listModelServices(@SpringQueryMap  SplitPageDTO splitPageDTO);
 
-    @RequestMapping (value = "/data_process_service",method = RequestMethod.GET)
-    JsonResult listDataProcessServices(@SpringQueryMap  SplitPageDTO splitPageDTO);
+    @RequestMapping (value = "/model_services/all",method = RequestMethod.GET)
+    JsonResult listAllModelServices();
+
+
+    @RequestMapping (value = "/model_services/listByIds", method = RequestMethod.GET)
+    JsonResult listModelServiceByIds(@RequestParam ("ids") List<String> ids);
+
+
+    @RequestMapping (value = "/model_services/listVOByIds", method = RequestMethod.GET)
+    JsonResult listModelServiceVOByIds(@RequestParam ("ids") List<String> ids);
+
+    @RequestMapping (value = "/model_services/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
+    JsonResult getModelsByPrivacy(@PathVariable String privacy,@PathVariable int currentPage,@PathVariable int pageSize);
+
+
+
+
 
 
     @RequestMapping (value = "/data_service",method = RequestMethod.GET)
@@ -40,18 +55,13 @@ public interface ContainerFeign {
     @RequestMapping (value = "/data_service/all",method = RequestMethod.GET)
     JsonResult listAllDataServices();
 
-    @RequestMapping (value = "/model_service/all",method = RequestMethod.GET)
-    JsonResult listAllModelServices();
 
-    @RequestMapping (value = "/model_service/{id}",method = RequestMethod.GET)
+
+    @RequestMapping (value = "/model/{id}",method = RequestMethod.GET)
     JsonResult getModelService(@PathVariable String id);
-
-    @RequestMapping (value = "/data_process_service/{id}",method = RequestMethod.GET)
-    JsonResult getDataProcessService(@PathVariable String id);
 
     @RequestMapping (value = "/data_service/{id}",method = RequestMethod.GET)
     JsonResult getDataService(@PathVariable String id);
-
 
     @RequestMapping (value = "/instance",method = RequestMethod.POST)
     JsonResult addInstance(@RequestBody JSONObject serviceInstance);
@@ -85,19 +95,6 @@ public interface ContainerFeign {
     JsonResult getEvaluationServiceById(@PathVariable ("id") String id);
 
 
-    @RequestMapping (value = "/model_service/listByIds", method = RequestMethod.GET)
-    JsonResult listModelServiceByIds(@RequestParam ("ids") List<String> ids);
-
-    @RequestMapping (value = "/data_process_service/listByIds", method = RequestMethod.GET)
-    JsonResult listDataProcessServiceByIds(@RequestParam ("ids") List<String> ids);
-
-
-    @RequestMapping (value = "/model_service/listVOByIds", method = RequestMethod.GET)
-    JsonResult listModelServiceVOByIds(@RequestParam ("ids") List<String> ids);
-
-    @RequestMapping (value = "/data_process_service/listVOByIds", method = RequestMethod.GET)
-    JsonResult listDataProcessServiceVOByIds(@RequestParam ("ids") List<String> ids);
-
     @RequestMapping (value = "/evaluation_service/listVOByIds", method = RequestMethod.GET)
     JsonResult listEvaluationServicesVO(@RequestParam ("ids") List<String> evaluationServices);
 
@@ -118,11 +115,6 @@ public interface ContainerFeign {
                 }
 
                 @Override
-                public JsonResult listDataProcessServices(SplitPageDTO splitPageDTO) {
-                    return null;
-                }
-
-                @Override
                 public JsonResult listDataServices(SplitPageDTO splitPageDTO) {
                     return null;
                 }
@@ -139,11 +131,6 @@ public interface ContainerFeign {
 
                 @Override
                 public JsonResult getModelService(String id) {
-                    return null;
-                }
-
-                @Override
-                public JsonResult getDataProcessService(String id) {
                     return null;
                 }
 
@@ -204,10 +191,6 @@ public interface ContainerFeign {
                     return null;
                 }
 
-                @Override
-                public JsonResult listDataProcessServiceByIds(List<String> ids) {
-                    return null;
-                }
 
                 @Override
                 public JsonResult listModelServiceVOByIds(List<String> ids) {
@@ -215,9 +198,10 @@ public interface ContainerFeign {
                 }
 
                 @Override
-                public JsonResult listDataProcessServiceVOByIds(List<String> ids) {
+                public JsonResult getModelsByPrivacy(String privacy, int currentPage, int pageSize) {
                     return null;
                 }
+
 
                 @Override
                 public JsonResult listEvaluationServicesVO(List<String> evaluationServices) {

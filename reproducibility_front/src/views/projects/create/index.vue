@@ -52,16 +52,16 @@
     </el-form>
 
     <div class="btn">
-      <el-button @click="cancel" size="small">Cancel</el-button>
+      <!-- <el-button @click="cancel" size="small">Cancel</el-button> -->
       <el-button type="primary" @click="saveProject" size="small"
-        >Confirm</el-button
+        >Create</el-button
       >
     </div>
   </div>
 </template>
 
 <script>
-import { saveProject, postFile, saveScenario } from "@/api/request";
+import { saveProject, postFile } from "@/api/request";
 import addImage from "_com/AddImage/index1.vue";
 export default {
   components: { addImage },
@@ -121,9 +121,8 @@ export default {
           picture: "http://221.226.60.2:8082/data/" + pictureData.data.data.id,
         },
       };
-      let data = await saveProject(jsonData);
-      await saveScenario({ projectId: data.id });
-      console.log(data);
+      await saveProject(jsonData);
+
       this.cancel();
     },
 

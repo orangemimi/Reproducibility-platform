@@ -116,26 +116,15 @@ export default [
             meta: {
               requireAuth: true,
             },
-            // children: [
-            //   {
-            //     path: "compute",
-            //     name: "Processes",
-            //     component: () => import("@/views/project/construction/Compute"),
-            //   },
-            // ],
           },
-          // {
-          //   path: "compute",
-          //   name: "Processes",
-          //   meta: {
-          //     requireAuth: true,
-          //   },
-          //   components: {
-          //     header: () => import("_com/layout/MyHeader.vue"),
-          //     main: () => import("@/views/project/construction/Compute"),
-          //     footer: () => import("_com/layout/MyFooter.vue"),
-          //   },
-          // },
+          {
+            path: "scenarios",
+            name: "Scenarios",
+            component: () => import("@/views/project/scenarios/index.vue"),
+            meta: {
+              requireAuth: true,
+            },
+          },
           // {
           //   path: "contributor",
           //   name: "Contributor",

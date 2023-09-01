@@ -3,7 +3,7 @@ package edu.njnu.opengms.r2.domain.project.dto;
 
 import edu.njnu.opengms.common.dto.ToDomainConverter;
 import edu.njnu.opengms.r2.domain.project.Project;
-import edu.njnu.opengms.r2.domain.project.Workspace;
+import edu.njnu.opengms.r2.domain.workspace.Workspace;
 import lombok.Data;
 
 /**

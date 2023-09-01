@@ -78,7 +78,7 @@
 
 <script>
 import { getAllModelItems, getModelsByPrivacy } from "@/api/request";
-import serviceCard from "_com/Cards/ServiceCard";
+import serviceCard from "_com/Cards/ServiceCard.vue";
 import createModel from "./create";
 export default {
   data() {

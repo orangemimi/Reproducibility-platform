@@ -554,7 +554,7 @@ export default {
     },
 
     // async getScenario() {
-    //   let data = await getScenarioByProjectId(this.projectId);
+    //   let data = await getScenariosByProjectId(this.projectId);
 
     //   this.selectId = data.selectTaskId;
     //   let flag = data.selectTaskId == this.currentTask.id;

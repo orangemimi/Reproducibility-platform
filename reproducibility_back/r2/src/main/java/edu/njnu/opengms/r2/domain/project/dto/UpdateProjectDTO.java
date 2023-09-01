@@ -21,6 +21,7 @@ public class UpdateProjectDTO implements ToDomainConverter<Project> {
     String privacy;// Ispublic
     String creatorId;
     List<Member> memberList;
+    String scenario; //selected workspace
 
 
     Integer level=0;

@@ -6,10 +6,9 @@ import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
+import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 /**
@@ -69,12 +68,13 @@ public class ProjectController {
         return ResultUtils.success(projectService.getStarredCount(projectId));
     }
 
-    @RequestMapping(value = "/workspace/{projectId}/{type}", method = RequestMethod.PATCH)
+
+
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.PATCH)
     public JsonResult update(@PathVariable("projectId") String projectId,
-                             @PathVariable("type") String type,
                              @JwtTokenParser(key = "userId") String userId,
-                             @RequestBody List<String> update) {
-        return ResultUtils.success(projectService.updateWorkspace(projectId,type, userId, update));
+                             @RequestBody UpdateProjectDTO update) {
+        return ResultUtils.success(projectService.update(projectId, userId, update));
     }
 
 

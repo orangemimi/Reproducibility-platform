@@ -5,8 +5,10 @@ import edu.njnu.opengms.common.entity.AgentInfo;
 import edu.njnu.opengms.common.entity.BaseEntity;
 import edu.njnu.opengms.r2.domain.model.support.Dependency;
 import edu.njnu.opengms.r2.domain.model.support.State;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,6 +24,8 @@ import java.util.List;
 @Data
 @Document
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Model extends BaseEntity {
     @Id
     String id;

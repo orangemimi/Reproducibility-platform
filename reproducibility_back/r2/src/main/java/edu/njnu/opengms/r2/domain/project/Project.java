@@ -25,7 +25,9 @@ public class Project extends BaseEntity {
     String privacy;// Ispublic
     String creatorId;
     List<Member> memberList;
-    Workspace workspace;
+    String scenario; //selected workspace
+
+//    ResourceCollection resourceCollection;
 
     Integer level=0;
     String forkingProjectId;// //从项目的那条记录开始fork的

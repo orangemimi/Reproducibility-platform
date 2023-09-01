@@ -3,7 +3,7 @@
   <div>
     <div class="page-header">
       <div class="nav">
-        <el-col class="breadcrumb" :span="10">
+        <el-col class="breadcrumb" :span="15">
           <el-breadcrumb separator="/">
             <el-breadcrumb-item class="name">
               {{ creator.name }}
@@ -13,11 +13,6 @@
             }}</el-breadcrumb-item>
           </el-breadcrumb>
         </el-col>
-        <!-- TODO-zzy -->
-        <!-- <el-col class="info-btn" :span="14">
-          <star-btn class="star"></star-btn>
-          <watch-btn :count="projectInfo.watchCount" class="watch"></watch-btn>
-        </el-col> -->
       </div>
 
       <div class="menu">
@@ -36,10 +31,6 @@
 
 <script>
 import { getProjectAndUsers, forkProject } from "@/api/request";
-// import { judgeRole } from "@/api/requestVuex";
-// import watchBtn from "_com/PageHeaderBtn/WatchBtn";
-// import starBtn from "_com/PageHeaderBtn/StarBtn";
-// import folkBtn from "_com/PageHeaderBtn/FolkBtn";
 import builderMenu from "./components/BuilderMenu";
 import reBuilderMenu from "./components/ReBuilderMenu";
 import { mapState } from "vuex";
@@ -88,7 +79,6 @@ export default {
       this.projectInfo = data.project;
       this.creator = data.creator;
       this.memberList = data.memberList;
-      console.log;
     },
 
     toRouterType(val) {
@@ -144,7 +134,7 @@ export default {
         font-weight: 400;
       }
       .project {
-        // width: 1200px;
+        width: 500px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -173,4 +163,8 @@ export default {
     line-height: 72px;
   }
 }
+
+// .page-content {
+//   width: 100%;
+// }
 </style>

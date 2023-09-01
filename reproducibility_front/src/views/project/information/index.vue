@@ -296,7 +296,7 @@ import { getProjectAndUsers } from "@/api/request";
 import { dateFormat } from "@/utils/utils";
 import { mapState } from "vuex";
 import Avatar from "vue-avatar";
-import userCard from "_com/Cards/UserCard";
+import userCard from "_com/Cards/UserCard.vue";
 // import editInfoForm from "./components/EditProjectInfo";
 // import shareProject from "_com/ShareProject";
 // import citationForm from "./components/CitationForm.vue";
@@ -386,7 +386,7 @@ export default {
 
     async getProjectInfo() {
       let data = await getProjectAndUsers(this.projectId);
-      console.log(data);
+
       this.projectInfo = data.project;
       this.creator = data.creator;
       if (data.memberList != null) {

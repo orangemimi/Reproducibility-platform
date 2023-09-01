@@ -1,21 +1,14 @@
 package edu.njnu.opengms.container.socket;
 
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.njnu.opengms.common.domain.container.instance.InstanceEnum;
 import edu.njnu.opengms.common.domain.container.instance.ServiceInstance;
 import edu.njnu.opengms.common.domain.container.instance.StatusEnum;
-import edu.njnu.opengms.common.utils.CopyUtils;
 import edu.njnu.opengms.common.utils.SpringApplicationContextHolder;
 import edu.njnu.opengms.container.domain.instance.ServiceInstanceRepository;
-import edu.njnu.opengms.container.domain.model.ModelService;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
@@ -81,41 +74,40 @@ public class ServerHandlerImpl implements ServerHandler {
     public void handleWrite(SelectionKey selectionKey) throws IOException {
         SocketChannel channel = (SocketChannel) selectionKey.channel();
         channel.configureBlocking(false);
-        Selector selector = selectionKey.selector();
-        writeBuffer.clear();
-        if (JSONUtil.isJson(value)) {
-            JSONObject jsonObject = JSONUtil.parseObj(value);
-            ServiceInstance instance = SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).findById(instanceId).orElse(null);
-            ObjectMapper objectMapper=new ObjectMapper();
-            instance.setStatusEnum(StatusEnum.FINISH);
-            if(serviceInstance.getInstanceEnum().equals(InstanceEnum.MODEL)){
-                ModelService originalService = objectMapper.convertValue(instance.getService(), ModelService.class);
-                ModelService modelService = jsonObject.get("service", ModelService.class);
-                CopyUtils.copyProperties(modelService,originalService);
-                instance.setService(originalService);
-            }
-//            else if(serviceInstance.getInstanceEnum().equals(InstanceEnum.PROCESS)){
+//        Selector selector = selectionKey.selector();
+//        writeBuffer.clear();
+//        if (JSONUtil.isJson(value)) {
+//            JSONObject jsonObject = JSONUtil.parseObj(value);
+//            ServiceInstance instance = SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).findById(instanceId).orElse(null);
+//            ObjectMapper objectMapper=new ObjectMapper();
+//            instance.setStatusEnum(StatusEnum.FINISH);
+//            if(serviceInstance.getInstanceEnum().equals(InstanceEnum.MODEL)){
+//                ModelService originalService = objectMapper.convertValue(instance.getService(), ModelService.class);
+//                ModelService modelService = jsonObject.get("service", ModelService.class);
+//                CopyUtils.copyProperties(modelService,originalService);
+//                instance.setService(originalService);
+//            }else if(serviceInstance.getInstanceEnum().equals(InstanceEnum.PROCESS)){
 //                DataProcessService originalService = objectMapper.convertValue(instance.getService(), DataProcessService.class);
 //                DataProcessService dataProcessService = jsonObject.get("service", DataProcessService.class);
 //                CopyUtils.copyProperties(dataProcessService,originalService);
 //                instance.setService(originalService);
 //            }
-            SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).save(instance);
-            System.out.println("请求完成");
-            channel.close();
-            return;
-        } else if (value.startsWith(INSTANCEID)) {
-            instanceId = value.split(":")[1];
-            serviceInstance = SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).findById(instanceId).orElse(null);
-            writeBuffer.put(JSONUtil.toJsonStr(serviceInstance).getBytes());
-            writeBuffer.flip();
-            channel.write(writeBuffer);
-            channel.register(selector, SelectionKey.OP_READ);
-        } else {
-            System.out.println("value: " + value);
-            handleError(channel);
-            return;
-        }
+//            SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).save(instance);
+//            System.out.println("请求完成");
+//            channel.close();
+//            return;
+//        } else if (value.startsWith(INSTANCEID)) {
+//            instanceId = value.split(":")[1];
+//            serviceInstance = SpringApplicationContextHolder.getBean(ServiceInstanceRepository.class).findById(instanceId).orElse(null);
+//            writeBuffer.put(JSONUtil.toJsonStr(serviceInstance).getBytes());
+//            writeBuffer.flip();
+//            channel.write(writeBuffer);
+//            channel.register(selector, SelectionKey.OP_READ);
+//        } else {
+//            System.out.println("value: " + value);
+//            handleError(channel);
+//            return;
+//        }
     }
 
     public void handleError(SocketChannel socketChannel) throws IOException {

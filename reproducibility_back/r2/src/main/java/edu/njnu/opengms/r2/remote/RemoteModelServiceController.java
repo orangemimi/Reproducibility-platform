@@ -3,6 +3,7 @@ package edu.njnu.opengms.r2.remote;
 import edu.njnu.opengms.common.dto.SplitPageDTO;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
+import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +37,12 @@ public class RemoteModelServiceController {
 //        System.out.print(containerFeign.listAllDataServices());
         return ResultUtils.success(containerFeign.listAllModelServices());
     }
+
+    @RequestMapping(value = "/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
+    public JsonResult getModelsByPrivacy(@JwtTokenParser(key = "userId") String userId,@PathVariable String privacy, @PathVariable int currentPage, @PathVariable int pageSize) {
+        return ResultUtils.success(containerFeign.getModelsByPrivacy(privacy,currentPage,pageSize));
+    }
+
+
 
 }
