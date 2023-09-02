@@ -83,7 +83,7 @@ export default [
         },
         components: {
           header: () => import("_com/layout/MyHeader.vue"),
-          main: () => import("@/views/data/index.vue"),
+          main: () => import("@/views/data/components/ResourceTable.vue"),
           footer: () => import("_com/layout/MyFooter.vue"),
         },
       },

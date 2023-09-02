@@ -1,5 +1,6 @@
 package edu.njnu.opengms.r2.domain.model.support;
 
+import cn.hutool.json.JSONObject;
 import lombok.Data;
 
 
@@ -17,4 +18,6 @@ public class ModelEvent {
     public Boolean isOptional=false;
     public String description;
     public String dataId;
+    public JSONObject datasetItem;
+
 }

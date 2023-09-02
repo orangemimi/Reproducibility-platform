@@ -5,6 +5,8 @@ import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.enums.ResultEnum;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JwtUtils;
+import edu.njnu.opengms.r2.domain.folder.FolderService;
+import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
 import edu.njnu.opengms.r2.domain.project.Project;
 import edu.njnu.opengms.r2.domain.project.ProjectRepository;
 import edu.njnu.opengms.r2.remote.UserServiceServie;
@@ -35,8 +37,8 @@ public class UserService {
     @Autowired
     UserServiceServie userServiceServie;
 
-//    @Autowired
-//    NoticeService noticeService;
+    @Autowired
+    FolderService folderService;
 
     @Autowired
     ProjectRepository projectRepository;
@@ -61,14 +63,6 @@ public class UserService {
     * */
     public User register(String name, String email, String password) {
 
-
-//        JSONObject remoteUserJson = userServiceServie.register(add);    //用户数据库注册，注册成功时code值返回0
-//        if((int) remoteUserJson.get("code") != 0) {
-//            throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
-//        }
-//        add.setUserId(((JSONObject) remoteUserJson.get("data")).getStr("userId"));
-
-
         //用户邮箱已经被注册的情况,抛出自定义异常
         if (userRepository.findByEmail(email).isPresent()) {
             throw new MyException(ResultEnum.EXIST_OBJECT);
@@ -77,8 +71,15 @@ public class UserService {
 
         User user=User.builder().name(name).email(email).password(password).build();
 
+        User newUser =  userRepository.insert(user);
+
+        AddFolderDTO add = new AddFolderDTO();
+        add.setName("Main");
+        add.setParent("0");
+        folderService.create(add,newUser.id);
+
         System.out.println(user.toString());
-        return userRepository.insert(user);
+        return newUser;
     }
 
     public JSONObject login(String email, String password) {

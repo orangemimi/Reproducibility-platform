@@ -71,28 +71,6 @@ export async function saveProject(form) {
   return data;
 }
 
-//-----------------------------------------------dataContainer---------------------------------------------
-
-export async function postDataContainer(form) {
-  // debugger;
-  let data = await post(`/dataContainer/uploadSingle`, form);
-  return data;
-}
-
-export async function getDataServiceInfo(form) {
-  debugger;
-
-  return await post(`/dataContainer/dataService/getData`, form);
-}
-
-export async function getDataServiceInfo1(form) {
-  return await post(`/dataContainer/dataService/findData`, form);
-}
-
-export async function getAllProcessing(list) {
-  return await get(`/dataContainer/dataService/getAllProcessing`, list);
-}
-
 //------------------------------------------manager server------------------------------------
 export async function runtask(formData) {
   return await post(`/managerServer/runtask`, formData);
@@ -153,6 +131,44 @@ export async function updateresourceCollection(id, type, form) {
   let data = await patch(`/scenario/resources/${id}/${type}`, form);
 
   return data;
+}
+
+//-----------------------------------------------folder---------------------------------------------
+
+export async function addFolder(form) {
+  return await post(`/folders`, form);
+}
+
+export async function getFolders() {
+  return await get(`/folders`);
+}
+
+//-----------------------------------------------data---------------------------------------------
+
+export async function saveData(form, storedFolderId, fileSize) {
+  return await post(`/data/uploadFileForm/${storedFolderId}/${fileSize}`, form);
+}
+
+//-----------------------------------------------dataContainer---------------------------------------------
+
+export async function postDataContainer(form) {
+  // debugger;
+  let data = await post(`/dataContainer/uploadSingle`, form);
+  return data;
+}
+
+export async function getDataServiceInfo(form) {
+  debugger;
+
+  return await post(`/dataContainer/dataService/getData`, form);
+}
+
+export async function getDataServiceInfo1(form) {
+  return await post(`/dataContainer/dataService/findData`, form);
+}
+
+export async function getAllProcessing(list) {
+  return await get(`/dataContainer/dataService/getAllProcessing`, list);
 }
 
 //===============================extra=================================================

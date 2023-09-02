@@ -30,7 +30,6 @@
           <el-col :span="20">
             <el-row style="float:right;margin-right:10px">
               <div style="float:left;margin-right:10px">Binded to reviewer</div>
-
               <el-tooltip
                 :content="'Is binded to reviewer: ' + chosenScenario.isBinded"
                 placement="top"
@@ -44,7 +43,7 @@
               </el-tooltip>
             </el-row>
             <el-row>
-              {{ currentModel }}
+              <model-content :modelItem="currentModel"></model-content>
             </el-row>
           </el-col>
         </el-card>
@@ -64,11 +63,13 @@ import {
 import ScenarioCard from "_com/Cards/ScenarioListCard.vue";
 
 import ResourceToolbar from "./Toolbars/ResourceToolbar";
+import ModelContent from "./Toolbars/ModelContent";
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
   components: {
     ScenarioCard,
     ResourceToolbar,
+    ModelContent,
     // SelectedScenario
   },
 

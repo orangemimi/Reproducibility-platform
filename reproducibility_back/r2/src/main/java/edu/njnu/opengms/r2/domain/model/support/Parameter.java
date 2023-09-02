@@ -1,5 +1,6 @@
 package edu.njnu.opengms.r2.domain.model.support;
 
+import cn.hutool.json.JSONObject;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
@@ -27,4 +28,5 @@ public class Parameter {
     public String description;
     public String tooltip;
     public String value;
+    public JSONObject datasetItem;
 }

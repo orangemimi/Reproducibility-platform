@@ -70,7 +70,7 @@ public class ModelController {
                                 .privacy("public")
                                 .serviceId(add.get(i))
                                 .contributorId("OpenGMS_platform")
-//                                .behavior((List< State >) data.get("behavior"))
+                                .behavior((List< State >) data.get("behavior"))
                                 .description(data.getStr("description"))
                                 .name(data.getStr("name"))
                                 .build();

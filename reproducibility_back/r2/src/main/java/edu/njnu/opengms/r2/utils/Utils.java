@@ -22,6 +22,8 @@ public class Utils {
             return null;
         }
 
+//        String modelId= data.getJSONObject("mdlJson");
+
         JSONObject jsonObject = data.getJSONObject("mdlJson");
         JSONObject result = new JSONObject();
         result.put("name", data.getStr("name"));
@@ -102,6 +104,7 @@ public class Utils {
                     if (event.getStr("type").equals("response")) {
                         if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
                             temp.put("tooltip", event.getJSONObject("datasetItem").getStr("datasetReference"));
+                            temp.put("datasetItem", event.get("datasetItem"));
                             stateJson.getJSONArray("parameters").add(temp);//judge input
                         } else {
                             stateJson.getJSONArray("inputs").add(temp);//judge input

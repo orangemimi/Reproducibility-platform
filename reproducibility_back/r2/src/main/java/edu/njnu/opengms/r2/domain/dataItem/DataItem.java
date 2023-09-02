@@ -1,10 +1,7 @@
-package edu.njnu.opengms.r2.domain.data;
+package edu.njnu.opengms.r2.domain.dataItem;
 
 import edu.njnu.opengms.common.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,14 +13,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class DataItem extends BaseEntity {
     @Id
     String id;
     String name;
+    String suffix;
     String description;
+    String privacy;
     Boolean isInitial;//是否是初始数据
     Boolean isIntermediate;//是否是中间数据
     Boolean isReproduced;//是否是复现的结果
@@ -31,5 +27,7 @@ public class DataItem extends BaseEntity {
     String key;
     String value;//resource url or value
     String contributorId;// if is reproduced intermediate data , the contributor is the executor
+
+    String fileSize;
 
 }
