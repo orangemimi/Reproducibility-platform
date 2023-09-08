@@ -9,7 +9,6 @@ import edu.njnu.opengms.r2.domain.modelInstance.dto.UpdateModelInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,17 +37,11 @@ public class ModelInstanceController {
 
     }
 
-    @RequestMapping(value = "/{scenarioId}/{modelId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/inscenario/{scenarioId}/{modelId}", method = RequestMethod.GET)
     public JsonResult getInstancesByScenarioIdAndModelIs(@PathVariable("modelId") String modelId,@PathVariable("scenarioId") String scenarioId) {
-        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioId(scenarioId);
-        List<ModelInstance> newArray = new ArrayList<>();
+        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelId(scenarioId,modelId);
 
-        for (ModelInstance modelInstance : modelInstanceList){
-            if (modelInstance.getModel().getId().equals(modelId)){
-                newArray.add(modelInstance);
-            }
-        }
-        return ResultUtils.success(newArray) ;
+        return ResultUtils.success(modelInstanceList) ;
 
     }
 

@@ -1,9 +1,12 @@
 package edu.njnu.opengms.r2.domain.modelInstance.dto;
 
 import edu.njnu.opengms.common.dto.ToDomainConverter;
-import edu.njnu.opengms.r2.domain.model.Model;
+import edu.njnu.opengms.r2.domain.model.support.State;
 import edu.njnu.opengms.r2.domain.modelInstance.ModelInstance;
+import edu.njnu.opengms.r2.domain.modelInstance.RefreshForm;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @ClassName AddModelServiceDTO
@@ -14,9 +17,14 @@ import lombok.Data;
  */
 @Data
 public class AddModelInstanceDTO implements ToDomainConverter<ModelInstance> {
-    Model model;
+    String name;
+    List<State> behavior;
+    String modelId;
     String executorId;
     String scenarioId;
-    String status;//running, fail, success
+    String status;//running 0, fail, success 2
+    RefreshForm refreshForm;
+    Boolean isReproduced;
+
 }
 

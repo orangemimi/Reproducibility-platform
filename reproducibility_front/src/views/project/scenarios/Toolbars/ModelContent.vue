@@ -11,7 +11,12 @@
           <p class="description">{{ modelItem.description }}</p>
         </el-col>
         <el-col :span="7">
-          <el-button type="success" size="mini" style="float:right">
+          <el-button
+            type="success"
+            size="mini"
+            style="float:right"
+            @click="getInstances"
+          >
             <i class="el-icon-setting"></i>&nbsp;Instances
           </el-button>
           <el-button
@@ -311,6 +316,18 @@
     </div>
     <div class="selectData">
       <el-dialog
+        :visible.sync="instanceDialogShow"
+        width="1000px"
+        title="Insatnces"
+        :close-on-click-modal="false"
+        :destroy-on-close="true"
+      >
+        {{ modelInstanceList }}
+      </el-dialog>
+    </div>
+
+    <div class="selectData">
+      <el-dialog
         :visible.sync="selectDataDialogShow"
         width="1000px"
         title="Select data from resource center or upload"
@@ -332,11 +349,12 @@ import {
   saveInstance,
   updateInstance,
   getRecordofSingleModel,
-  //   getInstancesInScenario,
+  getInstancesInScenario,
   //   getInstanceById,
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
+import { dateFormat } from "@/lib/utils";
 export default {
   props: {
     currentModel: {
@@ -353,7 +371,6 @@ export default {
       async handler(newVal) {
         if (Object.hasOwnProperty.call(newVal, "md5")) {
           this.modelItem = newVal;
-          console.log(this.modelItem);
           await this.initTask();
         }
       },
@@ -372,11 +389,13 @@ export default {
     return {
       modelItem: this.currentEvent,
       modelInstance: {},
+      modelInstanceList: [],
+      instanceDialogShow: false,
       activeNames: 0,
       selectDataDialogShow: false,
       currentEvent: "",
       timer: {},
-      record: {},
+      recordOutput: {},
       refreshForm: {},
       invokeForm: {
         ip: "",
@@ -432,6 +451,23 @@ export default {
       this.currentEvent = event;
       this.selectDataDialogShow = true;
     },
+
+    async getInstances() {
+      this.instanceDialogShow = true;
+      this.modelInstanceList = await getInstancesInScenario(
+        this.scenarioId,
+        this.modelItem.id
+      );
+      await this.getInstanceStatus();
+    },
+    async getInstanceStatus() {
+      this.modelInstanceList.forEach((instance) => {
+        if (instance.status == 0) {
+          this.getOutputs(instance, instance.refreshForm);
+          //表示正在运行
+        }
+      });
+    },
     // selectData(val) {
     //   let stateIndex = this.stateList.findIndex(
     //     (state) => state.name == this.currentEvent.stateName
@@ -460,82 +496,73 @@ export default {
       this.selectDataDialogShow = false;
     },
     async invokeTest() {
+      debugger;
       await this.createFilefromParam();
       this.createInvokeForm();
       //测试数据没有弄 直接运行 根据ip+id
       //invoke
       let data = await invokeSingleModel(this.invokeForm);
-      debugger;
-
-      this.refreshForm = {
+      let refreshForm = {
         ip: this.invokeForm.ip,
         port: this.invokeForm.port,
-        tid: data.data.tid,
       };
-      let refreshForm = this.refreshForm;
-
       if (data == null) {
         this.$message({
           message: "You have run the model failed",
           type: "error",
         });
-        let record = {
-          status: -1, //0 calculating
-          ...refreshForm,
-        };
-        await this.emitInstance(record);
-        // this.status = false;
+
+        await this.emitInstance(-1, this.modelItem, refreshForm);
       } else {
-        debugger;
-        let record = {
-          status: 0, //0 calculating
-          ...refreshForm,
-        };
-        await this.emitInstance(record);
-        this.getOutputs();
+        refreshForm.tid = data.data.tid;
+        console.log("refreshForm", "refreshForm", refreshForm);
+        await this.emitInstance(0, this.modelItem, refreshForm);
       }
     },
-    async emitInstance(record) {
+    async emitInstance(status, modelItem, refreshForm) {
       //在运行时 instance的创建
-      if (record.status == 0) {
+      if (status == 0 || status == -1) {
         let instanceTemp = {
-          model: this.modelItem,
-          status: record.status,
+          name: modelItem.name + "||" + dateFormat(new Date()),
+          behavior: modelItem.behavior,
+          status: status,
           scenarioId: this.scenarioId,
+          modelId: modelItem.id,
+          refreshForm: refreshForm,
+          isReproduced: false,
         };
-
-        let data = await saveInstance(instanceTemp);
-        console.log(data);
-        debugger;
-        this.modelInstance = data;
+        await saveInstance(instanceTemp);
       } else {
-        let stepResource = {
-          states: this.modelItem,
-          status: record.status, //2 finish
+        let instanceTemp = {
+          behavior: modelItem.behavior,
+          status: status,
         };
-        let data = await updateInstance(this.scenarioId, stepResource);
-        this.modelInstance = data;
+        console.log(instanceTemp);
+
+        let data = await updateInstance(modelItem.id, instanceTemp);
+        console.log("over", data);
       }
     },
 
-    async getOutputs() {
+    async getOutputs(instance, refreshForm) {
+      debugger;
       //获得结果
-      this.record = {};
-      this.timer = setInterval(async () => {
-        if (this.record.status == 2) {
-          clearInterval(this.timer);
-          await this.getStateEventOut(this.record);
-          return;
-        } else {
-          let { data } = await getRecordofSingleModel(this.refreshForm);
-          this.record = data;
-          console.log(data);
+      if (instance.status != 2) {
+        let { data } = await getRecordofSingleModel(refreshForm);
+        console.log(data);
+
+        if (data.status != instance.status) {
+          instance.status = data.status;
+          if (data.status == 2) {
+            await this.getStateEventOut(instance, data);
+            // let data3 = await updateInstance(this.scenarioId, stepResource);
+          }
         }
-      }, 2000);
+      }
     },
 
-    async getStateEventOut(record) {
-      let stateList = this.model.behavior;
+    async getStateEventOut(instance, record) {
+      let stateList = instance.behavior;
       let outputUrl = record.outputs;
       outputUrl.forEach((el) => {
         stateList.forEach((state, index) => {
@@ -543,7 +570,7 @@ export default {
             state.outputs.forEach((event, eventIndex) => {
               if (el.event == event.name) {
                 this.$set(
-                  this.modelItem.behavior[index].outputs[eventIndex],
+                  instance.behavior[index].outputs[eventIndex],
                   "value",
                   el.url
                 );
@@ -552,7 +579,9 @@ export default {
           }
         });
       });
-      await this.emitInstance(record);
+
+      console.log(instance);
+      await this.emitInstance(instance.status, instance, instance.refreshForm);
     },
 
     createInvokeForm() {
@@ -661,7 +690,6 @@ export default {
       this.invokeForm.port = data.port;
       this.invokeForm.pid = this.modelItem.md5; //md5
       this.invokeForm.username = this.userId;
-      console.log("data2", this.invokeForm);
     },
   },
 

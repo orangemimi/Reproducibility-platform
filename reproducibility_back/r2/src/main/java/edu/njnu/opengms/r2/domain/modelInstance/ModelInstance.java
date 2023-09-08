@@ -1,10 +1,12 @@
 package edu.njnu.opengms.r2.domain.modelInstance;
 
 import edu.njnu.opengms.common.entity.BaseEntity;
-import edu.njnu.opengms.r2.domain.model.Model;
+import edu.njnu.opengms.r2.domain.model.support.State;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * @Author ：Zhiyi
@@ -17,10 +19,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ModelInstance extends BaseEntity {
     @Id
     String id;
-    Model model;
+    String name;
+    List<State> behavior;
+    String modelId;
     String executorId;
     String scenarioId;
-    String status;//running, fail, success
+    Boolean isReproduced;
+    String status;//running 0, fail, success 2
+    RefreshForm refreshForm;
 
 
 }

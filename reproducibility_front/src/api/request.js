@@ -198,9 +198,7 @@ export async function getInstanceById(id) {
 }
 
 export async function getInstancesInScenario(scenarioId, modelId) {
-  return await post(
-    `/managermodel_instances/Server/initTask/${scenarioId}${modelId}`
-  );
+  return await get(`/model_instances/inscenario/${scenarioId}/${modelId}`);
 }
 
 export async function saveInstance(formData) {
