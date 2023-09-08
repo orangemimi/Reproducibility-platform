@@ -107,11 +107,13 @@ public class Utils {
                             temp.put("datasetItem", event.get("datasetItem"));
                             stateJson.getJSONArray("parameters").add(temp);//judge input
                         } else {
+                            temp.put("datasetItem", event.get("datasetItem"));
                             stateJson.getJSONArray("inputs").add(temp);//judge input
                         }
                     }
 
                     if (event.getStr("type").equals("noresponse")) {
+                        temp.put("datasetItem", event.get("datasetItem"));
                         stateJson.getJSONArray("outputs").add(temp);//judge parameter
                     }
                 }

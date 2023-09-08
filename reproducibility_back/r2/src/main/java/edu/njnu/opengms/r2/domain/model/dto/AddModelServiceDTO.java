@@ -1,9 +1,7 @@
 package edu.njnu.opengms.r2.domain.model.dto;
 
 import edu.njnu.opengms.common.dto.ToDomainConverter;
-import edu.njnu.opengms.common.entity.AgentInfo;
 import edu.njnu.opengms.r2.domain.model.Model;
-import edu.njnu.opengms.r2.domain.model.support.Dependency;
 import edu.njnu.opengms.r2.domain.model.support.State;
 import lombok.Data;
 
@@ -18,31 +16,10 @@ import java.util.List;
  */
 @Data
 public class AddModelServiceDTO implements ToDomainConverter<Model> {
-    String name;
-    String description;
-
-    String privacy;// is public?
-
-    String type; //service or code
-
-    List<Dependency> dependencies;
-    String boundaryCondition;
-
-    List<AgentInfo> agentInfo;
-    String license;
-    String snapshot;
-    String contributorId;
-    String value;//resource url
-
-
     //service
 //    ModelBehavior behavior;
     List<State> behavior;
     String md5;
     String serviceId;
-    String sponsor;
-
-    //code
-    String content;
 }
 

@@ -7,16 +7,22 @@
       </el-row>
 
       <el-row>
-        <el-col :span="16">
+        <el-col :span="17">
           <p class="description">{{ modelItem.description }}</p>
         </el-col>
-        <el-button
-          type="primary"
-          @click="invokeTest"
-          style="float:right;width:110px;margin-right:15%"
-        >
-          <i class="el-icon-setting"></i>&nbsp;Invoke
-        </el-button>
+        <el-col :span="7">
+          <el-button type="success" size="mini" style="float:right">
+            <i class="el-icon-setting"></i>&nbsp;Instances
+          </el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            @click="invokeTest"
+            style="float:right;margin-right:5px"
+          >
+            <i class="el-icon-setting"></i>&nbsp;Invoke
+          </el-button>
+        </el-col>
       </el-row>
 
       <el-collapse
@@ -311,7 +317,7 @@
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <resource-table></resource-table>
+        <resource-table @submitDataToEvent="submitDataToEvent"></resource-table>
       </el-dialog>
     </div>
   </div>
@@ -319,20 +325,84 @@
 
 <script>
 import ResourceTable from "./ResourceTable.vue";
+import {
+  saveData,
+  invokeSingleModel,
+  initTask,
+  saveInstance,
+  updateInstance,
+  getRecordofSingleModel,
+  //   getInstancesInScenario,
+  //   getInstanceById,
+} from "@/api/request";
+import { renderSize } from "@/utils/utils";
+import { mapState } from "vuex";
 export default {
   props: {
-    modelItem: {
+    currentModel: {
       type: Object,
+    },
+    scenarioId: {
+      type: String,
     },
   },
   components: { ResourceTable },
 
-  watch: {},
+  watch: {
+    currentModel: {
+      async handler(newVal) {
+        if (Object.hasOwnProperty.call(newVal, "md5")) {
+          this.modelItem = newVal;
+          console.log(this.modelItem);
+          await this.initTask();
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
 
-  computed: {},
+  computed: {
+    ...mapState({
+      userId: (state) => state.user.userId,
+    }),
+  },
 
   data() {
-    return { activeNames: 0, selectDataDialogShow: false, currentEvent: "" };
+    return {
+      modelItem: this.currentEvent,
+      modelInstance: {},
+      activeNames: 0,
+      selectDataDialogShow: false,
+      currentEvent: "",
+      timer: {},
+      record: {},
+      refreshForm: {},
+      invokeForm: {
+        ip: "",
+        port: "",
+        pid: "",
+        username: "",
+        inputs: [
+          {
+            statename: "",
+            event: "",
+            url: "",
+            tag: "",
+          },
+        ],
+        outputs: [
+          {
+            statename: "",
+            event: "",
+            template: {
+              type: "", //id|none
+              value: "", //if tyoe=none value=""
+            },
+          },
+        ],
+      },
+    };
   },
 
   methods: {
@@ -362,30 +432,241 @@ export default {
       this.currentEvent = event;
       this.selectDataDialogShow = true;
     },
-    selectData(val) {
-      let stateIndex = this.stateList.findIndex(
-        (state) => state.name == this.currentEvent.stateName
-      );
+    // selectData(val) {
+    //   let stateIndex = this.stateList.findIndex(
+    //     (state) => state.name == this.currentEvent.stateName
+    //   );
 
-      let eventIndex = this.stateList[stateIndex].Event.findIndex(
-        (event) => event.name == this.currentEvent.name
-      );
-      this.$set(
-        this.stateList[stateIndex].Event[eventIndex],
-        "url",
-        val.pathURL
-      );
-      this.$set(
-        this.stateList[stateIndex].Event[eventIndex],
-        "urlName",
-        val.name
-      );
+    //   let eventIndex = this.stateList[stateIndex].Event.findIndex(
+    //     (event) => event.name == this.currentEvent.name
+    //   );
+    //   this.$set(
+    //     this.stateList[stateIndex].Event[eventIndex],
+    //     "url",
+    //     val.pathURL
+    //   );
+    //   this.$set(
+    //     this.stateList[stateIndex].Event[eventIndex],
+    //     "urlName",
+    //     val.name
+    //   );
 
+    //   this.selectDataDialogShow = false;
+    // },
+
+    submitDataToEvent(val) {
+      this.currentEvent.value = val.value;
+      this.currentEvent.dataId = val.id;
       this.selectDataDialogShow = false;
     },
+    async invokeTest() {
+      await this.createFilefromParam();
+      this.createInvokeForm();
+      //测试数据没有弄 直接运行 根据ip+id
+      //invoke
+      let data = await invokeSingleModel(this.invokeForm);
+      debugger;
 
-    invokeTest() {},
+      this.refreshForm = {
+        ip: this.invokeForm.ip,
+        port: this.invokeForm.port,
+        tid: data.data.tid,
+      };
+      let refreshForm = this.refreshForm;
+
+      if (data == null) {
+        this.$message({
+          message: "You have run the model failed",
+          type: "error",
+        });
+        let record = {
+          status: -1, //0 calculating
+          ...refreshForm,
+        };
+        await this.emitInstance(record);
+        // this.status = false;
+      } else {
+        debugger;
+        let record = {
+          status: 0, //0 calculating
+          ...refreshForm,
+        };
+        await this.emitInstance(record);
+        this.getOutputs();
+      }
+    },
+    async emitInstance(record) {
+      //在运行时 instance的创建
+      if (record.status == 0) {
+        let instanceTemp = {
+          model: this.modelItem,
+          status: record.status,
+          scenarioId: this.scenarioId,
+        };
+
+        let data = await saveInstance(instanceTemp);
+        console.log(data);
+        debugger;
+        this.modelInstance = data;
+      } else {
+        let stepResource = {
+          states: this.modelItem,
+          status: record.status, //2 finish
+        };
+        let data = await updateInstance(this.scenarioId, stepResource);
+        this.modelInstance = data;
+      }
+    },
+
+    async getOutputs() {
+      //获得结果
+      this.record = {};
+      this.timer = setInterval(async () => {
+        if (this.record.status == 2) {
+          clearInterval(this.timer);
+          await this.getStateEventOut(this.record);
+          return;
+        } else {
+          let { data } = await getRecordofSingleModel(this.refreshForm);
+          this.record = data;
+          console.log(data);
+        }
+      }, 2000);
+    },
+
+    async getStateEventOut(record) {
+      let stateList = this.model.behavior;
+      let outputUrl = record.outputs;
+      outputUrl.forEach((el) => {
+        stateList.forEach((state, index) => {
+          if (state.name == el.statename) {
+            state.outputs.forEach((event, eventIndex) => {
+              if (el.event == event.name) {
+                this.$set(
+                  this.modelItem.behavior[index].outputs[eventIndex],
+                  "value",
+                  el.url
+                );
+              }
+            });
+          }
+        });
+      });
+      await this.emitInstance(record);
+    },
+
+    createInvokeForm() {
+      console.log(this.modelItem);
+      let stateList = this.modelItem.behavior;
+      let input = [];
+      let output = [];
+
+      for (let i = 0; i < stateList.length; i++) {
+        let state = stateList[i];
+        let allInputsWithPara = state.inputs.concat(state.parameters);
+        let detail = {};
+        for (let j = 0; j < allInputsWithPara.length; j++) {
+          //判断数据类型 如果是input--对应url
+
+          detail["statename"] = state.name;
+          detail["event"] = allInputsWithPara[j].name;
+
+          if (Object.hasOwnProperty.call(allInputsWithPara[j], "value")) {
+            detail["tag"] = allInputsWithPara[j].name;
+            detail["url"] = allInputsWithPara[j].value;
+            input.push(detail);
+          } else {
+            continue;
+          }
+        }
+
+        for (let j = 0; j < state.outputs.length; j++) {
+          let template = {};
+          let outputTemplate = state.outputs[j].datasetItem;
+          if (outputTemplate.type === "external") {
+            template = {
+              type: "id",
+              value: outputTemplate.externalId,
+            };
+          } else {
+            template = {
+              type: "none",
+              value: "",
+            };
+          }
+          detail["template"] = template;
+          output.push(detail);
+        }
+      }
+
+      this.invokeForm.inputs = input;
+      this.invokeForm.outputs = output;
+      console.log(this.invokeForm);
+    },
     handleChange() {},
+
+    async createFilefromParam() {
+      console.log("111", this.modelItem);
+      let stateList = this.modelItem.behavior;
+      for (let i = 0; i < stateList.length; i++) {
+        let events = stateList[i].parameters;
+        for (let j = 0; j < events.length; j++) {
+          //判断如果是参数的话，重新绑定成为一个文件 之后上传 返回url绑定到mdl中去
+
+          let content = "";
+          let uploadFileForm = new FormData();
+
+          let udxNodeList =
+            events[j].datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode;
+          for (let k = 0; k < udxNodeList.length; k++) {
+            if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
+              // content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
+              content += `<XDO name="${udxNodeList[k].name}" kernelType="string" value="${udxNodeList[k].value}" />`;
+            }
+          }
+          if (content != "") {
+            content = "<Dataset> " + content + " </Dataset>";
+            let file = new File([content], events[j].name + ".xml", {
+              type: "text/plain",
+            });
+            uploadFileForm.append("file", file);
+
+            // this.createConfigFile();
+            await this.submitUpload(i, j, uploadFileForm);
+          }
+        }
+      }
+    },
+
+    async submitUpload(stateIndex, eventIndex, fileItem) {
+      let param = fileItem.file;
+      let uploadFileForm = new FormData();
+      uploadFileForm.append("file", param);
+
+      let data = await saveData(uploadFileForm, "", renderSize(param.size));
+
+      this.$set(
+        this.modelItem.behavior[stateIndex].parameters[eventIndex],
+        "url",
+        data.value
+      );
+    },
+
+    async initTask() {
+      //get task ip port ...
+
+      let { data } = await initTask(this.modelItem.md5);
+
+      this.invokeForm.ip = data.host;
+      this.invokeForm.port = data.port;
+      this.invokeForm.pid = this.modelItem.md5; //md5
+      this.invokeForm.username = this.userId;
+      console.log("data2", this.invokeForm);
+    },
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timer);
   },
 
   mounted() {},

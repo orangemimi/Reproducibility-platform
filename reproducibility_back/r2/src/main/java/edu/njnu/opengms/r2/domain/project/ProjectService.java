@@ -67,12 +67,17 @@ public class ProjectService {
         List<String> createdProjects = (List<String>) userProjectInfo.get("createdProjects");
         List<String> joinedProjects = (List<String>) userProjectInfo.get("joinedProjects");
         List<Project> projectList = new ArrayList<>();
-        for(String projectId : createdProjects) {
-            projectList.add(get(projectId));
+        if(createdProjects!=null) {
+            for (String projectId : createdProjects) {
+                projectList.add(get(projectId));
+            }
         }
-        for(String projectId : joinedProjects) {
-            projectList.add(get(projectId));
+        if(joinedProjects!=null){
+            for(String projectId : joinedProjects) {
+                projectList.add(get(projectId));
+            }
         }
+
         return projectList;
     }
 

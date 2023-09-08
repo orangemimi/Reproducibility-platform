@@ -18,6 +18,7 @@ public class ModelEvent {
     public Boolean isOptional=false;
     public String description;
     public String dataId;
+    public String value;
     public JSONObject datasetItem;
 
 }

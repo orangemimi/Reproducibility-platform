@@ -70,6 +70,9 @@
       <div class="btnList">
         <div v-if="!isAddFolder">
           <div class="btn">
+            <el-button size="mini" @click="submitDataToEvent">Submit</el-button>
+          </div>
+          <div class="btn">
             <el-upload
               action
               :auto-upload="true"
@@ -85,7 +88,7 @@
               </el-button>
             </el-upload>
           </div>
-          <div class="btn"></div>
+
           <div class="btn">
             <el-button size="mini" @click="addFolderShow">Add folder</el-button>
           </div>
@@ -205,8 +208,7 @@ export default {
       if (this.currentRow != "") {
         form.parent = this.currentRow.id;
       }
-      let data = await addFolder(form);
-      console.log("addfolder", data);
+      await addFolder(form);
       this.isAddFolder = false;
       await this.getFolders();
     },
@@ -220,12 +222,11 @@ export default {
         let uploadFileForm = new FormData();
         uploadFileForm.append("file", param);
 
-        let data = await saveData(
+        await saveData(
           uploadFileForm,
           this.currentRow.id,
           renderSize(param.size)
         );
-        console.log(data);
       } else {
         this.$alert("Please select one folder to upload data", "Warning", {});
       }
@@ -236,6 +237,11 @@ export default {
     },
     cancleRow() {
       this.currentRow = "";
+    },
+    submitDataToEvent() {
+      if (this.currentRow != "") {
+        this.$emit("submitDataToEvent", this.currentRow);
+      }
     },
   },
   async mounted() {
