@@ -37,22 +37,21 @@ public class ModelController {
         Model model;
         JSONObject data;
 
-        if(add.getType().equals("service")){
-            data = remotePortalService.getModelInfo(add.getServiceId());
-            model = Model.builder()
-                    .type("service")
-                    .privacy("public")
-                    .serviceId(add.getServiceId())
-                    .snapshot(add.getSnapshot())
-                    .license(add.getLicense())
-                    .contributorId("OpenGMS_platform")
-                    .behavior( (List< State >) data.get("behavior"))
-                    .description(data.getStr("description"))
-                    .name(data.getStr("name"))
-                    .build();
-
-            return ResultUtils.success(modelRepository.insert(model));
-        }
+//        if(add.getType().equals("service")){
+//            data = remotePortalService.getModelInfo(add.getServiceId());
+//            model = Model.builder()
+//                    .type("service")
+//                    .privacy("public")
+//                    .serviceId(add.getServiceId())
+//
+//                    .contributorId("OpenGMS_platform")
+//                    .behavior( (List< State >) data.get("behavior"))
+//                    .description(data.getStr("description"))
+//                    .name(data.getStr("name"))
+//                    .build();
+//
+//            return ResultUtils.success(modelRepository.insert(model));
+//        }
         return ResultUtils.success();
     }
 
@@ -69,6 +68,7 @@ public class ModelController {
                                 .type("service")
                                 .privacy("public")
                                 .serviceId(add.get(i))
+                                .md5(data.getStr("md5"))
                                 .contributorId("OpenGMS_platform")
                                 .behavior((List< State >) data.get("behavior"))
                                 .description(data.getStr("description"))
@@ -106,6 +106,18 @@ public class ModelController {
 //        PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
         return ResultUtils.success(modelRepository.findByNameContainsIgnoreCase(text));
     }
+
+    @RequestMapping(value = "/invoke", method = RequestMethod.POST)
+    JsonResult invoke(@RequestBody JSONObject obj) {
+        return ResultUtils.success();
+    }
+
+    @RequestMapping(value = "/getRecord", method = RequestMethod.POST)
+    JsonResult getResult(@RequestBody JSONObject data) {
+
+        return ResultUtils.success();
+    }
+
 
 
 

@@ -164,14 +164,14 @@ export default {
     },
 
     async setScenario() {
-      console.log("try", {
-        projectId: this.projectId,
-        name: this.form.name,
-        type: this.form.type,
-        resourceCollection: {
-          modelList: this.selectedModelsWithId,
-        },
-      });
+      // console.log("try", {
+      //   projectId: this.projectId,
+      //   name: this.form.name,
+      //   type: this.form.type,
+      //   resourceCollection: {
+      //     modelList: this.selectedModelsWithId,
+      //   },
+      // });
       let data = await saveScenario({
         projectId: this.projectId,
         name: this.form.name,

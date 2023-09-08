@@ -43,7 +43,10 @@
               </el-tooltip>
             </el-row>
             <el-row>
-              <model-content :modelItem="currentModel"></model-content>
+              <model-content
+                :currentModel="currentModel"
+                :scenarioId="chosenScenario.id"
+              ></model-content>
             </el-row>
           </el-col>
         </el-card>

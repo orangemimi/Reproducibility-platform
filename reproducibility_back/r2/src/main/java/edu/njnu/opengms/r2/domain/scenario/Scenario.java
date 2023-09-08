@@ -21,7 +21,7 @@ public class Scenario extends BaseEntity {
 //    String creatorId;
 //    String executorId;
     String projectId;
-    List<String> tasks;
+    List<String> instances;//绑定的instanceId；
     String type;//notebook or integrateTask or sequentModels
     ResourceCollection resourceCollection;
 

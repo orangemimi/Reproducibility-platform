@@ -110,8 +110,13 @@ public class DataItemController {
         DataItem dataItem = new DataItem();
         add.convertTo(dataItem);
         DataItem resultData = dataItemRepository.insert(dataItem);
+        if(storedFolderId==""){
+            return ResultUtils.success( resultData);
+        } else {
+            return ResultUtils.success( folderService.updataDataList(storedFolderId,resultData.id));
+        }
 
-        return ResultUtils.success( folderService.updataDataList(storedFolderId,resultData.id));
+
 
     }
 

@@ -48,6 +48,10 @@ export async function getProjectById(projectId) {
   return await get(`/projects/info/${projectId}`);
 }
 
+export async function getMyProjects() {
+  return await get(`/projects/getmyprojects`);
+}
+
 //---------------
 
 export async function updateProject(projectId, form) {
@@ -169,6 +173,40 @@ export async function getDataServiceInfo1(form) {
 
 export async function getAllProcessing(list) {
   return await get(`/dataContainer/dataService/getAllProcessing`, list);
+}
+
+//-----------------------------------------------manager server type 1---------------------------------------------
+export async function initTask(md5) {
+  return await get(`/managerServer/getServiceTask/${md5}`);
+}
+
+export async function createTask(obj) {
+  return await post(`/managerServer/initTask/`, obj);
+}
+
+export async function invokeSingleModel(formData) {
+  return await post(`/managerServer/invoke`, formData);
+}
+
+export async function getRecordofSingleModel(obj) {
+  return await post(`/managerServer/refresh`, obj);
+}
+
+//-----------------------------------------------model instances---------------------------------------------
+export async function getInstanceById(id) {
+  return await get(`/model_instances/${id}`);
+}
+
+export async function getInstancesInScenario(scenarioId, modelId) {
+  return await get(`/model_instances/inscenario/${scenarioId}/${modelId}`);
+}
+
+export async function saveInstance(formData) {
+  return await post(`/model_instances`, formData);
+}
+
+export async function updateInstance(id, formData) {
+  return await patch(`/model_instances/${id}`, formData);
 }
 
 //===============================extra=================================================

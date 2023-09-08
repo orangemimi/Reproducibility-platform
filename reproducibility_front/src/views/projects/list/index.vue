@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { getUserProjects, getAllProjects } from "@/api/request";
+import { getMyProjects, getAllProjects } from "@/api/request";
 import create from "../create";
 import { imgBase64 } from "@/lib/utils";
 import projectCard from "../components/ProjectCard";
@@ -97,7 +97,7 @@ export default {
 
   methods: {
     async init() {
-      this.myProjects = await getUserProjects();
+      this.myProjects = await getMyProjects();
 
       let data = await getAllProjects(0, 16);
       this.projectList = data.content;

@@ -7,16 +7,27 @@
       </el-row>
 
       <el-row>
-        <el-col :span="16">
+        <el-col :span="17">
           <p class="description">{{ modelItem.description }}</p>
         </el-col>
-        <el-button
-          type="primary"
-          @click="invokeTest"
-          style="float:right;width:110px;margin-right:15%"
-        >
-          <i class="el-icon-setting"></i>&nbsp;Invoke
-        </el-button>
+        <el-col :span="7">
+          <el-button
+            type="success"
+            size="mini"
+            style="float:right"
+            @click="getInstances"
+          >
+            <i class="el-icon-setting"></i>&nbsp;Instances
+          </el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            @click="invokeTest"
+            style="float:right;margin-right:5px"
+          >
+            <i class="el-icon-setting"></i>&nbsp;Invoke
+          </el-button>
+        </el-col>
       </el-row>
 
       <el-collapse
@@ -305,13 +316,25 @@
     </div>
     <div class="selectData">
       <el-dialog
+        :visible.sync="instanceDialogShow"
+        width="1000px"
+        title="Insatnces"
+        :close-on-click-modal="false"
+        :destroy-on-close="true"
+      >
+        {{ modelInstanceList }}
+      </el-dialog>
+    </div>
+
+    <div class="selectData">
+      <el-dialog
         :visible.sync="selectDataDialogShow"
         width="1000px"
         title="Select data from resource center or upload"
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <resource-table></resource-table>
+        <resource-table @submitDataToEvent="submitDataToEvent"></resource-table>
       </el-dialog>
     </div>
   </div>
@@ -319,20 +342,86 @@
 
 <script>
 import ResourceTable from "./ResourceTable.vue";
+import {
+  saveData,
+  invokeSingleModel,
+  initTask,
+  saveInstance,
+  updateInstance,
+  getRecordofSingleModel,
+  getInstancesInScenario,
+  //   getInstanceById,
+} from "@/api/request";
+import { renderSize } from "@/utils/utils";
+import { mapState } from "vuex";
+import { dateFormat } from "@/lib/utils";
 export default {
   props: {
-    modelItem: {
+    currentModel: {
       type: Object,
+    },
+    scenarioId: {
+      type: String,
     },
   },
   components: { ResourceTable },
 
-  watch: {},
+  watch: {
+    currentModel: {
+      async handler(newVal) {
+        if (Object.hasOwnProperty.call(newVal, "md5")) {
+          this.modelItem = newVal;
+          await this.initTask();
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
 
-  computed: {},
+  computed: {
+    ...mapState({
+      userId: (state) => state.user.userId,
+    }),
+  },
 
   data() {
-    return { activeNames: 0, selectDataDialogShow: false, currentEvent: "" };
+    return {
+      modelItem: this.currentEvent,
+      modelInstance: {},
+      modelInstanceList: [],
+      instanceDialogShow: false,
+      activeNames: 0,
+      selectDataDialogShow: false,
+      currentEvent: "",
+      timer: {},
+      recordOutput: {},
+      refreshForm: {},
+      invokeForm: {
+        ip: "",
+        port: "",
+        pid: "",
+        username: "",
+        inputs: [
+          {
+            statename: "",
+            event: "",
+            url: "",
+            tag: "",
+          },
+        ],
+        outputs: [
+          {
+            statename: "",
+            event: "",
+            template: {
+              type: "", //id|none
+              value: "", //if tyoe=none value=""
+            },
+          },
+        ],
+      },
+    };
   },
 
   methods: {
@@ -362,30 +451,250 @@ export default {
       this.currentEvent = event;
       this.selectDataDialogShow = true;
     },
-    selectData(val) {
-      let stateIndex = this.stateList.findIndex(
-        (state) => state.name == this.currentEvent.stateName
-      );
 
-      let eventIndex = this.stateList[stateIndex].Event.findIndex(
-        (event) => event.name == this.currentEvent.name
+    async getInstances() {
+      this.instanceDialogShow = true;
+      this.modelInstanceList = await getInstancesInScenario(
+        this.scenarioId,
+        this.modelItem.id
       );
-      this.$set(
-        this.stateList[stateIndex].Event[eventIndex],
-        "url",
-        val.pathURL
-      );
-      this.$set(
-        this.stateList[stateIndex].Event[eventIndex],
-        "urlName",
-        val.name
-      );
+      await this.getInstanceStatus();
+    },
+    async getInstanceStatus() {
+      this.modelInstanceList.forEach((instance) => {
+        if (instance.status == 0) {
+          this.getOutputs(instance, instance.refreshForm);
+          //表示正在运行
+        }
+      });
+    },
+    // selectData(val) {
+    //   let stateIndex = this.stateList.findIndex(
+    //     (state) => state.name == this.currentEvent.stateName
+    //   );
 
+    //   let eventIndex = this.stateList[stateIndex].Event.findIndex(
+    //     (event) => event.name == this.currentEvent.name
+    //   );
+    //   this.$set(
+    //     this.stateList[stateIndex].Event[eventIndex],
+    //     "url",
+    //     val.pathURL
+    //   );
+    //   this.$set(
+    //     this.stateList[stateIndex].Event[eventIndex],
+    //     "urlName",
+    //     val.name
+    //   );
+
+    //   this.selectDataDialogShow = false;
+    // },
+
+    submitDataToEvent(val) {
+      this.currentEvent.value = val.value;
+      this.currentEvent.dataId = val.id;
       this.selectDataDialogShow = false;
     },
+    async invokeTest() {
+      debugger;
+      await this.createFilefromParam();
+      this.createInvokeForm();
+      //测试数据没有弄 直接运行 根据ip+id
+      //invoke
+      let data = await invokeSingleModel(this.invokeForm);
+      let refreshForm = {
+        ip: this.invokeForm.ip,
+        port: this.invokeForm.port,
+      };
+      if (data == null) {
+        this.$message({
+          message: "You have run the model failed",
+          type: "error",
+        });
 
-    invokeTest() {},
+        await this.emitInstance(-1, this.modelItem, refreshForm);
+      } else {
+        refreshForm.tid = data.data.tid;
+        console.log("refreshForm", "refreshForm", refreshForm);
+        await this.emitInstance(0, this.modelItem, refreshForm);
+      }
+    },
+    async emitInstance(status, modelItem, refreshForm) {
+      //在运行时 instance的创建
+      if (status == 0 || status == -1) {
+        let instanceTemp = {
+          name: modelItem.name + "||" + dateFormat(new Date()),
+          behavior: modelItem.behavior,
+          status: status,
+          scenarioId: this.scenarioId,
+          modelId: modelItem.id,
+          refreshForm: refreshForm,
+          isReproduced: false,
+        };
+        await saveInstance(instanceTemp);
+      } else {
+        let instanceTemp = {
+          behavior: modelItem.behavior,
+          status: status,
+        };
+        console.log(instanceTemp);
+
+        let data = await updateInstance(modelItem.id, instanceTemp);
+        console.log("over", data);
+      }
+    },
+
+    async getOutputs(instance, refreshForm) {
+      debugger;
+      //获得结果
+      if (instance.status != 2) {
+        let { data } = await getRecordofSingleModel(refreshForm);
+        console.log(data);
+
+        if (data.status != instance.status) {
+          instance.status = data.status;
+          if (data.status == 2) {
+            await this.getStateEventOut(instance, data);
+            // let data3 = await updateInstance(this.scenarioId, stepResource);
+          }
+        }
+      }
+    },
+
+    async getStateEventOut(instance, record) {
+      let stateList = instance.behavior;
+      let outputUrl = record.outputs;
+      outputUrl.forEach((el) => {
+        stateList.forEach((state, index) => {
+          if (state.name == el.statename) {
+            state.outputs.forEach((event, eventIndex) => {
+              if (el.event == event.name) {
+                this.$set(
+                  instance.behavior[index].outputs[eventIndex],
+                  "value",
+                  el.url
+                );
+              }
+            });
+          }
+        });
+      });
+
+      console.log(instance);
+      await this.emitInstance(instance.status, instance, instance.refreshForm);
+    },
+
+    createInvokeForm() {
+      console.log(this.modelItem);
+      let stateList = this.modelItem.behavior;
+      let input = [];
+      let output = [];
+
+      for (let i = 0; i < stateList.length; i++) {
+        let state = stateList[i];
+        let allInputsWithPara = state.inputs.concat(state.parameters);
+        let detail = {};
+        for (let j = 0; j < allInputsWithPara.length; j++) {
+          //判断数据类型 如果是input--对应url
+
+          detail["statename"] = state.name;
+          detail["event"] = allInputsWithPara[j].name;
+
+          if (Object.hasOwnProperty.call(allInputsWithPara[j], "value")) {
+            detail["tag"] = allInputsWithPara[j].name;
+            detail["url"] = allInputsWithPara[j].value;
+            input.push(detail);
+          } else {
+            continue;
+          }
+        }
+
+        for (let j = 0; j < state.outputs.length; j++) {
+          let template = {};
+          let outputTemplate = state.outputs[j].datasetItem;
+          if (outputTemplate.type === "external") {
+            template = {
+              type: "id",
+              value: outputTemplate.externalId,
+            };
+          } else {
+            template = {
+              type: "none",
+              value: "",
+            };
+          }
+          detail["template"] = template;
+          output.push(detail);
+        }
+      }
+
+      this.invokeForm.inputs = input;
+      this.invokeForm.outputs = output;
+      console.log(this.invokeForm);
+    },
     handleChange() {},
+
+    async createFilefromParam() {
+      console.log("111", this.modelItem);
+      let stateList = this.modelItem.behavior;
+      for (let i = 0; i < stateList.length; i++) {
+        let events = stateList[i].parameters;
+        for (let j = 0; j < events.length; j++) {
+          //判断如果是参数的话，重新绑定成为一个文件 之后上传 返回url绑定到mdl中去
+
+          let content = "";
+          let uploadFileForm = new FormData();
+
+          let udxNodeList =
+            events[j].datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode;
+          for (let k = 0; k < udxNodeList.length; k++) {
+            if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
+              // content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
+              content += `<XDO name="${udxNodeList[k].name}" kernelType="string" value="${udxNodeList[k].value}" />`;
+            }
+          }
+          if (content != "") {
+            content = "<Dataset> " + content + " </Dataset>";
+            let file = new File([content], events[j].name + ".xml", {
+              type: "text/plain",
+            });
+            uploadFileForm.append("file", file);
+
+            // this.createConfigFile();
+            await this.submitUpload(i, j, uploadFileForm);
+          }
+        }
+      }
+    },
+
+    async submitUpload(stateIndex, eventIndex, fileItem) {
+      let param = fileItem.file;
+      let uploadFileForm = new FormData();
+      uploadFileForm.append("file", param);
+
+      let data = await saveData(uploadFileForm, "", renderSize(param.size));
+
+      this.$set(
+        this.modelItem.behavior[stateIndex].parameters[eventIndex],
+        "url",
+        data.value
+      );
+    },
+
+    async initTask() {
+      //get task ip port ...
+
+      let { data } = await initTask(this.modelItem.md5);
+
+      this.invokeForm.ip = data.host;
+      this.invokeForm.port = data.port;
+      this.invokeForm.pid = this.modelItem.md5; //md5
+      this.invokeForm.username = this.userId;
+    },
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timer);
   },
 
   mounted() {},
