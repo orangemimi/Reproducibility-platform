@@ -33,6 +33,7 @@
 import { getProjectAndUsers, forkProject } from "@/api/request";
 import builderMenu from "./components/BuilderMenu";
 import reBuilderMenu from "./components/ReBuilderMenu";
+// import workFlow from
 import { mapState } from "vuex";
 
 export default {
@@ -87,6 +88,7 @@ export default {
           name: val,
           query: {
             forkingProjectId: this.projectInfo.forkingProjectId,
+            //   forkingProjectId: this.projectInfo.id,
           },
         });
       }

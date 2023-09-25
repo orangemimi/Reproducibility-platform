@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author ：Zhiyi
@@ -93,6 +94,16 @@ public class ModelController {
     public JsonResult getAllPublicModels() {
          List<Model> modelList = modelRepository.findAll();
         return ResultUtils.success(modelList);
+    }
+
+    @RequestMapping(value = "/getModelById/{id}", method = RequestMethod.GET)
+    public JsonResult getModelById(@PathVariable String id ){
+        Optional<Model> model = modelRepository.findById(id);
+        if (model.isPresent()) {
+            return ResultUtils.success(model.get());
+        }else {
+            return ResultUtils.error(404,"Model not found");
+        }
     }
 
 

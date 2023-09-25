@@ -66,7 +66,7 @@ public class DataItemController {
 //        return ResultUtils.success(dataItemRepository.insert(dataItem));
 //    }
 
-    @RequestMapping(value = "/uploadFileForm/{storedFolderId}/{fileSize}", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadFileForm/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
     public JsonResult uploadMultipleData(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
         Part part = multiRequest.getPart("file");
@@ -95,24 +95,25 @@ public class DataItemController {
 
 
         //add to dataItem in mongodb
-        AddDataItemDTO add = AddDataItemDTO.builder()
-                .contributorId(userId)
-                .name(filename)
-                .suffix(suffix)
-                .value("http://221.226.60.2:8082/data/" + url)
-                .fileSize(fileSize)
-                .isInitial(true)
-                .isIntermediate(false)
-                .isParameter(false)
-                .isReproduced(false)
-                .privacy("public")
-                .build();
-        DataItem dataItem = new DataItem();
-        add.convertTo(dataItem);
-        DataItem resultData = dataItemRepository.insert(dataItem);
-        if(storedFolderId==""){
-            return ResultUtils.success( resultData);
+
+        if(storedFolderId.equals("intermediate")){
+            return ResultUtils.success("http://221.226.60.2:8082/data/" +url);
         } else {
+            AddDataItemDTO add = AddDataItemDTO.builder()
+                    .contributorId(userId)
+                    .name(filename)
+                    .suffix(suffix)
+                    .value("http://221.226.60.2:8082/data/" + url)
+                    .fileSize(fileSize)
+                    .isInitial(true)
+                    .isIntermediate(false)
+                    .isParameter(false)
+                    .isReproduced(false)
+                    .privacy("public")
+                    .build();
+            DataItem dataItem = new DataItem();
+            add.convertTo(dataItem);
+            DataItem resultData = dataItemRepository.insert(dataItem);
             return ResultUtils.success( folderService.updataDataList(storedFolderId,resultData.id));
         }
 

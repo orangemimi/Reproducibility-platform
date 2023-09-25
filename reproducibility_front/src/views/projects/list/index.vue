@@ -97,8 +97,9 @@ export default {
 
   methods: {
     async init() {
+      console.log("得到projects");
       this.myProjects = await getMyProjects();
-
+      console.log(this.myProjects, "this.myProjects");
       let data = await getAllProjects(0, 16);
       this.projectList = data.content;
       this.total = data.totalElements;

@@ -259,10 +259,24 @@ public class Utils {
     }
 
 
+//    public static JSONObject judgeIsParam(JSONObject datasetItem){
+//        boolean flag = datasetItem.containsKey("UdxDeclaration");
+//        if(flag) {
+//            datasetItem.put("isParams", "true");
+//        } else {
+//            datasetItem.put("isParams", "false");
+//        }
+//        return datasetItem;
+//    }
     public static JSONObject judgeIsParam(JSONObject datasetItem){
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        if(flag) {
-            datasetItem.put("isParams", "true");
+        if(flag ) {
+            JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
+            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode")!="" ){
+                datasetItem.put("isParams", "true");
+            }else {
+                datasetItem.put("isParams", "false");
+            }
         } else {
             datasetItem.put("isParams", "false");
         }

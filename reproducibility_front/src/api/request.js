@@ -100,6 +100,10 @@ export async function getPublicModelListByIgnoreName(text) {
   return await get(`/models/getPublicModelListByIgnoreName/${text}`);
 }
 
+export async function getModelById(id) {
+  return await get(`/models/getModelById/${id}`);
+}
+
 //---
 
 export async function getAllModelItems(currentPage, pagesize) {
@@ -121,6 +125,10 @@ export async function getScenariosByProjectId(projectId) {
 
 export async function saveScenario(postJson) {
   return await post(`/scenario`, postJson);
+}
+
+export async function bindScenario(id, postJson) {
+  return await patch(`/scenario/instance/${id}`, postJson);
 }
 
 export async function updateScenarioByProjectId(projectId, postJson) {
@@ -149,8 +157,8 @@ export async function getFolders() {
 
 //-----------------------------------------------data---------------------------------------------
 
-export async function saveData(form, storedFolderId, fileSize) {
-  return await post(`/data/uploadFileForm/${storedFolderId}/${fileSize}`, form);
+export async function saveData(form, fileSize, storedFolderId) {
+  return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form);
 }
 
 //-----------------------------------------------dataContainer---------------------------------------------
@@ -199,6 +207,11 @@ export async function getInstanceById(id) {
 
 export async function getInstancesInScenario(scenarioId, modelId) {
   return await get(`/model_instances/inscenario/${scenarioId}/${modelId}`);
+}
+
+//这是一个另类，读取数据但是用的POST，注意
+export async function getInstancesByInstances(instances) {
+  return await post(`/model_instances/getBoundInstances`, instances);
 }
 
 export async function saveInstance(formData) {

@@ -125,6 +125,14 @@ export default [
               requireAuth: true,
             },
           },
+          {
+            path: "workFlow",
+            name: "WorkFlow",
+            component: () => import("@/views/project/workFlow/index.vue"),
+            meta: {
+              requireAuth: true,
+            },
+          },
           // {
           //   path: "contributor",
           //   name: "Contributor",

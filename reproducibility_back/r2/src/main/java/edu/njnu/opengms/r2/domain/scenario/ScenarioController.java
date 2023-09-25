@@ -1,15 +1,18 @@
 package edu.njnu.opengms.r2.domain.scenario;
 
 
+import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author ：Zhiyi
@@ -25,8 +28,12 @@ public class ScenarioController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public JsonResult getScenarioInfoBId(@PathVariable("id") String id) {
+
         return ResultUtils.success( scenarioService.getScenario(id) );
     }
+
+
+
 
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.GET)
     public JsonResult getScenariosByProjectId(@PathVariable("projectId") String projectId) {
@@ -36,6 +43,12 @@ public class ScenarioController {
     @RequestMapping(value = "/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
     public JsonResult updateScenarioInfo(@PathVariable("id") String id, @RequestBody UpdateScenarioDTO update) {
         return ResultUtils.success(scenarioService.updateScenario(id, update));
+    }
+
+    @RequestMapping(value = "/instance/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
+    public JsonResult updateScenarioInstance(  @JwtTokenParser(key="userId") String userId,@PathVariable("id") String id, @RequestBody UpdateScenarioInstanceDTO update) {
+        System.out.println("hahaahahah");
+        return ResultUtils.success(scenarioService.updateScenarioInstance(id, update));
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)

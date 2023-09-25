@@ -27,7 +27,7 @@ public class Parameter {
     public String type;
     public String description;
     public String tooltip;
-    public String value;
-    public String dataId;//参数构成的文件的id
+    public String value;//参数构成
+//    public String dataId;
     public JSONObject datasetItem;
 }

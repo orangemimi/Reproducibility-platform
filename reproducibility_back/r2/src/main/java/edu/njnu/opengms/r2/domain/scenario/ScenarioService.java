@@ -4,9 +4,11 @@ package edu.njnu.opengms.r2.domain.scenario;
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.model.ModelRepository;
+import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceRepository;
 import edu.njnu.opengms.r2.domain.project.ResourceCollection;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,13 @@ public class ScenarioService {
     @Autowired
     ModelRepository modelRepository;
 
+    @Autowired
+    ModelInstanceRepository modelInstanceRepository;
+
     public JSONObject getScenario(String id) {
 
         JSONObject obj = new JSONObject();
+        JSONObject objInstance = new JSONObject();
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
         JSONObject modelList =  Optional.ofNullable(scenario)
                 .map(x -> x.getResourceCollection())
@@ -44,11 +50,30 @@ public class ScenarioService {
                 })
                 .orElseGet(null);
 
+        JSONObject instanceList =  Optional.ofNullable(scenario)
+                .map(x -> x.getInstances())
+                .map(x -> {
+                    List<String> instanceIdList = x;
+                    if (instanceIdList != null) {
+                        objInstance.put("instanceList", modelInstanceRepository.findAllById(instanceIdList));
+                    } else {
+                        objInstance.put("instanceList", null);
+                    }
+                    return objInstance;
+                })
+                .orElseGet(() -> {
+                    JSONObject defaultObject = new JSONObject();
+                    defaultObject.put("instanceList", null);
+                    return defaultObject;
+                });
+
         JSONObject scenarioNew = new JSONObject();
         scenarioNew.put("name", scenario.name);
         scenarioNew.put("id", scenario.id);
         scenarioNew.put("type", scenario.type);
+        scenarioNew.put("instances", scenario.instances);
         scenarioNew.put("resourceCollection", obj);
+        scenarioNew.put("instanceObjects", objInstance);
 
 
         return scenarioNew;
@@ -87,6 +112,12 @@ public class ScenarioService {
         }
         scenario.setResourceCollection(resourceCollection);
 
+        return scenarioRepository.save(scenario);
+    }
+
+    public Scenario updateScenarioInstance(String id, UpdateScenarioInstanceDTO update) {
+        Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
+        update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
 }

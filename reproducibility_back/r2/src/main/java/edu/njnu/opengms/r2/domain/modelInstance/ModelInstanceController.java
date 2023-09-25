@@ -9,7 +9,9 @@ import edu.njnu.opengms.r2.domain.modelInstance.dto.UpdateModelInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author ：Zhiyi
@@ -40,9 +42,21 @@ public class ModelInstanceController {
     @RequestMapping(value = "/inscenario/{scenarioId}/{modelId}", method = RequestMethod.GET)
     public JsonResult getInstancesByScenarioIdAndModelIs(@PathVariable("modelId") String modelId,@PathVariable("scenarioId") String scenarioId) {
         List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelId(scenarioId,modelId);
-
         return ResultUtils.success(modelInstanceList) ;
-
+    }
+    //新加，用来读取绑定的实例
+    @RequestMapping(value = "/getBoundInstances", method = RequestMethod.POST)
+    public JsonResult getModelInstancesByIds(@RequestBody List<String> modelInstanceIds) {
+        List<ModelInstance> modelInstanceList = new ArrayList<>();
+        // 遍历传入的ID列表，根据每个ID从数据库中检索对应的ModelInstance对象
+        for (String modelInstanceId : modelInstanceIds) {
+            Optional<ModelInstance> optionalModelInstance = modelInstanceRepository.findById(modelInstanceId);
+            if (optionalModelInstance.isPresent()) {
+                ModelInstance modelInstance = optionalModelInstance.get();
+                modelInstanceList.add(modelInstance);
+            }
+        }
+        return ResultUtils.success(modelInstanceList);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

@@ -1,6 +1,7 @@
 <template>
   <div class="main">
     <div class="btnList" v-if="role == 'participant'">
+      <!-- <div class="btnList" > -->
       <div v-if="!isAddFolder">
         <div class="btn">
           <el-upload
@@ -39,7 +40,7 @@
         :span-method="arraySpanMethod"
         tooltip-effect="dark"
         style="width: 100%"
-        max-height="350"
+        max-height="800"
         :row-style="{ height: '0' }"
         :cell-style="{ padding: '4px' }"
         row-key="id"
@@ -80,7 +81,6 @@
               style="margin-right:10px"
               @click="cilckEditDialog"
             />
-
             <i class="el-icon-download" @click="download(scope.row.value)" />
           </template>
         </el-table-column>
@@ -202,11 +202,14 @@ export default {
         let param = fileItem.file;
         let uploadFileForm = new FormData();
         uploadFileForm.append("file", param);
+        // console.log( "datddd",uploadFileForm,
+        //   renderSize(param.size) ,
+        //   this.currentRow.id,)
 
         let data = await saveData(
           uploadFileForm,
-          this.currentRow.id,
-          renderSize(param.size)
+          renderSize(param.size),
+          this.currentRow.id
         );
         console.log(data);
       } else {

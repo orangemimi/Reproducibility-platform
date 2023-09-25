@@ -77,7 +77,6 @@ public class ProjectService {
                 projectList.add(get(projectId));
             }
         }
-
         return projectList;
     }
 

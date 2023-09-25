@@ -27,6 +27,14 @@
         Construction
       </div>
       <div
+        class="WorkFlow menu-item"
+        @click="handleClick('WorkFlow')"
+        :class="{ isActive: isWorkFlowActive }"
+      >
+        <i class="el-icon-info"></i>
+        WorkFlow
+      </div>
+      <div
         class="contributor menu-item"
         @click="handleClick('Contributor')"
         :class="{ isActive: isContributorActive }"
@@ -70,6 +78,7 @@ export default {
       isSettingsActive: false,
       isCommunityActive: false,
       isConstruction1Active: false,
+      isWorkFlowActive: false,
     };
   },
 
@@ -77,19 +86,22 @@ export default {
     handleClick(type) {
       if (type == "Information") {
         this.isInfoActive = true;
-        this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = false;
+        this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = this.isWorkFlowActive = false;
       } else if (type == "Contributor") {
         this.isContributorActive = true;
-        this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = false;
+        this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = this.isWorkFlowActive = false;
       } else if (type == "Community") {
         this.isCommunityActive = true;
-        this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isContributorActive = this.isConstruction1Active = false;
+        this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isContributorActive = this.isConstruction1Active = this.isWorkFlowActive = false;
       } else if (type == "Settings") {
         this.isSettingsActive = true;
-        this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isCommunityActive = this.isConstruction1Active = false;
+        this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isCommunityActive = this.isConstruction1Active = this.isWorkFlowActive = false;
       } else if (type == "Construction") {
         this.isConstruction1Active = true;
-        this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
+        this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isWorkFlowActive = false;
+      } else if (type == "WorkFlow") {
+        this.isWorkFlowActive = true;
+        this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = false;
       }
       this.$emit("toRouterType", type);
     },
@@ -98,27 +110,32 @@ export default {
       switch (this.$router.currentRoute.name) {
         case "Information": {
           this.isInfoActive = true;
-          this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
+          this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isWorkFlowActive = false;
           break;
         }
         case "Construction": {
           this.isConstructionActive = true;
-          this.isInfoActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
+          this.isInfoActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isWorkFlowActive = false;
+          break;
+        }
+        case "WorkFlow": {
+          this.isWorkFlowActive = true;
+          this.isInfoActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isWorkFlowActive = false;
           break;
         }
         case "Contributor": {
           this.isContributorActive = true;
-          this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isCommunityActive = false;
+          this.isInfoActive = this.isConstructionActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = false;
           break;
         }
         case "Settings": {
           this.isSettingsActive = true;
-          this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isCommunityActive = false;
+          this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isCommunityActive = this.isWorkFlowActive = false;
           break;
         }
         case "Community": {
           this.isCommunityActive = true;
-          this.isInfoActive = this.isReproductionActive = this.isSettingsActive = this.isContributorActive = false;
+          this.isInfoActive = this.isReproductionActive = this.isSettingsActive = this.isContributorActive = this.isWorkFlowActive = false;
         }
       }
     },

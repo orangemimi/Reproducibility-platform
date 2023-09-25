@@ -48,7 +48,6 @@
               style="margin-right:10px"
               @click="cilckEditDialog"
             />
-
             <i class="el-icon-download" @click="download(scope.row.value)" />
           </template>
         </el-table-column>
@@ -106,6 +105,49 @@
         </div>
       </div>
     </el-col>
+    <br /><br /><br />
+    <el-divider></el-divider>
+    <div class="row-style">
+      <el-table
+        ref="multipleTable"
+        :data="outputDataList"
+        tooltip-effect="dark"
+        style="width: 100%"
+        max-height="350"
+        :row-style="{ height: '0' }"
+        :cell-style="{ padding: '4px' }"
+        row-key="id"
+        :tree-props="{ children: 'dataList' }"
+        border
+        default-expand-all
+        @current-change="handleCurrentChange"
+        highlight-current-row
+      >
+        <el-table-column label="Name" prop="name" show-overflow-tooltip>
+        </el-table-column>
+
+        <el-table-column label="Produced from" prop="pname" width="180">
+        </el-table-column>
+        <el-table-column
+          label="Description"
+          width="200"
+          prop="description"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <!--TODO-zzy -->
+        <el-table-column label="Operation" width="120" show-overflow-tooltip>
+          <template #default="scope">
+            <i
+              class="el-icon-edit-outline"
+              style="margin-right:10px"
+              @click="cilckEditDialog"
+            />
+            <i class="el-icon-download" @click="download(scope.row.value)" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <el-dialog>
       <div class="contentBottom">
         <div v-show="editDataDialogShow != ''"></div>
@@ -121,8 +163,13 @@ import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
 
 export default {
+  props: {
+    splitDataProp: {
+      type: Array,
+      required: true, // 这表示 splitDataProp 必须由父组件提供
+    },
+  },
   components: {},
-
   data() {
     return {
       uploadFileDialogShow: true, //upload data dialog
@@ -151,9 +198,32 @@ export default {
     ...mapState({
       role: (state) => state.permission.role,
     }),
+    // 从instances中读取output数据
+    outputDataList() {
+      let outputDataList = [];
+      for (let i = 0; i < this.splitDataProp.length; i++) {
+        if (this.splitDataProp[i].status == "success") {
+          for (let j = 0; j < this.splitDataProp[i].outputs.length; j++) {
+            let data = {};
+            data.name = this.splitDataProp[i].outputs[j].name;
+            data.pname = this.splitDataProp[i].pname;
+            data.description = this.splitDataProp[i].outputs[j].description;
+            data.value = this.splitDataProp[i].outputs[j].value;
+            data.id = this.splitDataProp[i].outputs[j].dataId;
+            outputDataList.push(data);
+          }
+        }
+      }
+      return outputDataList;
+    },
   },
 
   methods: {
+    // test(){
+    // console.log(this.folderList,'folderList');
+    // console.log(this.splitDataProp,'splitDataProp');
+    // this.getOutputData();
+    // },
     arraySpanMethod({ row }) {
       if (row.isFolder) {
         return [1, 3];
@@ -224,8 +294,9 @@ export default {
 
         await saveData(
           uploadFileForm,
-          this.currentRow.id,
-          renderSize(param.size)
+
+          renderSize(param.size),
+          this.currentRow.id
         );
       } else {
         this.$alert("Please select one folder to upload data", "Warning", {});

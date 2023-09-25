@@ -49,6 +49,7 @@ public class RemoteManagerServerController {
 
     @RequestMapping(value = "/getServiceTask/{pid}", method = RequestMethod.GET)
     JsonResult getServiceTask(@PathVariable String pid){
+        System.out.println("-------------");
         return ResultUtils.success(managerServerFeign.getServiceTask(pid));
     }
 
