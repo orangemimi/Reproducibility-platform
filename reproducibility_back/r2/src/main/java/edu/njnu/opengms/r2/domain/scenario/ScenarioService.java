@@ -7,6 +7,7 @@ import edu.njnu.opengms.r2.domain.model.ModelRepository;
 import edu.njnu.opengms.r2.domain.project.ResourceCollection;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,12 @@ public class ScenarioService {
         }
         scenario.setResourceCollection(resourceCollection);
 
+        return scenarioRepository.save(scenario);
+    }
+
+    public Scenario updateScenarioInstance(String id, UpdateScenarioInstanceDTO update) {
+        Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
+        update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
 }

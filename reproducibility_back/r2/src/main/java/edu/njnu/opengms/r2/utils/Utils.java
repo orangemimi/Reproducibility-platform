@@ -93,7 +93,7 @@ public class Utils {
                         for (int a = 0; a < datasetItem.size(); a++) {
                             JSONObject item = (JSONObject) datasetItem.get(a);
                             //新增是否为参数or文件
-                            item = Utils.judgeIsParam(item);
+//                            item = Utils.judgeIsParam(item);
                             if (item.getStr("name").equals(datasetReference)) {
                                 event.put("datasetItem", item);
                             }
@@ -105,7 +105,7 @@ public class Utils {
                         if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
                             temp.put("tooltip", event.getJSONObject("datasetItem").getStr("datasetReference"));
                             temp.put("datasetItem", event.get("datasetItem"));
-                            stateJson.getJSONArray("parameters").add(temp);//judge input
+                            stateJson.getJSONArray("parameters").add(temp);//judge parameters
                         } else {
                             temp.put("datasetItem", event.get("datasetItem"));
                             stateJson.getJSONArray("inputs").add(temp);//judge input
@@ -261,8 +261,15 @@ public class Utils {
 
     public static JSONObject judgeIsParam(JSONObject datasetItem){
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        if(flag) {
-            datasetItem.put("isParams", "true");
+        if(flag ) {
+            JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
+
+            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode")!="" ){
+                datasetItem.put("isParams", "true");
+            }else {
+                datasetItem.put("isParams", "false");
+            }
+
         } else {
             datasetItem.put("isParams", "false");
         }

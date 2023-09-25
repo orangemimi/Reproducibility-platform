@@ -6,6 +6,7 @@ import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,11 @@ public class ScenarioController {
     @RequestMapping(value = "/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
     public JsonResult updateScenarioInfo(@PathVariable("id") String id, @RequestBody UpdateScenarioDTO update) {
         return ResultUtils.success(scenarioService.updateScenario(id, update));
+    }
+
+    @RequestMapping(value = "/instance/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
+    public JsonResult updateScenarioInstance( @JwtTokenParser(key = "userId") String userId, @PathVariable("id") String id, @RequestBody UpdateScenarioInstanceDTO update) {
+        return ResultUtils.success(scenarioService.updateScenarioInstance(id, update));
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)

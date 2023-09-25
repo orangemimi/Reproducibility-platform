@@ -5,6 +5,8 @@ import edu.njnu.opengms.common.dto.ToDomainConverter;
 import edu.njnu.opengms.r2.domain.scenario.Scenario;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author ：Zhiyi
  * @Date ：2021/4/1 22:42
@@ -12,6 +14,6 @@ import lombok.Data;
  * @version: 1.0.0
  */
 @Data
-public class UpdateScenarioDTO implements ToDomainConverter<Scenario> {
-    String type;
+public class UpdateScenarioInstanceDTO implements ToDomainConverter<Scenario> {
+    List<String> instances;//绑定的instanceId；
 }
