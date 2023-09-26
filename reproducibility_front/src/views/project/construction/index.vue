@@ -1,8 +1,8 @@
 <!--  -->
 <template>
   <div class="main">
-    <el-col :span="16" :offset="2">
-      <el-form ref="form" :model="form" label-width="200px">
+    <el-col :span="18" :offset="2">
+      <el-form ref="form" :model="form" label-width="150px">
         <el-form-item label="Name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
@@ -28,13 +28,6 @@
                     slot="append"
                     icon="el-icon-search"
                     @click="searchModelByName"
-                    v-if="!isSearching"
-                  ></el-button>
-                  <el-button
-                    slot="append"
-                    icon="el-icon-close"
-                    @click="clearSearch"
-                    v-else
                   ></el-button>
                 </el-input>
               </el-col>
@@ -90,6 +83,7 @@ import {
   saveScenario,
 } from "@/api/request";
 export default {
+  props: ["isOverOne"],
   data() {
     return {
       projectId: this.$route.params.id, //projectId
@@ -145,13 +139,13 @@ export default {
       });
       // 初始化数据
       this.currentModelList = currentModelList;
-      this.isSearching = true;
+      // this.isSearching = true;
     },
-    clearSearch() {
-      this.keyword = "";
-      this.init();
-      this.isSearching = false;
-    },
+    // clearSearch() {
+    //   this.keyword = "";
+    //   // this.init();
+    //   this.isSearching = false;
+    // },
 
     init() {
       this.getPublicModels(0);
@@ -164,14 +158,6 @@ export default {
     },
 
     async setScenario() {
-      // console.log("try", {
-      //   projectId: this.projectId,
-      //   name: this.form.name,
-      //   type: this.form.type,
-      //   resourceCollection: {
-      //     modelList: this.selectedModelsWithId,
-      //   },
-      // });
       let data = await saveScenario({
         projectId: this.projectId,
         name: this.form.name,
@@ -182,10 +168,13 @@ export default {
       });
       this.project.scenario = data.id;
       await updateProject(this.projectId, this.project);
-
-      this.$router.push({
-        path: `/project/${this.projectId}/scenarios`,
-      });
+      if (this.isOverOne) {
+        this.$emit("createStatus", "success");
+      } else {
+        this.$router.push({
+          path: `/project/${this.projectId}/scenarios`,
+        });
+      }
     },
   },
   async mounted() {

@@ -20,6 +20,7 @@ public class ModelInstance extends BaseEntity {
     @Id
     String id;
     String name;
+    String modelName;
     List<State> behavior;
     String modelId;
     String executorId;

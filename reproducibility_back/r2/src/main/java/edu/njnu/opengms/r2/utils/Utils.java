@@ -71,7 +71,7 @@ public class Utils {
                         for (int a = 0; a < datasetItem.size(); a++) {
                             JSONObject item = (JSONObject) datasetItem.get(a);
                             //新增是否为参数or文件
-                            item = Utils.judgeIsParam(item);
+                            item = Utils.judgeIsParam2(item);
                             if (item.getStr("name").equals(datasetReference)) {
                                 event.put("datasetItem", item);
                             }
@@ -93,7 +93,7 @@ public class Utils {
                         for (int a = 0; a < datasetItem.size(); a++) {
                             JSONObject item = (JSONObject) datasetItem.get(a);
                             //新增是否为参数or文件
-                            item = Utils.judgeIsParam(item);
+                            item = Utils.judgeIsParam2(item);
                             if (item.getStr("name").equals(datasetReference)) {
                                 event.put("datasetItem", item);
                             }
@@ -270,24 +270,240 @@ public class Utils {
 //    }
     public static JSONObject judgeIsParam(JSONObject datasetItem){
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        if(flag ) {
+        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONObject tempUDX = new JSONObject();
+        if(flag) {
             JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
-            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode")!="" ){
-                datasetItem.put("isParams", "true");
+            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode").toString()!="" ){
+                JSONObject test2 = (JSONObject) test.getJSONArray("UdxNode").get(0);
+                if(test2!=null && test2.get("UdxNode")!=null&& test2.get("UdxNode").toString()!="" ){
+                    if(test2.containsKey("type")){
+                        tempUDX.put("name",test2.getStr("name"));
+                        tempUDX.put("type",test2.getStr("type"));
+                        tempUDX.put("description",test2.getStr("description"));
+                        if(test2.getStr("type").equals("DTKT_ANY")){
+                            datasetItem.put("isParams", "false");
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        } else {
+                            datasetItem.put("isParams", "true");
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                    }else{
+                        JSONObject test3 = (JSONObject) test2.getJSONArray("UdxNode").get(0);
+                        if (!test3.containsKey("type")){
+                            datasetItem.put("isParams", "false");
+                        }
+                        else if(test3.getStr("type").equals("DTKT_ANY")){
+                            datasetItem.put("isParams", "false");
+                            tempUDX.put("name",test3.getStr("name"));
+                            tempUDX.put("type",test3.getStr("type"));
+                            tempUDX.put("description",test3.getStr("description"));
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                        else{
+                            datasetItem.put("isParams", "true");
+                            tempUDX.put("name",test3.getStr("name"));
+                            tempUDX.put("type",test3.getStr("type"));
+                            tempUDX.put("description",test3.getStr("description"));
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                    }
+                }else {
+                    datasetItem.put("isParams", "false");
+                    datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                }
+
             }else {
                 datasetItem.put("isParams", "false");
+                datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
             }
         } else {
             datasetItem.put("isParams", "false");
+            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+
         }
         return datasetItem;
     }
 
-    public static Boolean judgeIsParameter(JSONObject datasetItem) {
-        return datasetItem.containsKey("UdxDeclaration");
+    public static JSONObject judgeIsParam3(JSONObject datasetItem){
+        boolean flag = datasetItem.containsKey("UdxDeclaration");
+        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONObject tempUDX = new JSONObject();
+        if(flag) {
+
+            JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
+
+            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode").toString()!="" ){
+                JSONObject test2 = (JSONObject) test.getJSONArray("UdxNode").get(0);
+                if(test2!=null && test2.get("UdxNode")!=null&& test2.get("UdxNode").toString()!="" ){
+                    if(test2.containsKey("type")){
+                        tempUDX.put("name",test2.getStr("name"));
+                        tempUDX.put("type",test2.getStr("type"));
+                        tempUDX.put("description",test2.getStr("description"));
+                        if(test2.getStr("type").equals("DTKT_ANY")){
+                            datasetItem.put("isParams", "false");
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        } else {
+                            datasetItem.put("isParams", "true");
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                    }else{
+                        JSONObject test3 = (JSONObject) test2.getJSONArray("UdxNode").get(0);
+                        if (!test3.containsKey("type")){
+                            datasetItem.put("isParams", "false");
+                        }
+                        else if(test3.getStr("type").equals("DTKT_ANY")){
+                            datasetItem.put("isParams", "false");
+                            tempUDX.put("name",test3.getStr("name"));
+                            tempUDX.put("type",test3.getStr("type"));
+                            tempUDX.put("description",test3.getStr("description"));
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                        else{
+                            datasetItem.put("isParams", "true");
+                            tempUDX.put("name",test3.getStr("name"));
+                            tempUDX.put("type",test3.getStr("type"));
+                            tempUDX.put("description",test3.getStr("description"));
+                            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                        }
+                    }
+                }else {
+                    datasetItem.put("isParams", "false");
+                    datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+                }
+
+            }else {
+                datasetItem.put("isParams", "false");
+                datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+            }
+        } else {
+            datasetItem.put("isParams", "false");
+            datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
+
+        }
+        return datasetItem;
     }
 
-    public static JSONArray filterUserInfo(List<User> users) {
+    public static JSONObject judgeIsParam2(JSONObject datasetItem){
+        boolean flag = datasetItem.containsKey("UdxDeclaration");
+        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONObject tempUDX = new JSONObject();
+        if(flag) {
+            JSONArray testArray = datasetItem.getJSONArray("UdxDeclaration");
+            if (testArray != null && testArray.toString() != "") {
+                for (int i = 0; i < testArray.size(); i++) {
+                    JSONObject test2Arr = (JSONObject) testArray.get(i);
+                    if (test2Arr != null && test2Arr.toString() != "") {
+                        if (test2Arr.containsKey("type") ){
+                            tempUDX.put("name", test2Arr.getStr("name"));
+                            tempUDX.put("type", test2Arr.getStr("type"));
+                            tempUDX.put("description", test2Arr.getStr("description"));
+                            if (test2Arr.getStr("type").equals("DTKT_ANY")) {
+                                datasetItem.put("isParams", "false");
+                            } else {
+                                datasetItem.put("isParams", "true");
+                            }
+                            UdxDeclarationNew.add(tempUDX);
+                        }
+                        else{
+                            if (test2Arr.containsKey("UdxNode") && test2Arr.get("UdxNode") != null && test2Arr.get("UdxNode").toString() != "") {
+                                    for (int j = 0; j < test2Arr.getJSONArray("UdxNode").size(); j++) {
+                                        JSONObject test3Arr = (JSONObject) test2Arr.getJSONArray("UdxNode").get(j);
+                                        if (test3Arr != null && test3Arr.toString() != "") {
+                                            if (test3Arr.containsKey("type") ){
+                                                tempUDX.put("name", test3Arr.getStr("name"));
+                                                tempUDX.put("type", test3Arr.getStr("type"));
+                                                tempUDX.put("description", test3Arr.getStr("description"));
+                                                if (test3Arr.getStr("type").equals("DTKT_ANY")) {
+                                                    datasetItem.put("isParams", "false");
+                                                } else {
+                                                    datasetItem.put("isParams", "true");
+                                                }
+                                                UdxDeclarationNew.add(tempUDX);
+                                            } else{
+                                                if (test3Arr.containsKey("UdxNode") && test3Arr.get("UdxNode") != null && test3Arr.get("UdxNode").toString() != "") {
+                                                        for (int k = 0; k < test3Arr.getJSONArray("UdxNode").size(); k++) {
+                                                            JSONObject test4Arr = (JSONObject) test3Arr.getJSONArray("UdxNode").get(k);
+                                                            if (test4Arr != null && test4Arr.toString() != "") {
+                                                                if (test4Arr.containsKey("type") ){
+                                                                    tempUDX.put("name", test4Arr.getStr("name"));
+                                                                    tempUDX.put("type", test4Arr.getStr("type"));
+                                                                    tempUDX.put("description", test4Arr.getStr("description"));
+                                                                    if (test4Arr.getStr("type").equals("DTKT_ANY")) {
+                                                                        datasetItem.put("isParams", "false");
+                                                                    } else {
+                                                                        datasetItem.put("isParams", "true");
+                                                                    }
+                                                                    UdxDeclarationNew.add(tempUDX);
+                                                                } else {
+                                                                    if (test4Arr.containsKey("UdxNode") && test4Arr.get("UdxNode") != null && test4Arr.get("UdxNode").toString() != "") {
+                                                                        for (int s = 0; s < test4Arr.getJSONArray("UdxNode").size(); s++) {
+                                                                            JSONObject test5Arr = (JSONObject) test4Arr.getJSONArray("UdxNode").get(k);
+                                                                            if (test4Arr != null && test4Arr.toString() != "") {
+                                                                                if (test5Arr.containsKey("type")) {
+                                                                                    tempUDX.put("name", test5Arr.getStr("name"));
+                                                                                    tempUDX.put("type", test5Arr.getStr("type"));
+                                                                                    tempUDX.put("description", test5Arr.getStr("description"));
+                                                                                    if (test3Arr.getStr("type").equals("DTKT_ANY")) {
+                                                                                        datasetItem.put("isParams", "false");
+                                                                                    } else {
+                                                                                        datasetItem.put("isParams", "true");
+                                                                                    }
+                                                                                    UdxDeclarationNew.add(tempUDX);
+                                                                                }else{
+                                                                                    datasetItem.put("isParams", "false");
+                                                                                }
+                                                                            }else{
+                                                                                datasetItem.put("isParams", "false");
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        datasetItem.put("isParams", "false");
+                                                                    }
+                                                                }
+                                                            }else{
+                                                                datasetItem.put("isParams", "false");
+                                                            }
+                                                        }
+
+                                                }else{
+                                                    datasetItem.put("isParams", "false");
+                                                }
+                                            }
+
+                                        }else{
+                                            datasetItem.put("isParams", "false");
+                                        }
+                                    }
+
+                            }else{
+                                datasetItem.put("isParams", "false");
+                            }
+                        }
+
+                    }else{
+                        datasetItem.put("isParams", "false");
+                    }
+                }
+            }else{
+                datasetItem.put("isParams", "false");
+            }
+
+        } else{
+            datasetItem.put("isParams", "false");
+        }
+        datasetItem.put("UdxDeclarationNew",UdxDeclarationNew);
+        return datasetItem;
+    }
+
+
+
+
+
+
+
+        public static JSONArray filterUserInfo(List<User> users) {
         JSONArray userList = new JSONArray();
         for (User user : users) {
             JSONObject jsonObject = new JSONObject();

@@ -102,7 +102,7 @@ export default {
         width: 100%;
         .card_info_name {
           display: block;
-          width: 120px;
+          width: 160px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;

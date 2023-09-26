@@ -18,6 +18,7 @@ import java.util.List;
 @Data
 public class AddModelInstanceDTO implements ToDomainConverter<ModelInstance> {
     String name;
+    String modelName;
     List<State> behavior;
     String modelId;
     String executorId;

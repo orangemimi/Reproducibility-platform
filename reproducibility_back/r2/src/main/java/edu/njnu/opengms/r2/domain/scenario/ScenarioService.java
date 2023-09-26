@@ -35,7 +35,9 @@ public class ScenarioService {
     public JSONObject getScenario(String id) {
 
         JSONObject obj = new JSONObject();
-        JSONObject objInstance = new JSONObject();
+//        JSONObject objInstance = new JSONObject();
+        JSONObject scenarioNew = new JSONObject();
+
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
         JSONObject modelList =  Optional.ofNullable(scenario)
                 .map(x -> x.getResourceCollection())
@@ -55,25 +57,25 @@ public class ScenarioService {
                 .map(x -> {
                     List<String> instanceIdList = x;
                     if (instanceIdList != null) {
-                        objInstance.put("instanceList", modelInstanceRepository.findAllById(instanceIdList));
+                        scenarioNew.put("instanceObjectList", modelInstanceRepository.findAllById(instanceIdList));
                     } else {
-                        objInstance.put("instanceList", null);
+                        scenarioNew.put("instanceObjectList", null);
                     }
-                    return objInstance;
+                    return scenarioNew;
                 })
                 .orElseGet(() -> {
                     JSONObject defaultObject = new JSONObject();
-                    defaultObject.put("instanceList", null);
+                    defaultObject.put("instanceObjectList", null);
                     return defaultObject;
                 });
 
-        JSONObject scenarioNew = new JSONObject();
+
         scenarioNew.put("name", scenario.name);
         scenarioNew.put("id", scenario.id);
         scenarioNew.put("type", scenario.type);
         scenarioNew.put("instances", scenario.instances);
         scenarioNew.put("resourceCollection", obj);
-        scenarioNew.put("instanceObjects", objInstance);
+//        scenarioNew.put("instanceObjects", objInstance);
 
 
         return scenarioNew;

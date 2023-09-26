@@ -141,7 +141,6 @@ export async function updateScenarioByProjectId(projectId, postJson) {
 
 export async function updateresourceCollection(id, type, form) {
   let data = await patch(`/scenario/resources/${id}/${type}`, form);
-
   return data;
 }
 
@@ -210,7 +209,7 @@ export async function getInstancesInScenario(scenarioId, modelId) {
 }
 
 //这是一个另类，读取数据但是用的POST，注意
-export async function getInstancesByInstances(instances) {
+export async function getInstancesByIds(instances) {
   return await post(`/model_instances/getBoundInstances`, instances);
 }
 

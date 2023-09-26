@@ -30,9 +30,9 @@
                 :to="{ path: `/project/${item.projectId}/info` }"
               >
                 <div style="height: 30px; line-height: 30px" class="router">
-                  {{ item.userName }}
+                  {{ user.name }}
                   <span>/</span>
-                  {{ item.projectName }}
+                  {{ item.name }}
                 </div>
               </router-link>
             </div>
@@ -97,9 +97,7 @@ export default {
 
   methods: {
     async init() {
-      console.log("得到projects");
       this.myProjects = await getMyProjects();
-      console.log(this.myProjects, "this.myProjects");
       let data = await getAllProjects(0, 16);
       this.projectList = data.content;
       this.total = data.totalElements;
@@ -114,8 +112,9 @@ export default {
       this.projectList = data.content;
     },
 
-    dialogShow(val) {
+    async dialogShow(val) {
       this.dialogNewProject = val;
+      await this.init();
     },
   },
 

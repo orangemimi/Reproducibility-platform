@@ -109,20 +109,25 @@ export default {
     },
     async saveProject() {
       let form = new FormData();
-      form.append("datafile", this.pictureFile.raw);
+      let pictureData = "";
       form.append("name", this.form.name);
-      let pictureData = await postFile(form);
+
+      if (this.pictureFile != null && this.pictureFile != "") {
+        form.append("datafile", this.pictureFile.raw);
+        let picData = await postFile(form);
+        pictureData = "http://221.226.60.2:8082/data/" + picData.data.data.id;
+      }
+
       let jsonData = {
         project: {
           name: this.form.name,
           description: this.form.description,
           privacy: this.form.privacy,
           tags: this.dynamicTags,
-          picture: "http://221.226.60.2:8082/data/" + pictureData.data.data.id,
+          picture: this.pictureFile == null ? null : pictureData,
         },
       };
       await saveProject(jsonData);
-
       this.cancel();
     },
 

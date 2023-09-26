@@ -12,6 +12,9 @@
       >
         <scenario-card :secnarioForm="item"></scenario-card>
       </div>
+      <el-button @click="createNewScenario">
+        + New scienario
+      </el-button>
     </el-col>
 
     <el-col :span="21">
@@ -52,6 +55,22 @@
         </el-card>
       </div>
     </el-col>
+
+    <div class="createScenario">
+      <el-dialog
+        :visible.sync="createScenarioDialog"
+        width="1200px"
+        title="Create a new scenario"
+        :close-on-click-modal="false"
+        :destroy-on-close="true"
+      >
+        <create-scenario
+          :isOverOne="false"
+          @createStatus="createStatus"
+        ></create-scenario>
+      </el-dialog>
+    </div>
+
     <!-- </el-row> -->
   </div>
 </template>
@@ -63,16 +82,18 @@ import {
   getScenariosByProjectId,
 } from "@/api/request";
 
-import ScenarioCard from "_com/Cards/ScenarioListCard.vue";
+import scenarioCard from "_com/Cards/ScenarioListCard.vue";
+import createScenario from "./../construction/index.vue";
 
-import ResourceToolbar from "./Toolbars/ResourceToolbar";
-import ModelContent from "./Toolbars/ModelContent";
+import resourceToolbar from "./Toolbars/ResourceToolbar";
+import modelContent from "./Toolbars/ModelContent";
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
   components: {
-    ScenarioCard,
-    ResourceToolbar,
-    ModelContent,
+    scenarioCard,
+    resourceToolbar,
+    modelContent,
+    createScenario,
     // SelectedScenario
   },
 
@@ -88,6 +109,7 @@ export default {
       allScenarioList: [],
       chosenScenario: {},
       currentModel: {},
+      createScenarioDialog: false,
     };
   },
 
@@ -97,6 +119,8 @@ export default {
 
       this.chosenScenario = await getScenarioById(this.project.scenario);
       this.chosenScenario.isBinded = true;
+      this.currentModel = this.chosenScenario.resourceCollection.modelList[0];
+
       this.allScenarioList = await getScenariosByProjectId(this.projectId);
       let binded = {};
       this.allScenarioList.forEach((element, index) => {
@@ -115,8 +139,18 @@ export default {
       this.chosenScenario.isBinded = true;
     },
 
+    createNewScenario() {
+      this.createScenarioDialog = true;
+    },
+
     selectModel(val) {
       this.currentModel = val;
+    },
+    createStatus(val) {
+      if (val == "success") {
+        this.createScenarioDialog = false;
+        this.init();
+      }
     },
   },
 
@@ -140,6 +174,12 @@ export default {
 
     .el-card__body {
       min-height: calc(100vh - 240px);
+    }
+  }
+  .createScenario {
+    .el-dialog__body {
+      height: 1200px;
+      overflow: auto;
     }
   }
 }

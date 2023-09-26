@@ -30,119 +30,212 @@
           </el-button>
         </el-col>
       </el-row>
-      <el-row class="table">
-        <div v-for="(state, index) in modelItem.behavior" :key="index">
-          <el-row>
-            <state-description :stateItem="state"></state-description>
-          </el-row>
 
-          <el-table
-            border
-            :data="filterCurrentAllEventsWithStates(state)"
-            :row-class-name="tableRowClassName"
-            @expand-change="handleExpandChange"
-            :span-method="arraySpanMethod"
-          >
-            <el-table-column key="need" type="expand" width="30">
-              <template slot-scope="props">
-                <el-table
-                  border
-                  :data="props.row.datasetItem.UdxDeclarationNew"
+      <el-collapse
+        v-model="activeNames"
+        @change="handleChange"
+        v-for="(state, index) in modelItem.behavior"
+        :key="index"
+      >
+        <el-collapse-item :title="state.name" :name="index">
+          <!-- <el-divider></el-divider> -->
+          <div>
+            <div class="_params-group">
+              <el-row v-if="state.inputs.length !== 0" class="stateTitle"
+                >Inputs</el-row
+              >
+              <el-divider class="stateTitleDivider"></el-divider>
+              <div class="events">
+                <el-row
+                  v-for="(modelInEvent, inEventIndex) in state.inputs"
+                  :key="inEventIndex"
+                  class="event"
                 >
-                  <el-table-column prop="name" label="Event name" width="180">
-                  </el-table-column>
-                  <el-table-column
-                    prop="description"
-                    label="Description"
-                  ></el-table-column>
-                  <el-table-column
-                    width="150"
-                    prop="type"
-                    label="Type"
-                  ></el-table-column>
-                  <el-table-column width="150" prop="value" label="Value">
-                    <template slot-scope="scope">
-                      <el-input v-model="scope.row.value"></el-input>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </template>
-            </el-table-column>
-            <el-table-column label="Event name" width="180">
-              <template slot-scope="scope">
-                <span class="event_name" :title="scope.row.name">
-                  <span
-                    v-show="scope.row.isOptional == false"
-                    style="color: red"
-                    >*</span
-                  >
-                  {{ scope.row.name }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="description"
-              label="Description"
-            ></el-table-column>
-            <el-table-column
-              width="110"
-              prop="type"
-              label="Type"
-            ></el-table-column>
-            <el-table-column label="Value" width="260">
-              <template slot-scope="scope">
-                <div v-if="scope.row.type == 'parameters'">
-                  <!-- <el-input v-model="scope.row.value"></el-input> -->
-                </div>
-                <div v-if="scope.row.type == 'inputs'">
-                  <div
-                    v-if="
-                      scope.row.hasOwnProperty('value') &&
-                        scope.row.value != '' &&
-                        scope.row.valueName != ''
-                    "
-                  >
-                    <div class="select-data select-data-line">
+                  <el-row>
+                    <el-col :span="17" class="_event-desc">
+                      <span class="event_name" :title="modelInEvent.name">
+                        <span
+                          v-show="modelInEvent.isOptional == false"
+                          style="color: red"
+                          >*</span
+                        >
+                        {{ modelInEvent.name }}
+                      </span>
+                      <p class="event_desc" :title="modelInEvent.description">
+                        {{ modelInEvent.description }}
+                      </p>
+                    </el-col>
+
+                    <el-row>
                       <div
-                        class="data-name"
-                        style="width: 160px;float:left
-                      "
+                        v-if="
+                          modelInEvent.hasOwnProperty('url') &&
+                            modelInEvent.url != '' &&
+                            modelInEvent.urlName != ''
+                        "
                       >
-                        {{ scope.row.valueName }}
+                        <div class="select-data select-data-line">
+                          <div class="data-name">
+                            {{ modelInEvent.urlName }}
+                          </div>
+                          <el-button
+                            type="success"
+                            icon="el-icon-download"
+                            size="mini"
+                            circle
+                            @click="download(modelInEvent)"
+                          ></el-button>
+                          <el-button
+                            type="warning"
+                            icon="el-icon-close"
+                            size="mini"
+                            circle
+                            @click="remove(modelInEvent)"
+                          ></el-button>
+                        </div>
                       </div>
-                      <div>
+                      <div v-else>
+                        <el-button
+                          type="primary"
+                          plain
+                          @click="selectDataDialog(modelInEvent)"
+                          v-if="!isDataSelected(modelInEvent)"
+                        >
+                          Select data
+                        </el-button>
                         <el-button
                           type="success"
-                          icon="el-icon-download"
-                          size="mini"
-                          circle
-                          @click="download(scope.row)"
-                        ></el-button>
-                        <el-button
-                          type="warning"
-                          icon="el-icon-close"
-                          size="mini"
-                          circle
-                          @click="clearData(scope.row)"
-                        ></el-button>
+                          plain
+                          @click="clearData(modelInEvent)"
+                          v-else
+                        >
+                          Delete {{ getFileName(modelInEvent) }} &#10006;
+                        </el-button>
                       </div>
-                    </div>
-                  </div>
-                  <div v-else>
-                    <el-button
-                      type="primary"
-                      plain
-                      @click="selectDataDialog(scope.row)"
+                    </el-row>
+                  </el-row>
+                  <el-row>
+                    <el-divider class="eventDivider"></el-divider>
+                  </el-row>
+                </el-row>
+              </div>
+            </div>
+
+            <div class="_params-group">
+              <el-row v-if="state.parameters.length !== 0" class="stateTitle"
+                >Parameters</el-row
+              >
+              <el-divider class="stateTitleDivider"></el-divider>
+              <div class="events">
+                <el-row
+                  v-for="(modelInEvent, inEventIndex) in state.parameters"
+                  :key="inEventIndex"
+                  class="event"
+                >
+                  <el-row>
+                    <el-col :span="17" class="_event-desc">
+                      <span class="event_name" :title="modelInEvent.name">
+                        <span
+                          v-show="modelInEvent.isOptional == false"
+                          style="color: red"
+                          >*</span
+                        >
+                        {{ modelInEvent.name }}
+                      </span>
+                      <p class="event_desc" :title="modelInEvent.description">
+                        {{ modelInEvent.description }}
+                      </p>
+                    </el-col>
+
+                    <el-table
+                      border
+                      :data="modelInEvent.datasetItem.UdxDeclarationNew"
                     >
-                      Select data
-                    </el-button>
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </el-row>
+                      <el-table-column
+                        prop="name"
+                        label="Parameter"
+                        width="180"
+                      ></el-table-column>
+                      <el-table-column
+                        prop="description"
+                        label="Description"
+                      ></el-table-column>
+                      <el-table-column
+                        width="180"
+                        prop="type"
+                        label="Type"
+                      ></el-table-column>
+                      <el-table-column label="Value" width="180">
+                        <template slot-scope="scope">
+                          <el-input v-model="scope.row.value"></el-input>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </el-row>
+                  <el-row>
+                    <el-divider class="eventDivider"></el-divider>
+                  </el-row>
+                </el-row>
+              </div>
+            </div>
+
+            <div class="_params-group">
+              <el-row v-if="state.outputs.length !== 0" class="stateTitle"
+                >Output</el-row
+              >
+              <el-divider class="stateTitleDivider"></el-divider>
+              <div class="events">
+                <el-row
+                  v-for="(modelOutEvent, outEventIndex) in state.outputs"
+                  :key="outEventIndex"
+                  class="event"
+                >
+                  <el-row>
+                    <el-col :span="17" class="_event-desc">
+                      <span class="event_name" :title="modelOutEvent.name">{{
+                        modelOutEvent.name
+                      }}</span>
+                      <p class="event_desc" :title="modelOutEvent.description">
+                        {{ modelOutEvent.description }}
+                      </p>
+                    </el-col>
+                    <el-col :span="6" :offset="1">
+                      <div class="_btn-group">
+                        <el-button
+                          plain
+                          round
+                          type="warning"
+                          @click="download(modelOutEvent)"
+                          v-if="
+                            modelOutEvent.hasOwnProperty('url') &&
+                              modelOutEvent.url != ''
+                          "
+                          >Download</el-button
+                        >
+                        <el-button
+                          plain
+                          round
+                          type="warning"
+                          @click="bind(modelOutEvent)"
+                          :class="{ bindClass: modelOutEvent.bind }"
+                          v-if="
+                            modelOutEvent.hasOwnProperty('url') &&
+                              modelOutEvent.url != ''
+                          "
+                          >Bind</el-button
+                        >
+                      </div>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-divider class="eventDivider"></el-divider>
+                  </el-row>
+                </el-row>
+              </div>
+            </div>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
     </div>
     <div class="selectData">
       <el-dialog
@@ -152,89 +245,41 @@
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <el-table
-          :data="modelInstanceList"
-          style="width: 100%;"
-          :row-class-name="tableRowClassNameofInstance"
-          @expand-change="handleExpandChange"
-        >
+        <el-table :data="modelInstanceList" style="width: 100%;">
           <el-table-column type="expand">
             <template slot-scope="props">
               <h1>Model Configuration</h1>
               <br />
               <hr />
               <!-- {{ props.row }} -->
-              <el-row class="table">
-                <div
-                  v-for="(state, index) in modelInstanceList.behavior"
-                  :key="index"
-                >
-                  <el-row>
-                    <state-description :stateItem="state"></state-description>
-                  </el-row>
-                  <el-table
-                    :data="filterCurrentAllEventsWithStates(state)"
-                    style="width: 100%;"
-                    :row-class-name="tableRowClassName"
-                    type="expand"
-                  >
-                    <el-table-column label="Name" prop="name">
-                    </el-table-column>
-                    <el-table-column label="Type" prop="type">
-                    </el-table-column>
-                    <el-table-column label="Description" prop="description">
-                    </el-table-column>
-
-                    <el-table-column label="Data Download or Parameters Value">
-                      <template slot-scope="scope">
-                        <div v-if="scope.row.type == 'parameters'">
-                          <template slot-scope="props">
-                            <el-table
-                              border
-                              :data="props.row.datasetItem.UdxDeclarationNew"
-                            >
-                              <el-table-column
-                                prop="name"
-                                label="Event name"
-                                width="180"
-                              >
-                              </el-table-column>
-                              <el-table-column
-                                prop="description"
-                                label="Description"
-                              ></el-table-column>
-                              <el-table-column
-                                width="150"
-                                prop="type"
-                                label="Type"
-                              ></el-table-column>
-                              <el-table-column
-                                width="150"
-                                prop="value"
-                                label="Value"
-                              >
-                                <template slot-scope="scope">
-                                  <el-input
-                                    v-model="scope.row.value"
-                                  ></el-input>
-                                </template>
-                              </el-table-column>
-                            </el-table>
-                          </template>
-                        </div>
-                        <el-button
-                          v-else
-                          type="info"
-                          round
-                          @click="download(scope.row, props.row)"
-                        >
-                          <i class="el-icon-download"></i>Download</el-button
-                        >
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-              </el-row>
+              <el-table
+                :data="dataTable(props.row)"
+                style="width: 100%;"
+                :row-class-name="tableRowClassName"
+              >
+                <el-table-column label="Name" prop="name"> </el-table-column>
+                <el-table-column label="Type" prop="type"> </el-table-column>
+                <el-table-column label="Description" prop="description">
+                </el-table-column>
+                <el-table-column label="Data Download or Parameters Value">
+                  <template slot-scope="scope">
+                    <div v-if="scope.row.type == 'parameters'">
+                      Parameter Value：{{
+                        props.row.parameters[0].datasetItem.UdxDeclaration[0]
+                          .UdxNode[0].UdxNode[0].value
+                      }}
+                    </div>
+                    <el-button
+                      v-else
+                      type="info"
+                      round
+                      @click="download(scope.row, props.row)"
+                    >
+                      <i class="el-icon-download"></i>Download</el-button
+                    >
+                  </template>
+                </el-table-column>
+              </el-table>
             </template>
           </el-table-column>
           <el-table-column label="name" prop="name"> </el-table-column>
@@ -314,7 +359,6 @@
 
 <script>
 import ResourceTable from "./ResourceTable.vue";
-import StateDescription from "_com/Cards/StateDescription.vue";
 import {
   saveData,
   invokeSingleModel,
@@ -339,7 +383,7 @@ export default {
       type: String,
     },
   },
-  components: { ResourceTable, StateDescription },
+  components: { ResourceTable },
 
   watch: {
     currentModel: {
@@ -369,7 +413,7 @@ export default {
       scenario: {},
       boundInstances: [],
       selectedDataName: "",
-      // selectedDataEvent: [],
+      selectedDataEvent: [],
       modelItem: this.currentEvent,
       modelInstance: {},
       modelInstanceList: [],
@@ -383,7 +427,6 @@ export default {
       refreshForm: {},
       boundData: [],
       canInvoke: true,
-      modelWithCurrentAllEvents: [],
       invokeForm: {
         ip: "",
         port: "",
@@ -393,7 +436,7 @@ export default {
           {
             statename: "",
             event: "",
-            value: "",
+            url: "",
             tag: "",
           },
         ],
@@ -412,45 +455,6 @@ export default {
   },
 
   methods: {
-    handleExpandChange(row, rows) {
-      const isExpend = rows.some((r) => r.id === row.id); // 判断当前行展开状态
-      if (isExpend) {
-        // Do some things
-      } else {
-        return;
-      }
-    },
-    arraySpanMethod({ row, columnIndex }) {
-      if (row.type == "parameters") {
-        if (columnIndex === 3) {
-          return {
-            // 删除第一列（columnIndex === 0），第3、4行单元格
-            rowspan: 1,
-            colspan: 2,
-          };
-        }
-      }
-    },
-
-    tableRowClassName({ row, rowIndex }) {
-      row.rowIndex = rowIndex;
-      if (row.type == "parameters") {
-        return "parameter-row";
-      }
-      if (row.type == "inputs") {
-        return "input-row";
-      }
-      if (row.type == "outputs") {
-        return "output-row";
-      }
-    },
-    tableRowClassNameofInstance({ row }) {
-      if (row.status == 2) {
-        return "run-success";
-      } else {
-        return "run-loading";
-      }
-    },
     isBound(row) {
       // 检查按钮是否已绑定
       if (this.boundInstances != null) {
@@ -494,9 +498,9 @@ export default {
       let update = { instances: this.boundInstances };
       await bindScenario(this.scenarioId, update);
     },
-    // tableRowClassName({ row, rowIndex }) {
-    //   row.rowIndex = rowIndex;
-    // },
+    tableRowClassName({ row, rowIndex }) {
+      row.rowIndex = rowIndex;
+    },
     // 下载按钮
     download(data) {
       if (data.value) {
@@ -516,34 +520,87 @@ export default {
         });
       }
     },
-    // 过滤方法，没有udxNode变量就加一个，暂时不知道udxNode是干啥的
-    filterCurrentAllEventsWithStates(state) {
-      let array = [];
-      state.inputs.forEach((item) => {
-        item.stateName = state.name;
-        item.type = "inputs";
-        array.push(item);
-      });
-      state.parameters.forEach((item) => {
-        item.stateName = state.name;
-        item.type = "parameters";
-        array.push(item);
-      });
-      state.outputs.forEach((item) => {
-        item.stateName = state.name;
-        item.type = "outputs";
-        array.push(item);
+    // 处理展开表的数据，让input、output和parameter依次输出
+    dataTable(val) {
+      let newVal = [];
+      val.behavior.forEach((state) => {
+        state.inputs.forEach((item) => {
+          let data = {
+            stateName: state.name,
+            name: item.name,
+            type: "inputs",
+            description: item.description,
+            value: item.value,
+          };
+          newVal.push(data);
+        });
+        state.outputs.forEach((item) => {
+          let data = {
+            stateName: state.name,
+            name: item.name,
+            type: "outputs",
+            description: item.description,
+            value: item.value,
+          };
+          newVal.push(data);
+        });
+        state.parameters.forEach((item) => {
+          let data = {
+            stateName: state.name,
+            name: item.name,
+            type: "parameters",
+            description: item.description,
+            value: item.value,
+          };
+          newVal.push(data);
+        });
       });
 
-      return array;
+      return newVal;
     },
-
+    // 过滤方法，没有udxNode变量就加一个，暂时不知道udxNode是干啥的
+    // filterUdxNode(event) {
+    //   if (
+    //     Object.prototype.hasOwnProperty.call(
+    //       event.datasetItem,
+    //       "UdxDeclaration"
+    //     )
+    //   ) {
+    //     if (event.datasetItem.UdxDeclaration[0].UdxNode != "") {
+    //       if (
+    //         Object.prototype.hasOwnProperty.call(
+    //           event.datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode[0],
+    //           "UdxNode"
+    //         )
+    //       ) {
+    //         return false;
+    //       } else {
+    //         let udxNode = event.datasetItem.UdxDeclaration[0].UdxNode;
+    //         return udxNode;
+    //       }
+    //     }
+    //   }
+    // },
+    // 判断当前 modelInEvent 是否被选中
+    isDataSelected(modelInEvent) {
+      // 使用 some 方法检查是否存在匹配的对象
+      return this.selectedDataEvent.some((item) => {
+        return item.value === modelInEvent.value;
+      });
+    },
     // 选择数据后清除数据
     clearData(modelInEvent) {
-      console.log(modelInEvent);
-      modelInEvent.value = "";
-      modelInEvent.valueName = "";
-      this.$forceUpdate();
+      // console.log(modelInEvent,'111');
+      let index = this.selectedDataEvent.findIndex((item) => {
+        return item.value === modelInEvent.value;
+      });
+      if (index !== -1) {
+        this.selectedDataEvent.splice(index, 1);
+      }
+      // 这两个属性是选择数据后新增的，起码要清空
+      this.currentEvent = modelInEvent;
+      this.currentEvent.value = null;
+      this.currentEvent.dataId = null;
     },
     // 控制选择数据dialogue
     async selectDataDialog(event) {
@@ -589,12 +646,34 @@ export default {
 
     // 选择数据提交按钮的方法，数据只是缓存在浏览器中 1、提取并存储文件名 2、将数据的id和url存储起来
     submitDataToEvent(val) {
+      let fileName = val.name + val.suffix;
+      let data = {};
+      data.fileName = fileName;
+      data.value = val.value;
+      if (data.value) {
+        this.selectedDataEvent.push(data);
+      } else {
+        this.$message({
+          showClose: true,
+          message: "Data failure",
+          type: "warning",
+        });
+      }
       this.currentEvent.value = val.value;
-      this.currentEvent.valueName = val.name + val.suffix;
-
+      this.currentEvent.dataId = val.id;
       this.selectDataDialogShow = false;
     },
-
+    getFileName(val) {
+      // 使用 find 方法查找匹配的元素
+      let matchedElement = this.selectedDataEvent.find((item) => {
+        return item.value === val.value;
+      });
+      if (matchedElement) {
+        // 如果找到匹配的元素，获取其 fileName 属性的值
+        var fileName = matchedElement.fileName;
+      }
+      return fileName;
+    },
     async getInstances() {
       await this.getScenario(this.scenarioId);
       this.instanceDialogShow = true;
@@ -628,7 +707,6 @@ export default {
     },
 
     async startInvoke() {
-      this.modelInvokeDialogShow = false;
       // debugger;
       try {
         await this.createFilefromParam();
@@ -655,6 +733,7 @@ export default {
           message: "invoke failed",
         });
       }
+      this.modelInvokeDialogShow = false;
     },
     // 创建运行时的instance
     async emitInstance(status, modelItem, refreshForm) {
@@ -736,33 +815,31 @@ export default {
     // 创建一个invokeForm，清洗参数，将各数据放到invokeForm中
     createInvokeForm() {
       let stateList = this.modelItem.behavior;
-      this.invokeForm.inputs = [];
-      this.invokeForm.outputs = [];
-
+      let input = [];
+      let output = [];
       // debugger;
       for (let i = 0; i < stateList.length; i++) {
         let state = stateList[i];
         let allInputsWithPara = state.inputs.concat(state.parameters);
-        allInputsWithPara.forEach((item) => {
-          if (
-            Object.hasOwnProperty.call(item, "value") &&
-            item.value != "" &&
-            item.value != null
-          ) {
-            let detail = {
-              statename: state.name,
-              event: item.name,
-              tag: item.name,
-              value: item.value,
-            };
+        let detail = {};
+        for (let j = 0; j < allInputsWithPara.length; j++) {
+          //判断数据类型 如果是input--对应url
 
-            this.invokeForm.inputs.push(detail);
+          detail["statename"] = state.name;
+          detail["event"] = allInputsWithPara[j].name;
+
+          if (Object.hasOwnProperty.call(allInputsWithPara[j], "value")) {
+            detail["tag"] = allInputsWithPara[j].name;
+            detail["url"] = allInputsWithPara[j].value;
+            input.push(detail);
+          } else {
+            continue;
           }
-        });
-        state.outputs.forEach((item) => {
-          let template = {};
+        }
 
-          let outputTemplate = item.datasetItem;
+        for (let j = 0; j < state.outputs.length; j++) {
+          let template = {};
+          let outputTemplate = state.outputs[j].datasetItem;
           if (outputTemplate.type === "external") {
             template = {
               type: "id",
@@ -774,37 +851,40 @@ export default {
               value: "",
             };
           }
-          let detail = {
-            statename: state.name,
-            event: item.name,
-            template: template,
-          };
-
-          this.invokeForm.outputs.push(detail);
-        });
+          detail["template"] = template;
+          output.push(detail);
+        }
       }
 
-      console.log(this.invokeForm, "this.invokeForm");
+      this.invokeForm.inputs = input;
+      this.invokeForm.outputs = output;
     },
     // 点击state使其收缩的事件，感觉没啥用啊
     handleChange() {},
 
     // 将参数绑定为一个xml文件，上传，返回url绑定到mdl
     async createFilefromParam() {
+      // console.log("111", this.modelItem);
       let stateList = this.modelItem.behavior;
+
       for (let i = 0; i < stateList.length; i++) {
         let events = stateList[i].parameters;
+
         for (let j = 0; j < events.length; j++) {
+          //判断如果是参数的话，重新绑定成为一个文件 之后上传 返回url绑定到mdl中去
           let content = "";
           // let uploadFileForm = new FormData();
-          let udxNodeList = events[j].datasetItem.UdxDeclarationNew;
+
+          let udxNodeList =
+            events[j].datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode;
+          // events[j].datasetItem.UdxDeclaration[0].UdxNode;
+
           for (let k = 0; k < udxNodeList.length; k++) {
             if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
-              content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
-              // content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`;
+              // content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
+              content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`;
             }
           }
-          console.log("content", content);
           if (content != "") {
             content = "<Dataset> " + content + " </Dataset>";
             let file = new File([content], events[j].name + ".xml", {
@@ -866,27 +946,6 @@ export default {
   /deep/.el-dialog {
     height: 800px;
     overflow: auto;
-  }
-  /deep/ .run-loading .el-table__expand-column .cell {
-    display: none;
-  }
-}
-.main {
-  .table {
-    /deep/ .el-table .parameter-row {
-      background: oldlace;
-    }
-
-    /deep/ .el-table .input-row {
-      background: #f0f9eb;
-    }
-    /deep/ .input-row .el-table__expand-column .cell {
-      display: none;
-    }
-
-    /deep/ .output-row .el-table__expand-column .cell {
-      display: none;
-    }
   }
 }
 </style>
