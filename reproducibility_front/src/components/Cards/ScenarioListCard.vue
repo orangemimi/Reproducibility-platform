@@ -47,7 +47,7 @@ export default {
   .cardBodyBinded {
     /deep/ .el-card__body {
       padding: 5px;
-      height: 40px;
+      height: 30px;
       background-color: rgb(255, 255, 255);
     }
     /deep/ .el-card:hover {
@@ -83,7 +83,7 @@ export default {
 
     /deep/ .el-card__body {
       padding: 5px;
-      height: 40px;
+      height: 30px;
     }
 
     .card_main {

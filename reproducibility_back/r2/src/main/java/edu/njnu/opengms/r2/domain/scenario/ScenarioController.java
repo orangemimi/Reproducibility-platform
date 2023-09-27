@@ -34,7 +34,7 @@ public class ScenarioController {
 
 
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.GET)
-    public JsonResult getScenariosByProjectId(@PathVariable("projectId") String projectId) {
+    public JsonResult getAllScenariosByProjectId(@PathVariable("projectId") String projectId) {
         return ResultUtils.success( scenarioService.getScenariosByProjectId(projectId) );
     }
 

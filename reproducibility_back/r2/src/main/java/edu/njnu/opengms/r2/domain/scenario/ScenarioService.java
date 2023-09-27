@@ -3,6 +3,8 @@ package edu.njnu.opengms.r2.domain.scenario;
 
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
+import edu.njnu.opengms.r2.domain.folder.Folder;
+import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.model.ModelRepository;
 import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceRepository;
 import edu.njnu.opengms.r2.domain.project.ResourceCollection;
@@ -32,6 +34,9 @@ public class ScenarioService {
     @Autowired
     ModelInstanceRepository modelInstanceRepository;
 
+    @Autowired
+    FolderRepository folderRepository;
+
     public JSONObject getScenario(String id) {
 
         JSONObject obj = new JSONObject();
@@ -50,7 +55,11 @@ public class ScenarioService {
                     }
                     return obj;
                 })
-                .orElseGet(null);
+                .orElseGet( () -> {
+//                    JSONObject defaultObject = new JSONObject();
+//                    defaultObject.put("instanceObjectList", null);
+                    return null;
+                });
 
         JSONObject instanceList =  Optional.ofNullable(scenario)
                 .map(x -> x.getInstances())
@@ -96,7 +105,17 @@ public class ScenarioService {
         Scenario scenario = new Scenario();
 //        scenario.setUserId(userId);
         add.convertTo(scenario);
-        return scenarioRepository.insert(scenario);
+
+        Scenario newScenario =  scenarioRepository.insert(scenario);
+
+        Folder folder = new Folder();
+        Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
+        folder.setParent(parentFolder.getId());
+        folder.setLevel("1");
+        folder.setName(newScenario.getName());
+        folder.setScenarioId(newScenario.getId());
+        folderRepository.insert(folder);
+        return newScenario;
     }
 
 

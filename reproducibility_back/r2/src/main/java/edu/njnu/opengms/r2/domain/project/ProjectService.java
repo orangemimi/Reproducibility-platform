@@ -3,8 +3,12 @@ package edu.njnu.opengms.r2.domain.project;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
+import edu.njnu.opengms.r2.domain.folder.Folder;
+import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
 import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
+import edu.njnu.opengms.r2.domain.scenario.Scenario;
+import edu.njnu.opengms.r2.domain.scenario.ScenarioRepository;
 import edu.njnu.opengms.r2.domain.user.User;
 import edu.njnu.opengms.r2.domain.user.UserRepository;
 import edu.njnu.opengms.r2.domain.user.UserService;
@@ -33,7 +37,13 @@ public class ProjectService {
     UserRepository userRepository;
 
     @Autowired
+    ScenarioRepository scenarioRepository;
+
+    @Autowired
     UserService userService;
+
+    @Autowired
+    FolderRepository folderRepository;
     public Project get(String projectId) {
         return projectRepository.findById(projectId).orElse(null);
     }
@@ -43,7 +53,28 @@ public class ProjectService {
         Project project = new Project();
         add.setCreatorId(userId);
         add.convertTo(project);
-        Project result = projectRepository.insert(project);
+
+        Project proj = projectRepository.insert(project);
+
+
+        Scenario exampleScenario = new Scenario();
+        exampleScenario.setName("example");
+        exampleScenario.setType("sequentModels");
+        exampleScenario.setProjectId(proj.getId());
+        Scenario newScenario = scenarioRepository.insert(exampleScenario);
+
+        Folder folder = new Folder();
+        Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
+        folder.setParent(parentFolder.getId());
+        folder.setLevel("1");
+        folder.setName(newScenario.getName());
+        folder.setScenarioId(newScenario.getId());
+        folderRepository.insert(folder);
+
+        proj.setScenario(newScenario.getId());
+        Project result= projectRepository.save(proj);
+
+
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         if (user.getCreatedProjects()==null){
             List<String> newProjects =new ArrayList<>();

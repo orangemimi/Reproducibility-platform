@@ -77,6 +77,7 @@ public class UserService {
         AddFolderDTO add = new AddFolderDTO();
         add.setName("Main");
         add.setParent("0");
+        add.setLevel("0");
         folderService.create(add,newUser.id);
 
         System.out.println(user.toString());

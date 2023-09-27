@@ -19,8 +19,9 @@ public class Folder extends BaseEntity {
     @Id
     String id;
     String name;//创建的文件夹名称
+    String scenarioId;// 如果是在scenario中，那么folder的name就是scenario的name？
     String parent;
-    String level;
+    String level;//貌似没用
     ArrayList<Folder> children;
     List<String> dataList;//这个文件夹下存储的 data id
     String creatorId;

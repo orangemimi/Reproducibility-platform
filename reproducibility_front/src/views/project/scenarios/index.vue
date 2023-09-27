@@ -1,20 +1,24 @@
 <!--  -->
 <template>
-  <div class="main" style="margin:10px">
+  <div class="main">
     <!-- <el-row :gutter="20"> -->
+
     <el-col :span="3" class="scenario">
-      <h3 style="text-align:center;margin-bottom: 10px;">Scenario list</h3>
-      <!-- TODO-ZZY ADD NEW SCENARIO -->
-      <div
-        v-for="(item, key) in allScenarioList"
-        :key="key"
-        @click="chooseScenario(item)"
-      >
-        <scenario-card :secnarioForm="item"></scenario-card>
-      </div>
-      <el-button @click="createNewScenario">
-        + New scienario
-      </el-button>
+      <el-row> </el-row>
+      <el-row>
+        <h3 style="text-align:center;margin-bottom: 10px;">Scenario list</h3>
+        <!-- TODO-ZZY ADD NEW SCENARIO -->
+        <div
+          v-for="(item, key) in allScenarioList"
+          :key="key"
+          @click="chooseScenario(item)"
+        >
+          <scenario-card :secnarioForm="item"></scenario-card>
+        </div>
+        <el-button @click="createNewScenario">
+          + New scienario
+        </el-button>
+      </el-row>
     </el-col>
 
     <el-col :span="21">
@@ -32,7 +36,9 @@
           </el-col>
           <el-col :span="20">
             <el-row style="float:right;margin-right:10px">
-              <div style="float:left;margin-right:10px">Binded to reviewer</div>
+              <div style="float:left;margin-right:10px">
+                Binded to reviewer
+              </div>
               <el-tooltip
                 :content="'Is binded to reviewer: ' + chosenScenario.isBinded"
                 placement="top"
@@ -161,8 +167,8 @@ export default {
 </script>
 <style lang="scss">
 .main {
-  width: 98%;
-  padding: 5px 10px;
+  width: 100%;
+  // padding: 5px 10px;
   /* min-height: calc(100vh - 240px); */
 
   .scenario {

@@ -16,6 +16,7 @@ import java.util.List;
 @Repository
 public interface FolderRepository extends MongoRepository<Folder,String> {
     List<Folder> findAllByCreatorId(String id);
+    Folder findByCreatorIdAndParent(String creatorId, String parentId);
 
 
 }
