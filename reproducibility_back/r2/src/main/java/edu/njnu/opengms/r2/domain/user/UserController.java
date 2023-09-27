@@ -7,6 +7,8 @@ import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Author ：Zhiyi
  * @Date ：2020/12/4 14:28
@@ -31,6 +33,7 @@ public class UserController {
     public JsonResult getUserProjectInfo(@JwtTokenParser(key="userId") String userId)  {
         return ResultUtils.success(userService.getUserProjectInfo(userId));
     }
+
 
     @RequestMapping (value = "/like/{email}", method = RequestMethod.GET)
     public JsonResult getUserInfoLike(@PathVariable String email)  {
@@ -74,4 +77,11 @@ public class UserController {
     public JsonResult getUserProjects(@JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success(userService.getUserProjects(userId));
     }
+
+    //model related
+    @RequestMapping (value = "/model", method = RequestMethod.PATCH)
+    public JsonResult updateModelList(@JwtTokenParser(key="userId") String userId, @RequestBody List<String> update) {
+        return ResultUtils.success(userService.updateModelList(userId,update));
+    }
+
 }

@@ -41,6 +41,8 @@ public class User  extends BaseEntity {
     List<String> forkedProjects;
     List<String> staredProjects;
 
+    List<String> modelList;//contained model list
+
     /**
      * User server
      */

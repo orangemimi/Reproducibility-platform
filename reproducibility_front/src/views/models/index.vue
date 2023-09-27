@@ -43,22 +43,42 @@
         :current-page="1"
         @current-change="currentChange"
       ></el-pagination>
-
-      <!-- <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page.sync="currentPage3"
-      :page-size="100"
-      layout="prev, pager, next, jumper"
-      :total="1000">
-    </el-pagination> -->
     </div>
 
     <div class="main">
-      <div class="main-container">
+      <div>
         <el-row>
           <el-col :span="6" v-for="(item, index) in data" :key="index">
-            <serviceCard :item="item" type="Model" @click="view"></serviceCard>
+            <div class="main-container">
+              <el-card class="box-card" v-if="item.type == 'service'">
+                <el-col :span="4">
+                  <img :src="imgPath(item.snapshot, item.name)" />
+                </el-col>
+                <el-col :span="20">
+                  <div class="content">
+                    <h3 class="title" :title="item.name">{{ item.name }}</h3>
+                    <p class="desc" :title="item.description">
+                      {{ item.description }}
+                    </p>
+                  </div>
+                  <div>
+                    <el-button
+                      class="config-btn"
+                      type="success"
+                      @click="
+                        operateModel(item.id, judgeModelIsContained(item.id))
+                      "
+                      :icon="
+                        judgeModelIsContained(item.id)
+                          ? 'el-icon-remove'
+                          : 'el-icon-shopping-cart-2'
+                      "
+                      circle
+                    />
+                  </div>
+                </el-col>
+              </el-card>
+            </div>
           </el-col>
         </el-row>
       </div>
@@ -77,9 +97,11 @@
 </template>
 
 <script>
-import { getAllModelItems, getModelsByPrivacy } from "@/api/request";
-import serviceCard from "_com/Cards/ServiceCard.vue";
+import { updateUsersModel, getModelsByPrivacy, getUser } from "@/api/request";
+// import { addModelByMD5Local } from "@/api/request";
+// import serviceCard from "_com/Cards/ModelCardInPortal.vue";
 import createModel from "./create";
+import { imgBase64 } from "@/lib/utils";
 export default {
   data() {
     return {
@@ -94,6 +116,8 @@ export default {
       total: 0,
       // currentPage: 1,
       modelList: [],
+      selectedModels: [],
+      currentUser: {},
     };
   },
   computed: {
@@ -105,26 +129,58 @@ export default {
     },
   },
   methods: {
-    view(item) {
-      this.$router.push({
-        path: `/resource/${item}/${this.type}`,
-      });
+    imgPath(snapshot, name) {
+      if (snapshot != undefined) {
+        return snapshot;
+      } else {
+        return imgBase64(name);
+      }
     },
+    async operateModel(id, isContained) {
+      let newarray = [];
+      if (isContained) {
+        //remove
+        newarray = this.selectedModels.filter((item) => item != id);
+      } else {
+        if (this.selectedModels.length == 0) {
+          newarray = this.selectedModels = [id];
+        } else {
+          newarray = this.selectedModels.concat(id);
+        }
+      }
+      let data = await updateUsersModel(newarray);
+      this.selectedModels = data.modelList;
+      console.log("newnew", newarray, data);
+    },
+
     async getPublicModels(val) {
       let data = await getModelsByPrivacy("public", val, 20);
-      console.log(data);
       this.total = data.totalElements;
       this.data = data.content;
     },
-    init() {
-      this.getPublicModels(0);
+
+    judgeModelIsContained(modelId) {
+      return this.selectedModels.some((select) => select == modelId);
+    },
+    async init() {
+      this.currentUser = await getUser();
+      if (
+        Object.prototype.hasOwnProperty.call(this.currentUser, "modelList") &&
+        this.currentUser.modelList != null
+      ) {
+        this.selectedModels = this.currentUser.modelList;
+      } else {
+        this.selectedModels = [];
+      }
+
+      console.log(this.currentUser, "currentUser");
+
+      await this.getPublicModels(0);
     },
     async currentChange(val) {
       this.data = (await getModelsByPrivacy("public", val - 1, 20)).content;
     },
     async searchData() {
-      // this.pageFilter.page = 0;
-      // this.getData();
       let params = {
         page: 0,
         pageSize: 20,
@@ -133,34 +189,11 @@ export default {
       let result = await getModelsByPrivacy(params);
       (this.total = result.data.total), (this.data = result.data.list);
     },
-
-    async getData() {
-      let { content } = await getAllModelItems(
-        this.pageFilter.page,
-        this.pageFilter.pageSize
-      );
-      // let { content } = await get(
-      //   `/modelItems/${this.pageFilter.page}/${this.pageFilter.pageSize}`
-      // );
-      // console.log(content);
-      if (content.length == 0) {
-        this.is_extending = false;
-        return;
-      } else {
-        this.data = content;
-        this.is_extending = true;
-      }
-      console.log(this.data);
-    },
-
-    addModelItem() {},
   },
   mounted() {
-    // this.getData();
     this.init();
-    // window.addEventListener('scroll', this.scrollDown);
   },
-  components: { serviceCard, createModel },
+  components: { createModel },
 };
 </script>
 
@@ -179,7 +212,7 @@ export default {
           object-fit: cover;
           //obackground-size: cover;
           width: 100%;
-          height: calc(100vh - 800px);
+          height: calc(100vh - 500px);
           filter: brightness(0.8);
         }
       }
@@ -224,25 +257,65 @@ export default {
 
   .main {
     position: relative;
-  }
-  .main-container {
-    p {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      overflow: hidden;
-    }
-  }
+    .main-container {
+      // p {
+      //   position: relative;
+      //   display: flex;
+      //   justify-content: center;
+      //   flex-wrap: wrap;
+      //   overflow: hidden;
+      // }
+      .box-card {
+        margin: 10px 2%;
+        width: 95%;
+        transition: box-shadow 0.1s ease;
 
-  .list-enter-active,
-  .list-leave-active {
-    transition: all 1s;
-  }
-  .list-enter,
-  .list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
+        height: 120px;
+        /* 相对定位 */
+        position: relative;
+        /deep/.el-card__body {
+          padding: 10px;
+        }
+        .content {
+          padding: 5px;
+          word-wrap: break-word;
+          width: 86%;
+          min-height: 40px;
+          max-height: 40px;
+          .title,
+          .desc {
+            max-height: 40px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            font-size: 8px;
+          }
+        }
+
+        // &:hover {
+        //   box-shadow: 0px 0px 20px #666;
+        // }
+        img {
+          width: 100%;
+          object-fit: cover;
+          height: 100px;
+        }
+        .config-btn {
+          margin-bottom: 0;
+          height: 40px;
+          /* 绝对定位 */
+          position: absolute;
+          bottom: 10px;
+          right: 10px;
+          // position: relative; //将button按钮固定在页面底部，注意，：和；是英文的哦，一定不要写成中文哦。
+          // bottom: 5px;
+          // float: ;
+          // margin: 0px 0px;
+          // padding: 10px;
+        }
+      }
+    }
   }
 }
 </style>

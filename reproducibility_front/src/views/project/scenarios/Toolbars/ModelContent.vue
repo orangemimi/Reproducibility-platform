@@ -324,7 +324,7 @@ import {
   getRecordofSingleModel,
   getInstancesInScenario,
   bindScenario,
-  getScenarioById,
+  getScenarioById
   //   getInstanceById,
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
@@ -333,11 +333,11 @@ import { dateFormat } from "@/lib/utils";
 export default {
   props: {
     currentModel: {
-      type: Object,
+      type: Object
     },
     scenarioId: {
-      type: String,
-    },
+      type: String
+    }
   },
   components: { ResourceTable, StateDescription },
 
@@ -351,14 +351,14 @@ export default {
         }
       },
       deep: true,
-      immediate: true,
-    },
+      immediate: true
+    }
   },
 
   computed: {
     ...mapState({
-      userId: (state) => state.user.userId,
-    }),
+      userId: state => state.user.userId
+    })
     //把获取数据中的name字段分开
   },
 
@@ -394,8 +394,8 @@ export default {
             statename: "",
             event: "",
             value: "",
-            tag: "",
-          },
+            tag: ""
+          }
         ],
         outputs: [
           {
@@ -403,17 +403,17 @@ export default {
             event: "",
             template: {
               type: "", //id|none
-              value: "", //if tyoe=none value=""
-            },
-          },
-        ],
-      },
+              value: "" //if tyoe=none value=""
+            }
+          }
+        ]
+      }
     };
   },
 
   methods: {
     handleExpandChange(row, rows) {
-      const isExpend = rows.some((r) => r.id === row.id); // 判断当前行展开状态
+      const isExpend = rows.some(r => r.id === row.id); // 判断当前行展开状态
       if (isExpend) {
         // Do some things
       } else {
@@ -426,7 +426,7 @@ export default {
           return {
             // 删除第一列（columnIndex === 0），第3、4行单元格
             rowspan: 1,
-            colspan: 2,
+            colspan: 2
           };
         }
       }
@@ -466,7 +466,7 @@ export default {
         this.$message({
           showClose: true,
           message: "Unbind successfully",
-          type: "info",
+          type: "info"
         });
       } else {
         // 执行绑定逻辑
@@ -474,7 +474,7 @@ export default {
         this.$message({
           showClose: true,
           message: "Binding successful",
-          type: "success",
+          type: "success"
         });
       }
     },
@@ -512,24 +512,24 @@ export default {
         this.$message({
           showClose: true,
           message: "Data lost",
-          type: "warning",
+          type: "warning"
         });
       }
     },
     // 过滤方法，没有udxNode变量就加一个，暂时不知道udxNode是干啥的
     filterCurrentAllEventsWithStates(state) {
       let array = [];
-      state.inputs.forEach((item) => {
+      state.inputs.forEach(item => {
         item.stateName = state.name;
         item.type = "inputs";
         array.push(item);
       });
-      state.parameters.forEach((item) => {
+      state.parameters.forEach(item => {
         item.stateName = state.name;
         item.type = "parameters";
         array.push(item);
       });
-      state.outputs.forEach((item) => {
+      state.outputs.forEach(item => {
         item.stateName = state.name;
         item.type = "outputs";
         array.push(item);
@@ -559,8 +559,8 @@ export default {
 
       let dataArray = [];
       if (this.boundInstances != null) {
-        this.allModelInstanceListInScenario.forEach((instance) => {
-          this.boundInstances.forEach((bound) => {
+        this.allModelInstanceListInScenario.forEach(instance => {
+          this.boundInstances.forEach(bound => {
             if (bound == instance.id) {
               dataArray.push(instance);
             }
@@ -575,9 +575,9 @@ export default {
 
     getBoundData() {
       let dataArray = [];
-      this.boundInstances.forEach((instance) =>
-        instance.behavior.forEach((state) =>
-          state.outputs.forEach((out) => {
+      this.boundInstances.forEach(instance =>
+        instance.behavior.forEach(state =>
+          state.outputs.forEach(out => {
             out.modelName = instance.modelName;
             out.instanceName = instance.name;
             dataArray.push(out);
@@ -612,7 +612,7 @@ export default {
       }
     },
     getInstanceStatus() {
-      this.modelInstanceList.forEach(async (instance) => {
+      this.modelInstanceList.forEach(async instance => {
         if (instance.status == 0) {
           await this.getOutputs(instance, instance.refreshForm);
           //表示正在运行
@@ -637,12 +637,12 @@ export default {
         let data = await invokeSingleModel(this.invokeForm);
         let refreshForm = {
           ip: this.invokeForm.ip,
-          port: this.invokeForm.port,
+          port: this.invokeForm.port
         };
         if (data == null) {
           this.$message({
             message: "You have run the model failed",
-            type: "error",
+            type: "error"
           });
           await this.emitInstance(-1, this.modelItem, refreshForm);
         } else {
@@ -652,7 +652,7 @@ export default {
       } catch {
         this.$message({
           type: "info",
-          message: "invoke failed",
+          message: "invoke failed"
         });
       }
     },
@@ -668,7 +668,7 @@ export default {
           scenarioId: this.scenarioId,
           modelId: modelItem.id,
           refreshForm: refreshForm,
-          isReproduced: false,
+          isReproduced: false
         };
         await saveInstance(instanceTemp);
       } else {
@@ -679,7 +679,7 @@ export default {
     async updateInstance(status, behavior, instanceId) {
       await updateInstance(instanceId, {
         behavior: behavior,
-        status: status,
+        status: status
       });
     },
 
@@ -690,7 +690,7 @@ export default {
           instance.status = data.status;
           if (data.status == 2) {
             let isURLExist = true;
-            data.outputs.forEach((out) => {
+            data.outputs.forEach(out => {
               if (out.url == "") {
                 isURLExist = false;
               }
@@ -715,7 +715,7 @@ export default {
     getStateEventOut(instance, record) {
       let stateList = instance.behavior;
       let outputUrl = record.outputs;
-      outputUrl.forEach((el) => {
+      outputUrl.forEach(el => {
         stateList.forEach((state, index) => {
           if (state.name == el.statename) {
             state.outputs.forEach((event, eventIndex) => {
@@ -743,7 +743,7 @@ export default {
       for (let i = 0; i < stateList.length; i++) {
         let state = stateList[i];
         let allInputsWithPara = state.inputs.concat(state.parameters);
-        allInputsWithPara.forEach((item) => {
+        allInputsWithPara.forEach(item => {
           if (
             Object.hasOwnProperty.call(item, "value") &&
             item.value != "" &&
@@ -753,31 +753,31 @@ export default {
               statename: state.name,
               event: item.name,
               tag: item.name,
-              value: item.value,
+              value: item.value
             };
 
             this.invokeForm.inputs.push(detail);
           }
         });
-        state.outputs.forEach((item) => {
+        state.outputs.forEach(item => {
           let template = {};
 
           let outputTemplate = item.datasetItem;
           if (outputTemplate.type === "external") {
             template = {
               type: "id",
-              value: outputTemplate.externalId,
+              value: outputTemplate.externalId
             };
           } else {
             template = {
               type: "none",
-              value: "",
+              value: ""
             };
           }
           let detail = {
             statename: state.name,
             event: item.name,
-            template: template,
+            template: template
           };
 
           this.invokeForm.outputs.push(detail);
@@ -808,7 +808,7 @@ export default {
           if (content != "") {
             content = "<Dataset> " + content + " </Dataset>";
             let file = new File([content], events[j].name + ".xml", {
-              type: "text/plain",
+              type: "text/plain"
             });
             // uploadFileForm.append("file", file);
 
@@ -851,14 +851,14 @@ export default {
         this.invokeForm.pid = this.modelItem.md5; //md5
         this.invokeForm.username = this.userId;
       }
-    },
+    }
   },
 
   beforeDestroy() {
     clearInterval(this.timer);
   },
 
-  async mounted() {},
+  async mounted() {}
 };
 </script>
 <style lang="scss" scoped>

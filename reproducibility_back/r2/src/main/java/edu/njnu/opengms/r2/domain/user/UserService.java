@@ -7,6 +7,7 @@ import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JwtUtils;
 import edu.njnu.opengms.r2.domain.folder.FolderService;
 import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
+import edu.njnu.opengms.r2.domain.model.ModelRepository;
 import edu.njnu.opengms.r2.domain.project.Project;
 import edu.njnu.opengms.r2.domain.project.ProjectRepository;
 import edu.njnu.opengms.r2.remote.UserServiceServie;
@@ -14,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static edu.njnu.opengms.r2.utils.Utils.filterUserInfo;
 import static edu.njnu.opengms.r2.utils.Utils.filterUserInfoProjects;
@@ -39,6 +37,9 @@ public class UserService {
 
     @Autowired
     FolderService folderService;
+
+    @Autowired
+    ModelRepository modelRepository;
 
     @Autowired
     ProjectRepository projectRepository;
@@ -92,6 +93,9 @@ public class UserService {
             json.put("userId", userFromDB.getId());
 //            json.put("avatar", avatar);
             json.put("email", email);
+//            json.put("modelList", userFromDB.getModelList());
+//            json.put("modelItemList", userFromDB.get());
+
 //            json.put("unreadApply", unreadApply);
 //            json.put("unreadReply", unreadReply);
 //            json.put("joinedProjects", userFromDB.getJoinedProjects());
@@ -260,10 +264,38 @@ public class UserService {
         return filterUserInfoProjects(userFromDB);
     }
 
-    public User getUserInfoById(String userId) {
+    public JSONObject getUserInfoById(String userId) {
 
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
-        return userFromDB;
+        JSONObject obj = new JSONObject();
+        JSONObject userNew = new JSONObject();
+        if(userFromDB.getModelList()!=null) {
+            JSONObject models = Optional.ofNullable(userFromDB)
+                    .map(x -> x.getModelList())
+                    .map(x -> {
+
+                        List<String> modelIdList = x;
+                        if (modelIdList != null) {
+                            obj.put("modelList", modelRepository.findAllById(modelIdList));
+                        } else {
+                            obj.put("modelList", null);
+
+                        }
+
+                        return obj;
+                    })
+                    .orElseGet(null);
+//            userNew.put("modelItemList",obj);
+        }
+        userNew.put("name",userFromDB.getName());
+//        userNew.put("modelItemList",obj);
+        userNew.put("modelList",userFromDB.getModelList());
+        userNew.put("createdProjects",userFromDB.getCreatedProjects());
+//        user.put("modelItemList", obj);
+//        scenarioNew.put("instanceObjects", objInstance);
+
+
+        return userNew;
     }
 
     public User update(User user){
@@ -365,9 +397,13 @@ public class UserService {
             }
         }
 
-
-
         return result;
     }
 
+    public Object updateModelList(String userId, List<String> update) {
+        User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
+
+        userFromDB.setModelList(update);
+        return userRepository.save(userFromDB);
+    }
 }

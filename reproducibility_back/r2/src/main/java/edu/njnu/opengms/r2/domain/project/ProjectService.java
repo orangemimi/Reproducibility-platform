@@ -6,6 +6,7 @@ import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
 import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
 import edu.njnu.opengms.r2.domain.user.User;
+import edu.njnu.opengms.r2.domain.user.UserRepository;
 import edu.njnu.opengms.r2.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,8 +30,10 @@ public class ProjectService {
     ProjectRepository projectRepository;
 
     @Autowired
-    UserService userService;
+    UserRepository userRepository;
 
+    @Autowired
+    UserService userService;
     public Project get(String projectId) {
         return projectRepository.findById(projectId).orElse(null);
     }
@@ -40,12 +43,8 @@ public class ProjectService {
         Project project = new Project();
         add.setCreatorId(userId);
         add.convertTo(project);
-//        Creator creator = new Creator();
-//        creator.setName(userName);
-//        creator.setId(userId);
         Project result = projectRepository.insert(project);
-        User user = userService.getUserInfoById(userId);
-
+        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         if (user.getCreatedProjects()==null){
             List<String> newProjects =new ArrayList<>();
             newProjects.add(result.getId());
@@ -109,7 +108,7 @@ public class ProjectService {
     public Page<Project> getAllProjects(String userId, int currentPage, int pagesize) {
         PageRequest pageable = PageRequest.of(currentPage, pagesize);
         List<String> privacyList = Arrays.asList("public", "private");
-        User user = userService.getUserInfoById(userId);
+//        User user = userRepository.findById(userId).orElseThrow(MyException::noObject)
         Page<Project> projectList = projectRepository.findByPrivacyInOrCreatorId(privacyList, userId, pageable);
         return projectList;
     }
@@ -122,7 +121,7 @@ public class ProjectService {
         project.getMemberList().add(update);
 
 
-        User user = userService.getUserInfoById(update.getMemberId());
+        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         user.getJoinedProjects().add(project.getId());
         userService.update(user);
 
@@ -135,7 +134,7 @@ public class ProjectService {
 
 
         Project project = projectRepository.findById(projectId).orElse(null);
-        User creator = userService.getUserInfoById(project.getCreatorId());
+        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
 
 
         List<Member> memberIdList = project.getMemberList();
@@ -146,10 +145,11 @@ public class ProjectService {
 
         JSONObject json = new JSONObject();
         json.put("project", project);
-        json.put("creator", creator);
+        json.put("creator", user);
         if (!(memberIdList == null || memberIdList.size() == 0)) {
             for (int i = 0; i < memberIdList.size(); i++) {
-                User member = userService.getUserInfoById(memberIdList.get(i).getMemberId());
+                User member = userRepository.findById(memberIdList.get(i).getMemberId()).orElseThrow(MyException::noObject);
+
                 memberList.add(member);
 
             }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="box-card" v-if="type != 'Model'">
+    <el-card class="box-card" v-if="type == 'service'">
       <el-col :span="4">
         <img :src="imgPath(item.snapshot, item.name)" />
       </el-col>
@@ -12,7 +12,7 @@
         <el-button
           class="config-btn"
           type="success"
-          @click="view(item.id)"
+          @click="addModelToUser(item.id)"
           icon="el-icon-shopping-cart-2"
         ></el-button>
       </el-col>
@@ -20,7 +20,7 @@
 
     <el-card
       class="box-card"
-      v-if="type == 'Model'"
+      v-else
       :style="select ? 'box-shadow: 0px 0px 20px #666;' : ''"
     >
       <el-col :span="6">
@@ -152,133 +152,6 @@ export default {
       } else {
         return imgBase64(name);
       }
-    },
-
-    modelView() {
-      window.open(
-        "http://geomodeling.njnu.edu.cn/modelItem/" + this.item.oid,
-        "_blank"
-      );
-    },
-    async selectClick() {
-      await this.getComputableModels();
-      console.log(this.computableModels);
-      if (this.select) {
-        let temp = JSON.parse(localStorage.selectModels);
-        for (let i = 0; i < this.computableModels.length; i++) {
-          this.selectNumArr[i] = -1;
-        }
-        for (let i = 0; i < temp.computableModels.length; i++) {
-          for (let j = 0; j < this.computableModels.length; j++) {
-            if (temp.computableModels[i].doi == this.computableModels[j].doi) {
-              this.selectNumArr[j] = 1;
-              break;
-            }
-          }
-        }
-        this.dialogVisible = true;
-      } else {
-        if (this.computableModels.length > 0) {
-          for (let i = 0; i < this.computableModels.length; i++) {
-            this.selectNumArr[i] = -1;
-          }
-          this.dialogVisible = true;
-        } else {
-          this.$notify({
-            title: "Warning",
-            message: "The model has no computing resources!",
-            type: "warning",
-          });
-        }
-      }
-    },
-    async getComputableModels() {
-      let data = await getComputableModels(this.item.oid);
-      this.computableModels = data;
-    },
-    getDescription(index) {
-      this.selectNum = index;
-      if (this.selectNumArr[index] == 1) {
-        this.selectNumArr.splice(index, 1, -1);
-        this.description = "";
-      } else {
-        this.selectNumArr.splice(index, 1, 1);
-        this.description = this.computableModels[index].description;
-      }
-    },
-    confirm() {
-      this.selectArr = [];
-      this.selectNumArr.forEach((item, index) => {
-        if (item == 1) {
-          this.selectArr.push(this.computableModels[index]);
-        }
-      });
-      let temp = "";
-      if (localStorage.selectModels == undefined) {
-        temp = {
-          modelItem: [],
-          computableModels: [],
-        };
-      } else {
-        temp = JSON.parse(localStorage.selectModels);
-      }
-      if (this.select) {
-        for (let i = 0; i < temp.computableModels.length; i++) {
-          for (let j = 0; j < this.computableModels.length; j++) {
-            if (this.computableModels[j].doi == temp.computableModels[i].doi) {
-              temp.computableModels.splice(i, 1);
-              console.log(temp.computableModels.length);
-              i--;
-              break;
-            }
-          }
-        }
-      }
-      if (this.selectArr.length == 0) {
-        temp.modelItem.forEach((item, index) => {
-          if (item.id == this.item.oid) {
-            temp.modelItem.splice(index, 1);
-          }
-        });
-      } else {
-        for (let i = 0; i < this.selectArr.length; i++) {
-          temp.computableModels.push({
-            name: this.selectArr[i].name,
-            doi: this.selectArr[i].doi,
-            snapshot: this.item.snapshot,
-            md5: this.selectArr[i].md5,
-          });
-        }
-        if (this.badgeNum == 0) {
-          temp.modelItem.push({
-            id: this.item.oid,
-            count: this.selectArr.length,
-          });
-        } else {
-          temp.modelItem.forEach((item) => {
-            if (item.id == this.item.oid) {
-              item.count = this.selectArr.length;
-            }
-          });
-        }
-      }
-      localStorage.setItem("selectModels", JSON.stringify(temp));
-      this.$store.state.user.selectNum =
-        this.$store.state.user.selectNum +
-        this.selectArr.length -
-        this.badgeNum;
-      if (this.selectArr.length > 0) {
-        this.select = true;
-        this.badgeNum = this.selectArr.length;
-      } else {
-        this.select = false;
-        this.badgeNum = 0;
-      }
-
-      this.dialogVisible = false;
-    },
-    cancel() {
-      this.dialogVisible = false;
     },
   },
   mounted() {

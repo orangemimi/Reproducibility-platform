@@ -20,6 +20,7 @@ import java.util.Optional;
 public interface ModelRepository extends MongoRepository<Model,String> {
     Optional<Model> findById(String id);
     Optional<Model> findByServiceId(String id);
+    Optional<Model> findByMd5(String id);
     List<Model> findByPrivacyInAndNameContainsIgnoreCase(String privacy, String name);
 
     Page<Model> getByNameContainsIgnoreCase(String name, Pageable pageable);

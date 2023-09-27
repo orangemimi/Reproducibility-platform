@@ -20,8 +20,17 @@ export async function saveUser(form) {
   return data;
 }
 
+//根据project来获取 不要暴露user接口
 export async function getUserInfoByUserId(userId) {
   return await get(`/users/getUserInfoByUserId/${userId}`);
+}
+
+export async function getUser() {
+  return await get(`/users`);
+}
+
+export async function updateUsersModel(json) {
+  return await patch(`/users/model`, json);
 }
 
 export async function getUserProjects() {
@@ -103,16 +112,22 @@ export async function getPublicModelListByIgnoreName(text) {
 export async function getModelById(id) {
   return await get(`/models/getModelById/${id}`);
 }
+export async function addModelByMD5Local(form) {
+  return await get(`/models/local`, form);
+}
+// export async function getMyModels(id) {
+//   return await get(`/models/getModelById/${id}`);
+// }
 
 //---
 
-export async function getAllModelItems(currentPage, pagesize) {
-  return await get(`/modelItems/${currentPage}/${pagesize}`);
-}
+// export async function getAllModelItems(currentPage, pagesize) {
+//   return await get(`/modelItems/${currentPage}/${pagesize}`);
+// }
 
-export async function getModelsByProjectId(projectId) {
-  return await get(`/modelItems/getModelsByProjectId/${projectId}`);
-}
+// export async function getModelsByProjectId(projectId) {
+//   return await get(`/modelItems/getModelsByProjectId/${projectId}`);
+// }
 
 //------------------------------------------scenario------------------------------------
 export async function getScenarioById(id) {

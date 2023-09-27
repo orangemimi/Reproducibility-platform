@@ -26,13 +26,14 @@ public class JwtUtils {
     private static final String TOKEN_PREFIX = "Bearer";
     private static final Key KEY = new SecretKeySpec(SECRET.getBytes(), SignatureAlgorithm.HS256.getJcaName());
 
-    public static String generateToken(String id, String name,String email, String password) {
+    public static String generateToken(String id, String name, String email, String password) {
         HashMap<String, Object> map = new HashMap<>(30);
         map.put("userId", id);
         map.put("name", name);
         map.put("email", email);
         map.put("password", password);
         map.put("type", "JWT");
+//        map.put("modelList", modelList);
         return Jwts.builder()
                 .setClaims(map)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))

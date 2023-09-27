@@ -10,19 +10,50 @@
         <el-row class="top-info">
           <el-row class="top-title">Official Repository</el-row>
           <el-row class="top-desc">Various, useful DataServices.</el-row>
-          <el-row class="top-desc">Collected by generous community of OpenGMS Team. 🎁</el-row>
+          <el-row class="top-desc"
+            >Collected by generous community of OpenGMS Team. 🎁</el-row
+          >
           <el-row class="input-container">
-            <el-input @keyup.enter.native="searchData" v-model="value" placeholder="" prefix-icon="el-icon-search"></el-input>
+            <el-input
+              @keyup.enter.native="searchData"
+              v-model="value"
+              placeholder=""
+              prefix-icon="el-icon-search"
+            ></el-input>
           </el-row>
-          <el-row class="search-note">Trending searches: Geodynamics,Geostatics,Hydrology,Coastal Vulnerability,Urban Noise</el-row>
+          <el-row class="search-note"
+            >Trending searches: Geodynamics,Geostatics,Hydrology,Coastal
+            Vulnerability,Urban Noise</el-row
+          >
           <el-row>
             <!-- <el-button plain class="add-btn" @click="addModelDialogShow = true">Add your model service ➔</el-button> -->
             <div class="Categories">
               <div class="head">Method Categories</div>
               <div class="bottom">
-                <div :class="select == 1 ? 'select bottom-content' : 'bottom-content'" @click="changeSelect(1)">Conversion</div>
-                <div :class="select == 2 ? 'select bottom-content' : 'bottom-content'" @click="changeSelect(2)">Processing</div>
-                <div :class="select == 3 ? 'select bottom-content' : 'bottom-content'" @click="changeSelect(3)">Visualization</div>
+                <div
+                  :class="
+                    select == 1 ? 'select bottom-content' : 'bottom-content'
+                  "
+                  @click="changeSelect(1)"
+                >
+                  Conversion
+                </div>
+                <div
+                  :class="
+                    select == 2 ? 'select bottom-content' : 'bottom-content'
+                  "
+                  @click="changeSelect(2)"
+                >
+                  Processing
+                </div>
+                <div
+                  :class="
+                    select == 3 ? 'select bottom-content' : 'bottom-content'
+                  "
+                  @click="changeSelect(3)"
+                >
+                  Visualization
+                </div>
               </div>
             </div>
           </el-row>
@@ -51,25 +82,30 @@
     </div>
 
     <!-- add model -->
-    <el-dialog title="Add model in Reproducibilty" :visible.sync="addModelDialogShow" width="40%" :close-on-click-modal="false">
+    <el-dialog
+      title="Add model in Reproducibilty"
+      :visible.sync="addModelDialogShow"
+      width="40%"
+      :close-on-click-modal="false"
+    >
       <create-model></create-model>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getDataServiceByPortal } from '@/api/request';
-import dataServiceCard from './components/DataServiceCard.vue';
-import createModel from './create';
+import { getDataServiceByPortal } from "@/api/request";
+import dataServiceCard from "./components/DataServiceCard.vue";
+import createModel from "./create";
 export default {
   data() {
     return {
       data: [],
       total: 0,
-      value: '',
-      method: 'conversion',
+      value: "",
+      method: "conversion",
       select: 1,
-      addModelDialogShow: false
+      addModelDialogShow: false,
     };
   },
 
@@ -80,14 +116,14 @@ export default {
 
     async changeSelect(val) {
       if (val == 1 && this.select != 1) {
-        await this.getData('conversion', '');
-        this.method = 'conversion';
+        await this.getData("conversion", "");
+        this.method = "conversion";
       } else if (val == 2 && this.select != 2) {
-        await this.getData('processing', '');
-        this.method = 'processing';
+        await this.getData("processing", "");
+        this.method = "processing";
       } else if (val == 3 && this.select != 3) {
-        await this.getData('visualization', '');
-        this.method = 'visualization';
+        await this.getData("visualization", "");
+        this.method = "visualization";
       }
       this.select = val;
     },
@@ -97,7 +133,7 @@ export default {
         method: method,
         page: 1,
         pageSize: 12,
-        searchText: searchText
+        searchText: searchText,
       };
       let data = await getDataServiceByPortal(jsonData);
 
@@ -110,17 +146,17 @@ export default {
         method: method,
         page: val,
         pageSize: 12,
-        searchText: ''
+        searchText: "",
       };
       let data = await getDataServiceByPortal(jsonData);
       this.data = data.data.list;
       this.total = data.data.total;
-    }
+    },
   },
   mounted() {
-    this.getData(this.method, '');
+    this.getData(this.method, "");
   },
-  components: { dataServiceCard, createModel }
+  components: { dataServiceCard, createModel },
 };
 </script>
 
@@ -139,7 +175,7 @@ export default {
           object-fit: cover;
           //obackground-size: cover;
           width: 100%;
-          height: calc(100vh - 60px);
+          height: calc(100vh - 30px);
           filter: brightness(0.8);
         }
       }
@@ -152,7 +188,7 @@ export default {
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;
-      font-family: Arial, Georgia, Times, 'Times New Roman', serif;
+      font-family: Arial, Georgia, Times, "Times New Roman", serif;
       .el-row {
         margin: 0.5rem 0;
       }

@@ -4,8 +4,8 @@ package edu.njnu.opengms.r2.aspect;
 import edu.njnu.opengms.common.enums.ResultEnum;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JwtUtils;
-import edu.njnu.opengms.r2.domain.creator.Creator;
-import edu.njnu.opengms.r2.domain.creator.CreatorService;
+import edu.njnu.opengms.r2.domain.user.User;
+import edu.njnu.opengms.r2.domain.user.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -34,8 +34,10 @@ public class NeedAuthAspect {
     private static final String NAME = "name";
     private static final String PASSWORD = "password";
 
+//    @Autowired
+//    CreatorService creatorService;
     @Autowired
-    CreatorService creatorService;
+    UserRepository userRepository;
 
     @Pointcut ("@annotation(edu.njnu.opengms.r2.annotation.NeedAuth)")
     public void point() {
@@ -53,11 +55,13 @@ public class NeedAuthAspect {
             throw new MyException(ResultEnum.NO_TOKEN);
         } else {
             Claims claims = JwtUtils.parseJWT(auth);
-            Creator creator = creatorService.findByName((String) claims.get(NAME));
-            if (creator == null) {
+//            Creator creator = creatorService.findByName((String) claims.get(NAME));
+            User user = userRepository.findByName((String) claims.get(NAME)).orElseThrow(MyException::noObject);
+
+            if (user == null) {
                 response.setStatus(401);
                 throw new MyException(ResultEnum.NO_OBJECT);
-            } else if (!creator.getPassword().equals(claims.get(PASSWORD))) {
+            } else if (!user.getPassword().equals(claims.get(PASSWORD))) {
                 response.setStatus(401);
                 throw new MyException(ResultEnum.USER_PASSWORD_NOT_MATCH);
             }
