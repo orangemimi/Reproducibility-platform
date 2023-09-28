@@ -1,6 +1,6 @@
 <!-- card -->
 <template>
-  <div class="main">
+  <div class="mainCardConstruction">
     <div :class="item.isBinded == true ? 'cardBodyBinded' : 'cardBody'">
       <el-card shadow="hover" class="card_main">
         <div class="card_info">
@@ -39,7 +39,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.main {
+.mainCardConstruction {
   width: 100%;
   // pointer-events: none; //鼠标点击不可修改
   // padding: 5px;

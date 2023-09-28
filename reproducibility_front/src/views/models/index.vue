@@ -109,7 +109,7 @@ export default {
       is_extending: false,
       value: "",
       pageFilter: {
-        pageSize: 8,
+        pageSize: 20,
         page: 0,
       },
       addModelDialogShow: false,
@@ -154,7 +154,12 @@ export default {
     },
 
     async getPublicModels(val) {
-      let data = await getModelsByPrivacy("public", val, 20);
+      let data = await getModelsByPrivacy({
+        privacy: "public",
+        currentPage: val,
+        pageSize: 20,
+        key: "",
+      });
       this.total = data.totalElements;
       this.data = data.content;
     },
@@ -172,13 +177,17 @@ export default {
       } else {
         this.selectedModels = [];
       }
-
-      console.log(this.currentUser, "currentUser");
-
       await this.getPublicModels(0);
     },
     async currentChange(val) {
-      this.data = (await getModelsByPrivacy("public", val - 1, 20)).content;
+      this.data = (
+        await getModelsByPrivacy({
+          privacy: "public",
+          currentPage: val - 1,
+          pageSize: 20,
+          key: "",
+        })
+      ).content;
     },
     async searchData() {
       let params = {
@@ -186,8 +195,16 @@ export default {
         pageSize: 20,
         searchText: this.value,
       };
-      let result = await getModelsByPrivacy(params);
-      (this.total = result.data.total), (this.data = result.data.list);
+
+      let data = await getModelsByPrivacy({
+        privacy: "public",
+        currentPage: params.page,
+        pageSize: params.pageSize,
+        key: this.value,
+      });
+      this.total = data.totalElements;
+      this.data = data.content;
+      this.$forceUpdate();
     },
   },
   mounted() {

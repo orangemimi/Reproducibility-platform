@@ -1,46 +1,42 @@
 <!--  -->
 <template>
-  <div class="main">
-    <el-col :span="5" class="scenario">
-      <el-row>
-        <el-button
-          v-show="scenariosToolBarShow"
-          icon="el-icon-document-add"
-          size="mini"
-          @click="createNewScenario"
-          title="add a scenario"
-        ></el-button>
-        <el-button
-          v-show="!scenariosToolBarShow"
-          icon="el-icon-document-add"
-          size="mini"
-          @click="addModelInScenario"
-          title="add a scenario"
-        ></el-button>
-        <el-button
-          v-show="!scenariosToolBarShow"
-          icon="el-icon-document-add"
-          size="mini"
-          @click="addDataInScenario"
-          title="add a scenario"
-        ></el-button>
+  <div class="mainLeft">
+    <el-row>
+      <el-button
+        v-show="scenariosToolBarShow"
+        icon="el-icon-document-add"
+        size="mini"
+        @click="createNewScenario"
+        title="add a scenario"
+      ></el-button>
+
+      <el-row style="float:right;margin-right:10px">
+        <div style="float:left;margin-right:10px">Binded to reviewer</div>
+        <el-tooltip
+          :content="'Is binded to reviewer: ' + chosenScenario.isBinded"
+          placement="top"
+        >
+          <el-switch
+            v-model="chosenScenario.isBinded"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
+        </el-tooltip>
       </el-row>
-      <el-row>
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item @click="scenariosToolBarShow = true"
-            >Scenarios</el-breadcrumb-item
-          >
-          <el-breadcrumb-item
-            v-show="
-              !scenariosToolBarShow &&
-                Object.prototype.hasOwnProperty.call(chosenScenario, 'name')
-            "
-          >
-            {{ chosenScenario.name }}</el-breadcrumb-item
-          >
-        </el-breadcrumb>
-      </el-row>
-      <el-row v-show="scenariosToolBarShow">
+    </el-row>
+    <el-row style="margin: 10px 0">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item @click.native="scenariosToolBarShow = true"
+          >Scenarios</el-breadcrumb-item
+        >
+        <el-breadcrumb-item v-show="!scenariosToolBarShow">
+          {{ chosenScenario.name }}</el-breadcrumb-item
+        >
+      </el-breadcrumb>
+    </el-row>
+    <el-row>
+      <div v-if="scenariosToolBarShow">
         <div
           v-for="(item, key) in allScenarioList"
           :key="key"
@@ -48,23 +44,16 @@
         >
           <scenario-card :secnarioForm="item"></scenario-card>
         </div>
-      </el-row>
-      <el-row
-        v-if="
-          !scenariosToolBarShow &&
-            Object.prototype.hasOwnProperty.call(
-              chosenScenario.resourceCollection,
-              'modelList'
-            )
-        "
-      >
+      </div>
+      <div v-else>
         <resource-toolbar
-          :modelList="chosenScenario.resourceCollection.modelList"
+          :chosenScenario="chosenScenario"
           @selectModel="selectModel"
-        ></resource-toolbar
-      ></el-row>
-    </el-col>
+        ></resource-toolbar>
 
+        <el-empty description="Please add the resources first"></el-empty>
+      </div>
+    </el-row>
     <div class="createScenario">
       <el-dialog
         :visible.sync="createScenarioDialog"
@@ -79,8 +68,6 @@
         ></create-scenario>
       </el-dialog>
     </div>
-
-    <!-- </el-row> -->
   </div>
 </template>
 
@@ -89,11 +76,11 @@ import {
   getProjectById,
   getScenarioById,
   getScenariosByProjectId,
+  getMyModels,
 } from "@/api/request";
 
 import scenarioCard from "_com/Cards/ScenarioListCard.vue";
-import createScenario from "./../../construction/create.vue";
-
+import createScenario from "../create.vue";
 import resourceToolbar from "./ResourceToolbar";
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
@@ -118,43 +105,33 @@ export default {
       currentModel: {},
       scenariosToolBarShow: true,
       createScenarioDialog: false,
+    
+      allModelsWithUser: [],
+      resourceCollection: {},
+      //   resourceCollectionOb
+ 
     };
   },
 
   methods: {
     async init() {
       this.project = await getProjectById(this.projectId);
-
       this.allScenarioList = await getScenariosByProjectId(this.projectId);
-
-      console.log(" this.allScenarioList ", this.allScenarioList);
       this.allScenarioList.forEach((element) => {
         if (element.id == this.project.scenario) {
           element.isBinded = true;
         }
       });
-    },
-
-    async getChosenScenario() {
-      this.chosenScenario = await getScenarioById(this.project.scenario);
-      this.chosenScenario.isBinded = true;
-      if (
-        Object.prototype.hasOwnProperty.call(
-          this.chosenScenario.resourceCollection,
-          "modelList"
-        )
-      ) {
-        this.currentModel = this.chosenScenario.resourceCollection.modelList[0];
-      } else {
-        this.currentModel = {};
-      }
+      //get my models
+      this.allModelsWithUser = await getMyModels();
+      console.log("this.allModelsWithUser", this.allModelsWithUser);
     },
 
     async chooseScenario(item) {
       this.scenariosToolBarShow = false;
-      this.chosenScenario = await getScenarioById(item.id);
-      console.log(this.chosenScenario, "chosenScenario");
-      // this.chosenScenario.isBinded = true;
+      let data = await getScenarioById(item.id);
+      this.chosenScenario = data;
+      this.scenariosToolBarShow = false;
     },
 
     createNewScenario() {
@@ -162,7 +139,8 @@ export default {
     },
 
     selectModel(val) {
-      this.currentModel = val;
+      this.$emit("selectModel", val, this.chosenScenario.id);
+      //   this.currentModel = val;
     },
     createStatus(val) {
       if (val == "success") {
@@ -177,14 +155,16 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-.main {
-  width: 100%;
-  padding: 5px 10px;
+<style lang="scss" scoped>
+.mainLeft {
+  width: 300px;
+  float: left;
+  //   padding: 5px 10px;
   /* min-height: calc(100vh - 240px); */
 
   .scenario {
-    background-color: #3067d61c;
+    // background-color: #6060601c;
+    // width: 300px;
   }
 
   .scenarioCard {
@@ -195,6 +175,12 @@ export default {
     }
   }
   .createScenario {
+    .el-dialog__body {
+      height: 200px;
+      overflow: auto;
+    }
+  }
+  .selectResource {
     .el-dialog__body {
       height: 1200px;
       overflow: auto;

@@ -7,7 +7,6 @@ import edu.njnu.opengms.r2.domain.folder.Folder;
 import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.model.ModelRepository;
 import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceRepository;
-import edu.njnu.opengms.r2.domain.project.ResourceCollection;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
@@ -83,7 +82,8 @@ public class ScenarioService {
         scenarioNew.put("id", scenario.id);
         scenarioNew.put("type", scenario.type);
         scenarioNew.put("instances", scenario.instances);
-        scenarioNew.put("resourceCollection", obj);
+        scenarioNew.put("resourceCollection", scenario.resourceCollection);
+        scenarioNew.put("resourceCollectionObjects", obj);
 //        scenarioNew.put("instanceObjects", objInstance);
 
 
@@ -119,20 +119,41 @@ public class ScenarioService {
     }
 
 
-    public Scenario updateresourceCollection(String id, String type, String userId, List<String> modelList) {
+//    public Scenario updateresourceCollection(String id,  String userId, UpdateResourceScenarioDTO update) {
+//
+//        Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
+//        update.convertTo(scenario);
+//        ResourceCollection resourceCollection = null;
+//        if (type.equals("modelList")) {
+//            resourceCollection = ResourceCollection.builder().modelList(modelList).build();
+//            if (scenario.resourceCollection != null) {
+//                if (scenario.resourceCollection.getDataList() != null) {
+//                    resourceCollection.setDataList(scenario.resourceCollection.getDataList());
+//                }
+//
+//            }
+//        }
+//        if (type.equals("dataList")) {
+//            resourceCollection = ResourceCollection.builder().dataList(modelList).build();
+//            if (scenario.resourceCollection != null) {
+//                if (scenario.resourceCollection.getDataList() != null) {
+//                    resourceCollection.setModelList(scenario.resourceCollection.getDataList());
+//                }
+//
+//            }
+//        }
+//        scenario.setResourceCollection(resourceCollection);
+//
+//        return scenarioRepository.save(scenario);
+//    }
+
+    public Scenario updateresourceCollection(String id,  String userId, JSONObject update) {
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
-        ResourceCollection resourceCollection = null;
-        if (type.equals("modelList")) {
-            resourceCollection = ResourceCollection.builder().modelList(modelList).build();
-            if (scenario.resourceCollection != null) {
-                if (scenario.resourceCollection.getDataList() != null) {
-                    resourceCollection.setDataList(scenario.resourceCollection.getDataList());
-                }
-
-            }
-        }
+        ResourceCollection resourceCollection =  ResourceCollection.builder()
+                .modelList((List<String>) update.get("modelList"))
+                .dataList((List<String>) update.get("dataList")).build();
         scenario.setResourceCollection(resourceCollection);
-
+//        update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
 

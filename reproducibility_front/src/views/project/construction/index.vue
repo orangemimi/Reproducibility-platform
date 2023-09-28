@@ -1,15 +1,14 @@
 <!--  -->
 <template>
   <div class="main">
-    <!-- <el-row :gutter="20"> -->
+    <div>
+      <LeftToolbar @selectModel="selectModel"></LeftToolbar>
+    </div>
 
-    <el-col :span="5" class="scenario">
-      <LeftToolbar></LeftToolbar>
-    </el-col>
-
-    <el-col :span="19">
-      <RightToolbar></RightToolbar>
-    </el-col>
+    <div>
+      <RightToolbar  :currentModel="currentModel"
+            :scenarioId="scenarioId"></RightToolbar>
+    </div>
 
     <!-- </el-row> -->
   </div>
@@ -28,5 +27,14 @@ export default {
   watch: {},
 
   computed: {},
+  data() {
+    return { currentModel: {},scenarioId:'' };
+  },
+  methods: {
+    selectModel(val,scenarioId) {
+      this.currentModel = val;
+      this.scenarioId=scenarioId
+    },
+  },
 };
 </script>

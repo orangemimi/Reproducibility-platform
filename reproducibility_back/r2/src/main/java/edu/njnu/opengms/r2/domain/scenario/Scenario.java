@@ -1,7 +1,6 @@
 package edu.njnu.opengms.r2.domain.scenario;
 
 import edu.njnu.opengms.common.entity.BaseEntity;
-import edu.njnu.opengms.r2.domain.project.ResourceCollection;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -18,8 +17,6 @@ public class Scenario extends BaseEntity {
     @Id
     String id;
     String name;
-//    String creatorId;
-//    String executorId;
     String projectId;
     List<String> instances;//绑定的instanceId；
     String type;//notebook or integrateTask or sequentModels

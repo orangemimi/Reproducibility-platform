@@ -95,19 +95,29 @@ export async function checkTaskStatus(tid) {
 
 //-------------------------------------------modelitems--------------------------------------------------
 
-export async function getModelsByPrivacy(privacy, currentPage, pagesize) {
-  return await get(
-    `/models/getPublicModels/${privacy}/${currentPage}/${pagesize}`
+// export async function getModelsByPrivacy(privacy, currentPage, pagesize, key) {
+//   return await post(
+//     `/models/getPublicModels/${privacy}/${currentPage}/${pagesize}`,
+//     key
+//   );
+// }
+export async function getModelsByPrivacy(form) {
+  return await post(
+    `/models/getPublicModels`,
+    form
   );
 }
-
-export async function getAllPublicModels() {
-  return await get(`/models/allPublic`);
+export async function getMyModels() {
+  return await get(`/models/my`);
 }
 
-export async function getPublicModelListByIgnoreName(text) {
-  return await get(`/models/getPublicModelListByIgnoreName/${text}`);
-}
+// export async function getAllPublicModels() {
+//   return await get(`/models/allPublic`);
+// }
+
+// export async function getPublicModelListByIgnoreName(text) {
+//   return await get(`/models/getPublicModelListByIgnoreName/${text}`);
+// }
 
 export async function getModelById(id) {
   return await get(`/models/getModelById/${id}`);
@@ -154,8 +164,8 @@ export async function updateScenarioByProjectId(projectId, postJson) {
   return data;
 }
 
-export async function updateresourceCollection(id, type, form) {
-  let data = await patch(`/scenario/resources/${id}/${type}`, form);
+export async function updateresourceCollection(id, form) {
+  let data = await patch(`/scenario/resources/${id}`, form);
   return data;
 }
 

@@ -1,4 +1,4 @@
-package edu.njnu.opengms.r2.domain.project;
+package edu.njnu.opengms.r2.domain.scenario;
 
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Builder
 public class ResourceCollection {
-    List<String> dataList;
-    List<String> modelList;
+   public List<String> dataList;
+  public  List<String> modelList;
 //    List<String> reproducedDataResourceList;
 }

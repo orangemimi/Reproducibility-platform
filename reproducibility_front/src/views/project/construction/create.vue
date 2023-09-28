@@ -14,52 +14,6 @@
             >Integrate task</el-radio
           >
         </el-form-item>
-        <el-form-item label="Model Resources">
-          <el-row>
-            <el-row>
-              <el-col :span="10">
-                <el-input
-                  placeholder="Search by name"
-                  v-model="keyword"
-                  class="input-with-select"
-                  size="small"
-                >
-                  <el-button
-                    slot="append"
-                    icon="el-icon-search"
-                    @click="searchModelByName"
-                  ></el-button>
-                </el-input>
-              </el-col>
-            </el-row>
-
-            <div class="transfer">
-              <el-transfer
-                class="mainContainer"
-                v-model="selectedModelsWithId"
-                @change="
-                  (value) => {
-                    selectChange(value, 'model');
-                  }
-                "
-                :titles="['Public models', 'Selected models']"
-                :data="currentModelList"
-              >
-              </el-transfer>
-              <el-pagination
-                layout="prev, pager, next"
-                :total="total"
-                small
-                :pager-count="5"
-                :page-size="20"
-                :current-page="1"
-                @current-change="currentModelChange"
-                class="pageClass"
-                v-show="!isSearching"
-              ></el-pagination>
-            </div>
-          </el-row>
-        </el-form-item>
       </el-form>
       <div class="dialog-footer">
         <!-- <el-button @click="resourceCollectDialog = false" size="mini"
@@ -77,7 +31,6 @@
 import {
   getProjectById,
   getModelsByPrivacy,
-  getPublicModelListByIgnoreName,
   updateProject,
   // getScenarioById,
   saveScenario,
@@ -126,21 +79,6 @@ export default {
       this.currentModelList = currentModelList;
     },
 
-    // 穿梭搜索
-    async searchModelByName() {
-      let data = await getPublicModelListByIgnoreName(this.keyword);
-      this.modelList = data;
-      var currentModelList = this.modelList.map((value) => {
-        return {
-          label: value.name,
-          key: value.id,
-          obj: value,
-        };
-      });
-      // 初始化数据
-      this.currentModelList = currentModelList;
-      // this.isSearching = true;
-    },
     // clearSearch() {
     //   this.keyword = "";
     //   // this.init();

@@ -13,10 +13,6 @@ import lombok.Data;
  * @version: 1.0.0
  */
 @Data
-public class AddScenarioDTO implements ToDomainConverter<Scenario> {
-    String userId;
-    String projectId;
-    String name;
+public class UpdateResourceScenarioDTO implements ToDomainConverter<Scenario> {
     ResourceCollection resourceCollection;
-    String type;
 }

@@ -1,16 +1,17 @@
 package edu.njnu.opengms.r2.domain.model;
 
 import cn.hutool.json.JSONObject;
+import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.model.dto.AddModelServiceDTO;
 import edu.njnu.opengms.r2.domain.model.support.State;
+import edu.njnu.opengms.r2.domain.user.User;
+import edu.njnu.opengms.r2.domain.user.UserRepository;
 import edu.njnu.opengms.r2.remote.RemotePortalService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,9 @@ public class ModelController {
     ModelRepository modelRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     RemotePortalService remotePortalService;
 
     //create one project
@@ -40,34 +44,21 @@ public class ModelController {
         Model model;
         JSONObject data;
 
-//        if(add.getType().equals("service")){
-//            data = remotePortalService.getModelInfo(add.getServiceId());
-//            model = Model.builder()
-//                    .type("service")
-//                    .privacy("public")
-//                    .serviceId(add.getServiceId())
-//
-//                    .contributorId("OpenGMS_platform")
-//                    .behavior( (List< State >) data.get("behavior"))
-//                    .description(data.getStr("description"))
-//                    .name(data.getStr("name"))
-//                    .build();
-//
-//            return ResultUtils.success(modelRepository.insert(model));
-//        }
+
         return ResultUtils.success();
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void createPortal(@RequestBody List<String> add) {
         for (int i = 0; i < add.size(); i++) {
-            Model model;
+            AddModelServiceDTO model;
+            Model newModel = new Model();
             JSONObject data;
 //            Optional<JSONObject> data = Optional.ofNullable(remotePortalService.getModelInfo(add.get(i)));
             if (!modelRepository.findByServiceId(add.get(i)).isPresent()) {
                 data = remotePortalService.getModelInfo(add.get(i));
                 if (data != null) {
-                    model = Model.builder()
+                    model = AddModelServiceDTO.builder()
                             .type("service")
                             .privacy("public")
                             .serviceId(add.get(i))
@@ -77,8 +68,9 @@ public class ModelController {
                             .description(data.getStr("description"))
                             .name(data.getStr("name"))
                             .build();
+                    model.convertTo(newModel);
 
-                    modelRepository.insert(model);
+                    modelRepository.insert(newModel);
                     System.out.print("______________" + add.get(i) + "  ______________");
                 }
             }
@@ -116,12 +108,43 @@ public class ModelController {
 
     }
 
-    @RequestMapping(value = "/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
-    public JsonResult listModelsByPrivacy(@PathVariable int currentPage, @PathVariable int pageSize) {
+//    @RequestMapping(value = "/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
+//    public JsonResult listModelsByPrivacy(@PathVariable int currentPage, @PathVariable int pageSize) {
+//        PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+//        Page<Model> modelList = modelRepository.findByPrivacy("public", pageable);
+//        return ResultUtils.success(modelList);
+//    }
+
+    @RequestMapping(value = "/getPublicModels", method = RequestMethod.POST)
+    public JsonResult listModelsByPrivacy(@RequestBody JSONObject jsonObject) {
+        int currentPage = jsonObject.getInt("currentPage");
+        int pageSize = jsonObject.getInt("pageSize");
+        String key = jsonObject.getStr("key");
+        String privacy = jsonObject.getStr("privacy");
+
         PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
-        Page<Model> modelList = modelRepository.findByPrivacy("public", pageable);
-        return ResultUtils.success(modelList);
+        Page<Model> modelList;
+        if(!key.equals("")){
+            Model modelquery = Model.builder()
+                    .name(key)
+                    .privacy(privacy)
+                    .build();
+
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                    .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) //改变默认字符串匹配方式：模糊查询
+                    .withIgnoreCase(true) //改变默认大小写忽略方式：忽略大小写
+                    .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains())
+                    .withMatcher("privacy",ExampleMatcher.GenericPropertyMatchers.exact());
+
+            modelList = modelRepository.findAll(Example.of(modelquery,matcher),pageable);
+//            Page<Model> newModels = (Page<Model>) modelList.stream().filter(s->s.getPrivacy().equals("public")).collect(Collectors.toList());
+            return ResultUtils.success(modelList);
+        } else{
+            modelList = modelRepository.findByPrivacy("public", pageable);
+            return ResultUtils.success(modelList);
+        }
     }
+
 
     @RequestMapping(value = "/allPublic", method = RequestMethod.GET)
     public JsonResult getAllPublicModels() {
@@ -130,7 +153,7 @@ public class ModelController {
     }
 
     @RequestMapping(value = "/getModelById/{id}", method = RequestMethod.GET)
-    public JsonResult getModelById(@PathVariable String id) {
+    public JsonResult getModelById(@JwtTokenParser(key = "userId") String userId, @PathVariable String id) {
         Optional<Model> model = modelRepository.findById(id);
         if (model.isPresent()) {
             return ResultUtils.success(model.get());
@@ -139,16 +162,11 @@ public class ModelController {
         }
     }
 
-
-    @RequestMapping(value = "/getMyodels/{currentPage}/{pageSize}", method = RequestMethod.GET)
+    @RequestMapping(value = "/my", method = RequestMethod.GET)
     public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success();
-    }
-
-    @RequestMapping(value = "/getPublicModelListByIgnoreName/{text}", method = RequestMethod.GET)
-    public JsonResult getPublicModelListByIgnoreName(@JwtTokenParser(key = "userId") String userId, @PathVariable String text) {
-//        PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
-        return ResultUtils.success(modelRepository.findByNameContainsIgnoreCase(text));
+        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
+        List<Model> modelList=  modelRepository.findAllByIdInOrContributorId(user.getModelList(),userId);
+        return ResultUtils.success(modelList);
     }
 
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)

@@ -1,6 +1,7 @@
 package edu.njnu.opengms.r2.domain.scenario;
 
 
+import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
@@ -9,8 +10,6 @@ import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @Author ：Zhiyi
@@ -54,11 +53,10 @@ public class ScenarioController {
         return ResultUtils.success(scenarioService.saveScenario(add,userId));
     }
 
-    @RequestMapping(value = "/resources/{id}/{type}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/resources/{id}", method = RequestMethod.PATCH)
     public JsonResult updateResourceCollection(@PathVariable("id") String id,
-                                               @PathVariable("type") String type,
                                                @JwtTokenParser(key = "userId") String userId,
-                                               @RequestBody List<String> update) {
-        return ResultUtils.success(scenarioService.updateresourceCollection(id,type, userId, update));
+                                               @RequestBody JSONObject update) {
+        return ResultUtils.success(scenarioService.updateresourceCollection(id, userId, update));
     }
 }
