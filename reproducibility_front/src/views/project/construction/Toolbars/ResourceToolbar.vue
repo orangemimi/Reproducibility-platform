@@ -2,6 +2,14 @@
 <template>
   <div>
     <div>
+      <div style="float:right;margin-right:10px">
+        <el-button
+          icon="el-icon-upload2"
+          size="mini"
+          @click="addResourceInScenario"
+          title="add a scenario"
+        ></el-button>
+      </div>
       <div
         v-if="
           chosenScenario.resourceCollection != null &&
@@ -30,20 +38,12 @@
             </el-tooltip>
             <div style="float:left;margin-right:10px">{{ activeNames }}</div>
           </div>
-          <div>
-            <el-button
-              icon="el-icon-upload2"
-              size="mini"
-              @click="addResourceInScenario"
-              title="add a scenario"
-            ></el-button>
-          </div>
         </el-row>
         <el-input
           placeholder="Search model/tool"
           size="mini"
           class="search_input"
-          v-show="modelList.length > 20"
+          v-show="resourceCollection.modelList.length > 20"
         >
           <el-button slot="append" icon="el-icon-search"></el-button>
         </el-input>
@@ -51,7 +51,7 @@
           <el-table
             border
             ref="multipleModelTable"
-            :data="modelList"
+            :data="resourceCollectionObjects.modelList"
             @row-click="rowClick"
             highlight-current-row
             :default-sort="{ prop: 'name', order: 'descending' }"
@@ -84,7 +84,7 @@
           <el-table
             border
             ref="multipleModelTable"
-            :data="dataList"
+            :data="resourceCollectionObjects.dataList"
             @row-click="rowClick"
             highlight-current-row
             :default-sort="{ prop: 'name', order: 'descending' }"
@@ -146,7 +146,7 @@
           <template v-if="stepActive == 0">
             <el-table
               border
-              ref="multipleTable"
+              ref="multipleModelTableInDialog"
               :data="allModelsWithUser"
               @select="handleSelectionChange"
             >
@@ -167,7 +167,31 @@
               ></el-table-column>
             </el-table>
           </template>
-          <!-- {{ multipleModelSelection }} -->
+          <template v-else>
+            <DataTable></DataTable>
+            <!-- <el-table
+              border
+              ref="multipleDataTableInDialog"
+              :data="allModelsWithUser"
+              @select="handleSelectionChange"
+            >
+              <el-table-column type="selection" width="55"> </el-table-column>
+              <el-table-column
+                prop="name"
+                label="Name"
+                width="200"
+              ></el-table-column>
+              <el-table-column
+                prop="description"
+                label="Description"
+              ></el-table-column>
+              <el-table-column
+                prop="privacy"
+                label="Privacy"
+                width="100"
+              ></el-table-column>
+            </el-table> -->
+          </template>
         </div>
 
         <span slot="footer" class="dialog-footer">
@@ -182,7 +206,8 @@
 
 <script>
 // import ModelCard from "_com/Cards/ModelCard";
-import { updateresourceCollection } from "@/api/request";
+import DataTable from "./DataTable";
+import { updateresourceCollection, getMyModels } from "@/api/request";
 export default {
   props: {
     chosenScenario: {
@@ -190,8 +215,7 @@ export default {
     },
   },
   components: {
-    // ModelCard,
-    // modelToolbar
+    DataTable,
   },
 
   watch: {
@@ -203,10 +227,10 @@ export default {
           (Object.hasOwnProperty.call(newVal, "modelList") ||
             Object.hasOwnProperty.call(newVal, "dataList"))
         ) {
-          this.modelList = newVal.modelList;
-          this.dataList = newVal.dataList;
+          this.resourceCollection = newVal;
+          this.resourceCollectionObjects = val.resourceCollectionObjects;
+          this.getSelectedResources();
         }
-        this.getSelectedResources();
       },
       deep: true,
       immediate: true,
@@ -217,33 +241,20 @@ export default {
 
   data() {
     return {
-      activeNames: "Models",
-      modelList: this.resourceList.modelList,
-      dataList: this.resourceList.dataList,
-      modelSelection: [],
-      resourceCollection: {},
-      //mxgraph scrollbar
-      multipleModelSelection: [],
-      multipleDataSelection: [],
       stepActive: 0,
       stepsList: [
         { title: "Add model", icon: "el-icon-edit" },
         { title: "Add data", icon: "el-icon-edit" },
       ],
+      activeNames: "Models",
+
+      modelSelection: [],
+      resourceCollection: {},
+      //mxgraph scrollbar
+      multipleModelSelection: [],
+      multipleDataSelection: [],
       selectResourceDialog: false,
-      ops: {
-        bar: {
-          onlyShowBarOnScroll: false,
-          keepShow: true,
-          background: "#c1c1c1",
-          opacity: 1,
-          hoverStyle: false,
-          specifyBorderRadius: false,
-          minSize: 0,
-          size: "6px",
-          disable: false,
-        },
-      },
+      allModelsWithUser: [],
     };
   },
 
@@ -270,10 +281,10 @@ export default {
     // handleCurrentChange(rows) {
     //   if (rows) {
     //     rows.forEach((row) => {
-    //       this.$refs.multipleTable.toggleRowSelection(row);
+    //       this.$refs.multipleModelTableInDialog.toggleRowSelection(row);
     //     });
     //   } else {
-    //     this.$refs.multipleTable.clearSelection();
+    //     this.$refs.multipleModelTableInDialog.clearSelection();
     //   }
     // },
     rowClick(row) {
@@ -294,24 +305,30 @@ export default {
     },
     getSelectedResources() {
       if (
-        Object.prototype.hasOwnProperty.call(
-          this.resourceCollection,
+        this.chosenScenario.resourceCollection == null ||
+        !Object.hasOwnProperty.call(
+          this.chosenScenario.resourceCollection,
           "modelList"
         )
       ) {
-        let selected = this.resourceCollection.modelList;
+        this.multipleModelSelection = {};
+        return;
+      }
+      let selected = this.chosenScenario.resourceCollection.modelList;
 
-        this.multipleModelSelection = selected;
-        this.multipleModelSelection.forEach((item) => {
-          this.$nextTick(() => {
-            this.allModelsWithUser.find((obj) => {
-              if (item === obj.id) {
-                this.$refs["multipleTable"].toggleRowSelection(obj, true);
-              }
-            });
+      this.multipleModelSelection = selected;
+      this.multipleModelSelection.forEach((item) => {
+        this.$nextTick(() => {
+          this.allModelsWithUser.find((obj) => {
+            if (item === obj.id) {
+              this.$refs["multipleModelTableInDialog"].toggleRowSelection(
+                obj,
+                true
+              );
+            }
           });
         });
-      }
+      });
     },
     async addResourceToScenario() {
       this.selectResourceDialog = false;
@@ -324,9 +341,16 @@ export default {
         }
       );
     },
+    async init() {
+      //get my models
+      this.allModelsWithUser = await getMyModels();
+      console.log("this.allModelsWithUser", this.allModelsWithUser);
+    },
   },
 
-  mounted() {},
+  async mounted() {
+    await this.init();
+  },
 };
 </script>
 <style lang="scss" scoped>

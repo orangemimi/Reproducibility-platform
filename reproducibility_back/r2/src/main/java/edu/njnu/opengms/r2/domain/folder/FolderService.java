@@ -6,11 +6,14 @@ import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.dataItem.DataItem;
 import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
 import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
+import edu.njnu.opengms.r2.domain.folder.dto.UpdateFolderChildrenDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author ：Zhiyi
@@ -26,47 +29,79 @@ public class FolderService {
 
     @Autowired
     DataItemRepository dataItemRepository;
+//    public static JSONObject getFolder(Folder folder){
+//        if(!folder.getLevel().equals(0)){
+//            JSONArray childrenFolder = new JSONArray();
+//
+//
+//        }
+//        return;
+//    }
 
 
     public Object getFolderByCreator(String userId) {
-        List<Folder> folderList = folderRepository.findAllByCreatorId(userId);
-        JSONArray newFolderList = new JSONArray();
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC,"level"));
 
+        List<Folder> folderList = folderRepository.findAllByCreatorId(userId,sort);
+        Integer highestLevel =folderList.get(0).level;// 最高的
+        ArrayList<JSONObject> newFolderList = new ArrayList<JSONObject>();
         for (Folder item : folderList) {
             JSONObject newFolder = new JSONObject();
+            newFolder.put("name", item.getName());
+            newFolder.put("id", item.getId());
+            newFolder.put("level", item.getLevel());
+            newFolder.put("parent", item.getParent());
+            newFolder.put("childrenIds", item.getChildren());
+            newFolder.put("isFolder", true);
+
+            JSONArray newChildren = new JSONArray();
             if (item.getDataList() != null) {
-                List<String> dataItemIdList = item.getDataList();
-                List<DataItem> dataItemList = new ArrayList<>();
-
-                for (String dataId : dataItemIdList) {
-                    DataItem dataItem = dataItemRepository.findById(dataId).orElseThrow(MyException::noObject);
-                    dataItemList.add(dataItem);
+                List<DataItem> newChildWithData = dataItemRepository.findAllByIdIn(item.getDataList());
+                for(DataItem data: newChildWithData){
+                    newChildren.add(data);
                 }
-
-                newFolder.put("name", item.getName());
-                newFolder.put("children", item.getChildren());
-                newFolder.put("id", item.getId());
-                newFolder.put("level", item.getLevel());
-                newFolder.put("parent", item.getParent());
-                newFolder.put("dataList", dataItemList);
-                newFolder.put("isFolder", true);
-                newFolderList.add(newFolder);
-            } else {
-                newFolder.put("name", item.getName());
-                newFolder.put("children", item.getChildren());
-                newFolder.put("id", item.getId());
-                newFolder.put("level", item.getLevel());
-                newFolder.put("parent", item.getParent());
-                newFolder.put("isFolder", true);
-                newFolderList.add(newFolder);
+                newFolder.put("dataList", newChildWithData);
             }
+            newFolderList.add(newFolder);//把所有的folder筛选一遍，每一层的folder都有对应的childrenObject
         }
 
-        return newFolderList;
+        for (JSONObject item : newFolderList) {
+            JSONArray withObjectsFolder = new JSONArray();
+            List<String> childrenIds = (List<String>) item.get("childrenIds");
+            if(childrenIds!=null){
+                for(String childId: childrenIds){
+                    for(JSONObject item2 : newFolderList){
+                        if(item2.get("id").equals(childId)){
+                            withObjectsFolder.add(item2);
+                        }
+                    }
+//                    JSONObject oneChild = newFolderList.stream()
+//                            .filter(s->s.get("id").equals(childId))
+//                            .findAny()
+//                            .orElseThrow(MyException::noObject);//查找到所有的children folder
+
+                }
+            }
+            List<DataItem> dataItemList = (List<DataItem>) item.get("dataList");
+            if(dataItemList!=null){
+                for(DataItem data: dataItemList){
+                    withObjectsFolder.add(data);
+                }
+            }
+            if(dataItemList!=null ||childrenIds!=null ){
+                item.put("children",withObjectsFolder);
+            }
+
+        }
+        List<JSONObject> returnFolders = newFolderList.stream()
+                .filter(s->s.get("level").equals(0))
+                .collect(Collectors.toList());
+;
+        return  returnFolders;
 
     }
 
-    public Object create(AddFolderDTO add, String userId) {
+    public Folder create(AddFolderDTO add, String userId) {
         Folder folder = new Folder();
         add.convertTo(folder);
         folder.setCreatorId(userId);
@@ -79,6 +114,14 @@ public class FolderService {
         folder.setCreatorId(userId);
         return folderRepository.insert(folder);
     }
+    public Folder updateFolderChildren(String id,UpdateFolderChildrenDTO add, String userId) {
+        Folder folder = folderRepository.findById(id).orElseThrow(MyException::noObject);
+        add.convertTo(folder);
+        folder.setCreatorId(userId);
+        return folderRepository.save(folder);
+    }
+
+
 
 
     public Folder updataDataList(String id, String addedDataId) {

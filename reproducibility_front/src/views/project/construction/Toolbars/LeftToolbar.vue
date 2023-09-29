@@ -50,8 +50,6 @@
           :chosenScenario="chosenScenario"
           @selectModel="selectModel"
         ></resource-toolbar>
-
-        <el-empty description="Please add the resources first"></el-empty>
       </div>
     </el-row>
     <div class="createScenario">
@@ -76,7 +74,6 @@ import {
   getProjectById,
   getScenarioById,
   getScenariosByProjectId,
-  getMyModels,
 } from "@/api/request";
 
 import scenarioCard from "_com/Cards/ScenarioListCard.vue";
@@ -105,11 +102,9 @@ export default {
       currentModel: {},
       scenariosToolBarShow: true,
       createScenarioDialog: false,
-    
-      allModelsWithUser: [],
+
       resourceCollection: {},
       //   resourceCollectionOb
- 
     };
   },
 
@@ -122,9 +117,6 @@ export default {
           element.isBinded = true;
         }
       });
-      //get my models
-      this.allModelsWithUser = await getMyModels();
-      console.log("this.allModelsWithUser", this.allModelsWithUser);
     },
 
     async chooseScenario(item) {

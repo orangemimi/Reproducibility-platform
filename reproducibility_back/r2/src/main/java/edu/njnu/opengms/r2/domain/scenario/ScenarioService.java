@@ -5,6 +5,9 @@ import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.folder.Folder;
 import edu.njnu.opengms.r2.domain.folder.FolderRepository;
+import edu.njnu.opengms.r2.domain.folder.FolderService;
+import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
+import edu.njnu.opengms.r2.domain.folder.dto.UpdateFolderChildrenDTO;
 import edu.njnu.opengms.r2.domain.model.ModelRepository;
 import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceRepository;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
@@ -13,6 +16,7 @@ import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +39,10 @@ public class ScenarioService {
 
     @Autowired
     FolderRepository folderRepository;
+
+    @Autowired
+    FolderService folderService;
+
 
     public JSONObject getScenario(String id) {
 
@@ -108,13 +116,31 @@ public class ScenarioService {
 
         Scenario newScenario =  scenarioRepository.insert(scenario);
 
-        Folder folder = new Folder();
         Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
-        folder.setParent(parentFolder.getId());
-        folder.setLevel("1");
-        folder.setName(newScenario.getName());
-        folder.setScenarioId(newScenario.getId());
-        folderRepository.insert(folder);
+
+        //create folderScenario
+        AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
+                .level(1)
+                .tagId(newScenario.getId())
+                .name(newScenario.getName()+" --folder")
+                .parent(parentFolder.getId())
+                .build();
+
+        Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
+//        Folder childFolder = folderRepository.insert(folder);
+        List<String> parentFolderChildren = new ArrayList<String>();
+        String id = newScenarioFolder.getId();
+        parentFolderChildren.add(id) ;
+
+        UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+                .children(parentFolderChildren)
+                .build();
+
+
+        folderService.updateFolderChildren(parentFolder.getId(),updateProjectFolderChildrenDTO,userId);
+
+
+
         return newScenario;
     }
 

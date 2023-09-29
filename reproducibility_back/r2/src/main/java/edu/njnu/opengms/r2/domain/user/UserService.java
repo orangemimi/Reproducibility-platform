@@ -74,13 +74,12 @@ public class UserService {
 
         User newUser =  userRepository.insert(user);
 
-        AddFolderDTO add = new AddFolderDTO();
-        add.setName("Main");
-        add.setParent("0");
-        add.setLevel("0");
+        AddFolderDTO add =  AddFolderDTO.builder()
+                .name("Main")
+                .level(0)
+                .parent("0")
+                .build();
         folderService.create(add,newUser.id);
-
-        System.out.println(user.toString());
         return newUser;
     }
 

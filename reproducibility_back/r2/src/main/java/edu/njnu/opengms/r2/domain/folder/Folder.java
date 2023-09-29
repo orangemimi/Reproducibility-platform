@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,10 +18,10 @@ public class Folder extends BaseEntity {
     @Id
     String id;
     String name;//创建的文件夹名称
-    String scenarioId;// 如果是在scenario中，那么folder的name就是scenario的name？
+    String tagId;// projectId or scenarioId
     String parent;
-    String level;//貌似没用
-    ArrayList<Folder> children;
+    Integer level;//貌似没用
+    List<String> children;
     List<String> dataList;//这个文件夹下存储的 data id
     String creatorId;
 

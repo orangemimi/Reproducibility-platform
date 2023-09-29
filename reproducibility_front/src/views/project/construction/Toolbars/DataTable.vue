@@ -2,7 +2,7 @@
   <div class="main">
     <div class="row-style">
       <el-table
-        ref="multipleTable"
+        ref="multipleDataTableInDialog"
         :data="folderList"
         :span-method="arraySpanMethod"
         tooltip-effect="dark"
@@ -10,8 +10,12 @@
         max-height="350"
         :row-style="{ height: '0' }"
         :cell-style="{ padding: '4px' }"
-        row-key="id"
-        :tree-props="{ children: 'dataList' }"
+        :rowKey="
+          (record, index) => {
+            return index + record.id;
+          }
+        "
+        :tree-props="{ children: 'children', hasChildren: true }"
         border
         default-expand-all
         @current-change="handleCurrentChange"
@@ -111,15 +115,19 @@
 
     <div class="row-style">
       <el-table
-        ref="multipleTable"
+        ref="multipleDataTableInDialog"
         :data="boundData"
         tooltip-effect="dark"
         style="width: 100%"
         max-height="350"
         :row-style="{ height: '0' }"
         :cell-style="{ padding: '4px' }"
-        row-key="id"
-        :tree-props="{ children: 'dataList' }"
+        :rowKey="
+          (record, index) => {
+            return index + record.id;
+          }
+        "
+        :tree-props="{ children: 'children', hasChildren: true }"
         border
         default-expand-all
         @current-change="handleCurrentChange"

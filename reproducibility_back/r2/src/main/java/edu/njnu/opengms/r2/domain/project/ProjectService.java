@@ -5,6 +5,9 @@ import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.r2.domain.folder.Folder;
 import edu.njnu.opengms.r2.domain.folder.FolderRepository;
+import edu.njnu.opengms.r2.domain.folder.FolderService;
+import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
+import edu.njnu.opengms.r2.domain.folder.dto.UpdateFolderChildrenDTO;
 import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
 import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
 import edu.njnu.opengms.r2.domain.scenario.Scenario;
@@ -43,6 +46,9 @@ public class ProjectService {
     UserService userService;
 
     @Autowired
+    FolderService folderService;
+
+    @Autowired
     FolderRepository folderRepository;
     public Project get(String projectId) {
         return projectRepository.findById(projectId).orElse(null);
@@ -56,23 +62,76 @@ public class ProjectService {
 
         Project proj = projectRepository.insert(project);
 
-
+        //create scenario
         Scenario exampleScenario = new Scenario();
-        exampleScenario.setName("example");
+        exampleScenario.setName("Example scenario");
         exampleScenario.setType("sequentModels");
         exampleScenario.setProjectId(proj.getId());
         Scenario newScenario = scenarioRepository.insert(exampleScenario);
 
-        Folder folder = new Folder();
-        Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
-        folder.setParent(parentFolder.getId());
-        folder.setLevel("1");
-        folder.setName(newScenario.getName());
-        folder.setScenarioId(newScenario.getId());
-        folderRepository.insert(folder);
 
         proj.setScenario(newScenario.getId());
         Project result= projectRepository.save(proj);
+
+        //create project folder
+
+        Folder mainFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
+        AddFolderDTO addFolderDTO = AddFolderDTO.builder()
+                .level(1)
+                .tagId(proj.getId())
+                .name(proj.getName()+" --folder")
+                .parent(mainFolder.getId())
+                .build();
+
+        Folder newProjectFolder =  folderService.create(addFolderDTO,userId);
+//        Folder childFolder = folderRepository.insert(folder);
+        List<String> mainFolderChildren = new ArrayList<String>();
+        if(mainFolder.getChildren()==(null)){
+            String id = newProjectFolder.getId();
+            mainFolderChildren.add(id) ;
+        } else{
+            mainFolderChildren = mainFolder.getChildren();
+            mainFolderChildren.add(newProjectFolder.getId());
+        }
+
+        UpdateFolderChildrenDTO updateMainFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+                .children(mainFolderChildren)
+                .build();
+       folderService.updateFolderChildren(mainFolder.getId(),updateMainFolderChildrenDTO,userId);
+
+
+        //create folderScenario
+        AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
+                .level(2)
+                .tagId(newScenario.getId())
+                .name("Example scenario --folder")
+                .parent(newProjectFolder.getId())
+                .build();
+
+        Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
+//        Folder childFolder = folderRepository.insert(folder);
+        List<String> parentFolderChildren = new ArrayList<String>();
+        String id = newScenarioFolder.getId();
+        parentFolderChildren.add(id) ;
+
+        UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+                .children(parentFolderChildren)
+                .build();
+
+
+        folderService.updateFolderChildren(newProjectFolder.getId(),updateProjectFolderChildrenDTO,userId);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);

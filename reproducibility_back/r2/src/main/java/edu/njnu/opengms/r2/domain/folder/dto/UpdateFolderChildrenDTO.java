@@ -16,13 +16,9 @@ import java.util.List;
  */
 @Data
 @Builder
-public class AddFolderDTO implements ToDomainConverter<Folder> {
-    String name;//创建的文件夹名称
-    String parent;
-    Integer level;
-    String tagId;// 如果是在scenario中，那么folder的name就是scenario的name？
+public class UpdateFolderChildrenDTO implements ToDomainConverter<Folder> {
+
     List<String> children;
-    List<String> dataList;//这个文件夹下存储的 data id
-    String creatorId;
+
 }
 

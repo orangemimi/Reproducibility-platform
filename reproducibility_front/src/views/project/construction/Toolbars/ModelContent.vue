@@ -313,7 +313,7 @@
 </template>
 
 <script>
-import ResourceTable from "./ResourceTable.vue";
+import ResourceTable from "./DataTable.vue";
 import StateDescription from "_com/Cards/StateDescription.vue";
 import {
   saveData,
