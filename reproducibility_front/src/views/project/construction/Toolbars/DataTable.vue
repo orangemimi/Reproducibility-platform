@@ -7,9 +7,17 @@
         :span-method="arraySpanMethod"
         tooltip-effect="dark"
         style="width: 100%"
-        max-height="350"
-        :row-style="{ height: '0' }"
-        :cell-style="{ padding: '4px' }"
+        :max-height="tableHeight"
+        :cell-style="{
+          color: '#666',
+          fontFamily: 'Arial',
+          fontSize: '10px',
+          padding: '0',
+        }"
+        :header-cell-style="{
+          fontFamily: 'Arial',
+          fontSize: '14px',
+        }"
         :rowKey="
           (record, index) => {
             return index + record.id;
@@ -25,7 +33,7 @@
           Please upload a file
         </template>
 
-        <el-table-column label="Name" show-overflow-tooltip>
+        <el-table-column label="Name" show-overflow-tooltip width="180">
           <template #default="scope">
             <i class="collapse" :class="collapseClass(scope.row)"></i>
             {{ scope.row.name }}
@@ -38,14 +46,14 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="File size" width="180">
+        <!-- <el-table-column label="File size" width="80">
           <template #default="scope">{{ scope.row.fileSize }}</template>
-        </el-table-column>
-        <el-table-column label="Upload time" width="200" show-overflow-tooltip>
+        </el-table-column> -->
+        <el-table-column label="Upload time" width="150" show-overflow-tooltip>
           <template #default="scope">{{ scope.row.createTime }}</template>
         </el-table-column>
         <!--TODO-zzy -->
-        <el-table-column label="Operation" width="120" show-overflow-tooltip>
+        <!-- <el-table-column label="Operation" width="120" show-overflow-tooltip>
           <template #default="scope">
             <i
               class="el-icon-edit-outline"
@@ -55,112 +63,9 @@
             <i class="el-icon-download" @click="download(scope.row.value)" />
             还需要一个可视化的按钮 什么kk什么的
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
     </div>
-
-    <el-col :span="12">
-      <div class="contentBottom">
-        <div class="selectFile" v-show="currentRow != ''">
-          <!-- {{ currentRow }} -->
-          <div style="float:left">
-            {{ currentRow.name }}{{ currentRow.suffix }}
-          </div>
-          <i class="el-icon-error" style="float:right;" @click="cancleRow" />
-        </div>
-      </div>
-    </el-col>
-    <el-col :span="12">
-      <div class="btnList">
-        <div v-if="!isAddFolder">
-          <div class="btn">
-            <el-button size="mini" @click="submitDataToEvent">Submit</el-button>
-          </div>
-          <div class="btn">
-            <el-upload
-              action
-              :auto-upload="true"
-              :show-file-list="false"
-              :on-change="handleUploadFileChange"
-              ref="upload"
-              :http-request="submitFile"
-              multiple
-            >
-              <el-button size="mini">
-                <i class="el-icon-upload"></i>
-                Upload
-              </el-button>
-            </el-upload>
-          </div>
-
-          <div class="btn">
-            <el-button size="mini" @click="addFolderShow">Add folder</el-button>
-          </div>
-        </div>
-        <div v-else>
-          <el-input v-model="folderName">
-            <template #suffix>
-              <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
-              <i
-                class="el-input__icon el-icon-close"
-                @click="closeAddFolder"
-              ></i>
-            </template>
-          </el-input>
-        </div>
-      </div>
-    </el-col>
-    <br /><br /><br />
-    <el-divider></el-divider>
-
-    <div class="row-style">
-      <el-table
-        ref="multipleDataTableInDialog"
-        :data="boundData"
-        tooltip-effect="dark"
-        style="width: 100%"
-        max-height="350"
-        :row-style="{ height: '0' }"
-        :cell-style="{ padding: '4px' }"
-        :rowKey="
-          (record, index) => {
-            return index + record.id;
-          }
-        "
-        :tree-props="{ children: 'children', hasChildren: true }"
-        border
-        default-expand-all
-        @current-change="handleCurrentChange"
-        highlight-current-row
-      >
-        <el-table-column label="Name" prop="name" show-overflow-tooltip>
-        </el-table-column>
-
-        <el-table-column label="Produced from" prop="pname" width="180">
-        </el-table-column>
-        <el-table-column
-          label="Description"
-          width="200"
-          prop="description"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <!--TODO-zzy -->
-        <el-table-column label="Operation" width="120" show-overflow-tooltip>
-          <template #default="scope">
-            <i
-              class="el-icon-upload"
-              @click="uploadToDataRepository(scope.row.value)"
-            />
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <el-dialog>
-      <div class="contentBottom">
-        <div v-show="editDataDialogShow != ''"></div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -175,12 +80,16 @@ export default {
     boundData: {
       type: Array,
     },
+    scenarioId: {
+      type: String,
+    },
   },
 
   components: {},
   data() {
     return {
       folderList: [],
+      projectId: this.$route.params.id, //projectId
 
       //add folder
       isAddFolder: false,
@@ -190,6 +99,7 @@ export default {
 
       fileList: [],
       editDataDialogShow: false,
+      tableHeight: 0,
     };
   },
   computed: {
@@ -218,10 +128,13 @@ export default {
     //get all the data
     async getFolders() {
       let data = await getFolders();
-      this.folderList = data;
-      // console.log(this.folderList, "folferlist");
-      // this.fileItemListDirect = this.getFileItemListDirect();
-      // await this.getSelectedFile();
+      let folderList = data[0].children.filter(
+        (item) => (item.tagId = this.projectId)
+      );
+      this.folderList = folderList[0].children.filter(
+        (item) => (item.tagId = this.scenarioId)
+      );
+      // todo --只在project内展示所有project的
     },
 
     handleUploadFileChange(file, fileList) {
@@ -248,10 +161,12 @@ export default {
       let form = {
         name: this.folderName,
         parent: "0",
+        level: 0,
         children: [],
       };
       if (this.currentRow != "") {
         form.parent = this.currentRow.id;
+        form.level = this.currentRow.level + 1;
       }
       await addFolder(form);
       this.isAddFolder = false;
@@ -262,7 +177,6 @@ export default {
     async submitFile(fileItem) {
       // console.log(param, this.fileList);
       if (this.currentRow != "") {
-        console.log(param);
         let param = fileItem.file;
         let uploadFileForm = new FormData();
         uploadFileForm.append("file", param);
@@ -293,6 +207,11 @@ export default {
   },
 
   async mounted() {
+    this.$nextTick(() => {
+      this.tableHeight = window.innerHeight - 300;
+      //后面的50：根据需求空出的高度，自行调整
+    });
+
     await this.getFolders();
   },
 };

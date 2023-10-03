@@ -81,7 +81,8 @@
           </el-table>
         </div>
         <div class="modelToolbarTable" v-show="activeNames == 'Data'">
-          <el-table
+          <DataTable :scenarioId=" chosenScenario.id"></DataTable>
+          <!-- <el-table
             border
             ref="multipleModelTable"
             :data="resourceCollectionObjects.dataList"
@@ -111,7 +112,7 @@
               width="150"
               sortable
             ></el-table-column>
-          </el-table>
+          </el-table> -->
         </div>
       </div>
 
@@ -261,12 +262,21 @@ export default {
   methods: {
     handleSelectionChange(selection, row) {
       const selected = selection.some((item) => item === row); // 是取消选择还是选中
+
+      if (!(this.multipleModelSelection instanceof Array)) {
+        this.multipleModelSelection = [];
+      }
+      console.log(
+        this.multipleModelSelection,
+        this.multipleModelSelection instanceof Array,
+        "modelselection"
+      );
       if (selected) {
         // 选择
         this.multipleModelSelection.push(row.id);
       } else {
         // 取消选择
-        var finalArr = this.multipleModelSelection.filter((item) => {
+        let finalArr = this.multipleModelSelection.filter((item) => {
           return item !== row.id;
         });
         this.multipleModelSelection = finalArr;
@@ -331,6 +341,11 @@ export default {
       });
     },
     async addResourceToScenario() {
+      console.log(
+        this.multipleModelSelection,
+        this.multipleDataSelection,
+        "selection"
+      );
       this.selectResourceDialog = false;
 
       this.chosenScenario = await updateresourceCollection(

@@ -1,53 +1,24 @@
 <template>
   <div class="main">
-    <div class="btnList" v-if="role == 'participant'">
-      <!-- <div class="btnList" > -->
-      <div v-if="!isAddFolder">
-        <div class="btn">
-          <el-upload
-            action
-            :auto-upload="true"
-            :show-file-list="false"
-            :on-change="handleUploadFileChange"
-            ref="upload"
-            :http-request="submitFile"
-            multiple
-          >
-            <el-button size="mini">
-              <i class="el-icon-upload"></i>
-              Upload
-            </el-button>
-          </el-upload>
-        </div>
-        <div class="btn"></div>
-        <div class="btn">
-          <el-button size="mini" @click="addFolderShow">Add folder</el-button>
-        </div>
-      </div>
-      <div v-else>
-        <el-input v-model="folderName">
-          <template #suffix>
-            <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
-            <i class="el-input__icon el-icon-close" @click="closeAddFolder"></i>
-          </template>
-        </el-input>
-      </div>
-    </div>
     <div class="row-style">
       <el-table
-        ref="multipleTable"
+        ref="multipleDataTableInDialog"
         :data="folderList"
         :span-method="arraySpanMethod"
         tooltip-effect="dark"
         style="width: 100%"
-        max-height="800"
+        max-height="350"
         :row-style="{ height: '0' }"
         :cell-style="{ padding: '4px' }"
-        row-key="id"
-        :tree-props="{ children: 'children' }"
+        :rowKey="
+          (record, index) => {
+            return index + record.id;
+          }
+        "
+        :tree-props="{ children: 'children', hasChildren: true }"
         border
         default-expand-all
-        @row-click="rowClick"
+        @current-change="handleCurrentChange"
         highlight-current-row
       >
         <template slot="empty">
@@ -70,11 +41,11 @@
         <el-table-column label="File size" width="180">
           <template #default="scope">{{ scope.row.fileSize }}</template>
         </el-table-column>
-        <el-table-column label="Upload time" width="200" show-overflow-tooltip>
+        <!-- <el-table-column label="Upload time" width="200" show-overflow-tooltip>
           <template #default="scope">{{ scope.row.createTime }}</template>
-        </el-table-column>
+        </el-table-column> -->
         <!--TODO-zzy -->
-        <el-table-column label="Operation" width="120" show-overflow-tooltip>
+        <!-- <el-table-column label="Operation" width="120" show-overflow-tooltip>
           <template #default="scope">
             <i
               class="el-icon-edit-outline"
@@ -82,6 +53,105 @@
               @click="cilckEditDialog"
             />
             <i class="el-icon-download" @click="download(scope.row.value)" />
+            还需要一个可视化的按钮 什么kk什么的
+          </template>
+        </el-table-column> -->
+      </el-table>
+    </div>
+
+    <el-col :span="12">
+      <div class="contentBottom">
+        <div class="selectFile" v-show="currentRow != ''">
+          <!-- {{ currentRow }} -->
+          <div style="float:left">
+            {{ currentRow.name }}{{ currentRow.suffix }}
+          </div>
+          <i class="el-icon-error" style="float:right;" @click="cancleRow" />
+        </div>
+      </div>
+    </el-col>
+    <el-col :span="12">
+      <div class="btnList">
+        <div v-if="!isAddFolder">
+          <div class="btn">
+            <el-button size="mini" @click="submitDataToEvent">Submit</el-button>
+          </div>
+          <div class="btn">
+            <el-upload
+              action
+              :auto-upload="true"
+              :show-file-list="false"
+              :on-change="handleUploadFileChange"
+              ref="upload"
+              :http-request="submitFile"
+              multiple
+            >
+              <el-button size="mini">
+                <i class="el-icon-upload"></i>
+                Upload
+              </el-button>
+            </el-upload>
+          </div>
+
+          <div class="btn">
+            <el-button size="mini" @click="addFolderShow">Add folder</el-button>
+          </div>
+        </div>
+        <div v-else>
+          <el-input v-model="folderName">
+            <template #suffix>
+              <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
+              <i
+                class="el-input__icon el-icon-close"
+                @click="closeAddFolder"
+              ></i>
+            </template>
+          </el-input>
+        </div>
+      </div>
+    </el-col>
+    <br /><br /><br />
+    <el-divider></el-divider>
+
+    <div class="row-style">
+      <el-table
+        ref="multipleDataTableInDialog"
+        :data="boundData"
+        tooltip-effect="dark"
+        style="width: 100%"
+        max-height="350"
+        :row-style="{ height: '0' }"
+        :cell-style="{ padding: '4px' }"
+        :rowKey="
+          (record, index) => {
+            return index + record.id;
+          }
+        "
+        :tree-props="{ children: 'children', hasChildren: true }"
+        border
+        default-expand-all
+        @current-change="handleCurrentChange"
+        highlight-current-row
+      >
+        <el-table-column label="Name" prop="name" show-overflow-tooltip>
+        </el-table-column>
+
+        <el-table-column label="Produced from" prop="pname" width="180">
+        </el-table-column>
+        <el-table-column
+          label="Description"
+          width="200"
+          prop="description"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <!--TODO-zzy -->
+        <el-table-column label="Operation" width="120" show-overflow-tooltip>
+          <template #default="scope">
+            <i
+              class="el-icon-upload"
+              @click="uploadToDataRepository(scope.row.value)"
+            />
           </template>
         </el-table-column>
       </el-table>
@@ -101,21 +171,20 @@ import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
 
 export default {
-  components: {},
+  props: {
+    boundData: {
+      type: Array,
+    },
+    scenarioId:{
+      type:String
+    }
+  },
 
+  components: {},
   data() {
     return {
-      uploadFileDialogShow: true, //upload data dialog
       folderList: [],
-      fileItemListFromResource: [],
-      projectId: this.$route.params.id,
-      modelItemList: [],
-      checkAll: false,
-      checkedFileItemList: [],
-      isIndeterminate: false,
-
-      //table
-      multipleSelection: [],
+      projectId: this.$route.params.id, //projectId
 
       //add folder
       isAddFolder: false,
@@ -153,10 +222,9 @@ export default {
     //get all the data
     async getFolders() {
       let data = await getFolders();
-      this.folderList = data;
-      // console.log(this.folderList, "folferlist");
-      // this.fileItemListDirect = this.getFileItemListDirect();
-      // await this.getSelectedFile();
+      let folderList =  data[0].children.filter((item)=>item.tagId = this.projectId)
+      this.folderList = folderList[0].children.filter((item)=>item.tagId = this.scenarioId)
+      // todo --只在project内展示所有project的
     },
 
     handleUploadFileChange(file, fileList) {
@@ -164,11 +232,7 @@ export default {
       // console.log("22222", this.fileList);
     },
 
-    // handleCurrentChange(row) {
-    //   this.currentRow = row;
-    // },
-    rowClick(row) {
-      console.log(row);
+    handleCurrentChange(row) {
       this.currentRow = row;
     },
     cancleCurrentRow() {
@@ -201,21 +265,18 @@ export default {
 
     //上传文件到服务器
     async submitFile(fileItem) {
+      // console.log(param, this.fileList);
       if (this.currentRow != "") {
-        console.log(fileItem.file);
         let param = fileItem.file;
         let uploadFileForm = new FormData();
         uploadFileForm.append("file", param);
-        // console.log( "datddd",uploadFileForm,
-        //   renderSize(param.size) ,
-        //   this.currentRow.id,)
 
-        let data = await saveData(
+        await saveData(
           uploadFileForm,
+
           renderSize(param.size),
           this.currentRow.id
         );
-        console.log(data);
       } else {
         this.$alert("Please select one folder to upload data", "Warning", {});
       }
@@ -227,7 +288,14 @@ export default {
     cancleRow() {
       this.currentRow = "";
     },
+    submitDataToEvent() {
+      console.log("this.currentRow", this.currentRow);
+      if (this.currentRow != "") {
+        this.$emit("submitDataToEvent", this.currentRow);
+      }
+    },
   },
+
   async mounted() {
     await this.getFolders();
   },
@@ -248,6 +316,7 @@ export default {
   }
 
   .btnList {
+    margin-top: 10px;
     width: 100%;
     // padding: 0 0 0 35%;
     float: right;

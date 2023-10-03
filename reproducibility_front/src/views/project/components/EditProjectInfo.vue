@@ -32,7 +32,13 @@
               <template slot="append">+ New Tag</template>
             </el-input>
 
-            <el-tag :key="tag" v-for="tag in form.tags" closable :disable-transitions="false" @close="handleClose(tag)">
+            <el-tag
+              :key="tag"
+              v-for="tag in form.tags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)"
+            >
               {{ tag }}
             </el-tag>
           </el-form-item>
@@ -47,21 +53,23 @@
         </el-form>
       </el-col>
     </el-row>
-    <div class="title"><el-button @click="submitEdit" type="primary">Submit</el-button></div>
+    <div class="title">
+      <el-button @click="submitEdit" type="primary">Submit</el-button>
+    </div>
   </div>
 </template>
 
 <script>
 // import addImage from '_com/AddImage';
-import addImage from '_com/AddImage/index1.vue';
-import wangEditor from '_com/WangEditor/WangEditor.vue';
+import addImage from "_com/AddImage/index1.vue";
+import wangEditor from "_com/WangEditor/WangEditor.vue";
 
-import { updateProject, postFile } from '@/api/request';
+import { updateProject, postFile } from "@/api/request";
 export default {
   props: {
     projectInfo: {
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   components: { addImage, wangEditor },
@@ -81,26 +89,27 @@ export default {
   data() {
     return {
       form: JSON.parse(JSON.stringify(this.projectInfo)),
-      inputTagValue: '',
-      pictureFile: ''
+      inputTagValue: "",
+      pictureFile: "",
     };
   },
 
   methods: {
     async submitEdit() {
-      if (this.pictureFile != '') {
+      if (this.pictureFile != "") {
         let temp = new FormData();
-        temp.append('datafile', this.pictureFile.raw);
-        temp.append('name', this.form.name);
+        temp.append("datafile", this.pictureFile.raw);
+        temp.append("name", this.form.name);
         let pictureData = await postFile(temp);
-        this.form.picture = 'http://221.226.60.2:8082/data/' + pictureData.data.data.id;
+        this.form.picture =
+          "http://175.27.137.60:8083/data/" + pictureData.data.data.id;
         console.log(this.form);
       }
 
       let data = await updateProject(this.projectInfo.id, this.form);
       console.log(data);
       let result = { data: data, flag: true };
-      this.$emit('editProjectInfoResponse', result);
+      this.$emit("editProjectInfoResponse", result);
     },
 
     handleClose(val) {
@@ -112,7 +121,7 @@ export default {
       if (inputTagValue) {
         this.form.tags.push(inputTagValue);
       }
-      this.inputTagValue = '';
+      this.inputTagValue = "";
     },
 
     getfile(val) {
@@ -121,8 +130,8 @@ export default {
 
     textChange(val) {
       this.form.description = val;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

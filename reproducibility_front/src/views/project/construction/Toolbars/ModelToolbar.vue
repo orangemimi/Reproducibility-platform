@@ -57,19 +57,19 @@ export default {
     return {
       activeNames: "Models",
       //mxgraph scrollbar
-      ops: {
-        bar: {
-          onlyShowBarOnScroll: false,
-          keepShow: true,
-          background: "#c1c1c1",
-          opacity: 1,
-          hoverStyle: false,
-          specifyBorderRadius: false,
-          minSize: 0,
-          size: "6px",
-          disable: false,
-        },
-      },
+      // ops: {
+      //   bar: {
+      //     onlyShowBarOnScroll: false,
+      //     keepShow: true,
+      //     background: "#c1c1c1",
+      //     opacity: 1,
+      //     hoverStyle: false,
+      //     specifyBorderRadius: false,
+      //     minSize: 0,
+      //     size: "6px",
+      //     disable: false,
+      //   },
+      // },
     };
   },
 

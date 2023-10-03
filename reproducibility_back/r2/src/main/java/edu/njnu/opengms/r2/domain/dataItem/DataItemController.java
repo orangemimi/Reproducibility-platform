@@ -6,7 +6,13 @@ import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
+import edu.njnu.opengms.r2.domain.folder.Folder;
+import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.folder.FolderService;
+import edu.njnu.opengms.r2.domain.scenario.ResourceCollection;
+import edu.njnu.opengms.r2.domain.scenario.Scenario;
+import edu.njnu.opengms.r2.domain.scenario.ScenarioRepository;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateResourceScenarioDTO;
 import edu.njnu.opengms.r2.remote.DataContainerService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -28,6 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author ：Zhiyi
@@ -57,6 +66,12 @@ public class DataItemController {
     @Autowired
     FolderService folderService;
 
+    @Autowired
+    FolderRepository folderRepository;
+
+    @Autowired
+    ScenarioRepository scenarioRepository;
+
 
 //    @RequestMapping(value = "", method = RequestMethod.POST)
 //    public JsonResult uploadMultipleData(@JwtTokenParser(key = "userId") String userId, @RequestBody AddDataItemDTO add) throws IOException, ServletException {
@@ -85,7 +100,7 @@ public class DataItemController {
         form.add("datafile", resource);
         form.add("name", filename);
         form.add("origination", "reproducibility");
-        String urlStr = "http://" + dataContainer + ":8082/data";
+        String urlStr = "http://" + dataContainer + ":8083/data";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -93,17 +108,16 @@ public class DataItemController {
         }
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");//获得上传数据的URL
 
-
         //add to dataItem in mongodb
 
         if(storedFolderId.equals("intermediate")){
-            return ResultUtils.success("http://221.226.60.2:8082/data/" +url);
+            return ResultUtils.success("http://175.27.137.60:8083/data/" +url);
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://221.226.60.2:8082/data/" + url)
+                    .value("http://175.27.137.60:8083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)
@@ -114,12 +128,66 @@ public class DataItemController {
             DataItem dataItem = new DataItem();
             add.convertTo(dataItem);
             DataItem resultData = dataItemRepository.insert(dataItem);
-            return ResultUtils.success( folderService.updataDataList(storedFolderId,resultData.id));
+
+            Folder returnFolder1 = folderService.updataDataList(storedFolderId,resultData.id);
+            String scenarioFolder= setScenrioResource(storedFolderId);
+
+            Folder folder= folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
+            String tagId= folder.getTagId();
+
+            Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
+            ResourceCollection resourceCollectionUpdate =  Optional.ofNullable(scenario)
+                    .map(x -> x.getResourceCollection())
+                    .map(x -> {
+                        List<String> dataIdList = x.getDataList();
+                        List<String> modelIdList = x.getModelList();
+                        if (dataIdList != null) {
+                            dataIdList.add( resultData.getId());
+                        }
+                        ResourceCollection resourceCollection =  ResourceCollection.builder()
+                                .modelList(modelIdList)
+                                .dataList(dataIdList)
+                                .build();
+                        return resourceCollection;
+                    })
+
+                    .orElseGet(() ->  {
+                        List<String> dataIdList =new ArrayList<>();
+                        dataIdList.add(resultData.getId());
+
+                        return  ResourceCollection.builder()
+                                .dataList(dataIdList)
+                                .build();
+
+                    });
+
+            UpdateResourceScenarioDTO updateResourceScenarioDTO = new UpdateResourceScenarioDTO();
+            updateResourceScenarioDTO.setResourceCollection(resourceCollectionUpdate);
+            updateResourceScenarioDTO.updateTo(scenario);
+            scenarioRepository.save(scenario);
+
+
+
+            return ResultUtils.success(folder);
         }
 
 
 
     }
 
-
+    public  String setScenrioResource(String storedFolderId) {
+        Folder folder= folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
+        String object;
+        String tagId = folder.getTagId();
+        if (tagId == null) {
+            if (folder.getLevel() > 2) {
+                object = setScenrioResource(folder.getParent());
+            } else {
+                object = null;
+            }
+        } else {
+            object = folder.getId();
+        }
+        return object;
+    }
 }

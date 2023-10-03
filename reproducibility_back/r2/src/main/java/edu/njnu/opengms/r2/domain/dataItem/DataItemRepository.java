@@ -16,6 +16,7 @@ import java.util.List;
 @Repository
 public interface DataItemRepository extends MongoRepository<DataItem,String> {
     List<DataItem> findAllByIdIn(List<String> id);
+    List<DataItem> findAllById(List<String> id);
 
 
 }

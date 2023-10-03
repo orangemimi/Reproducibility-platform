@@ -29,6 +29,8 @@ public class FolderService {
 
     @Autowired
     DataItemRepository dataItemRepository;
+
+
 //    public static JSONObject getFolder(Folder folder){
 //        if(!folder.getLevel().equals(0)){
 //            JSONArray childrenFolder = new JSONArray();
@@ -43,7 +45,7 @@ public class FolderService {
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC,"level"));
 
         List<Folder> folderList = folderRepository.findAllByCreatorId(userId,sort);
-        Integer highestLevel =folderList.get(0).level;// 最高的
+//        Integer highestLevel =folderList.get(0).level;// 最高的
         ArrayList<JSONObject> newFolderList = new ArrayList<JSONObject>();
         for (Folder item : folderList) {
             JSONObject newFolder = new JSONObject();
@@ -55,20 +57,20 @@ public class FolderService {
             newFolder.put("isFolder", true);
 
             JSONArray newChildren = new JSONArray();
-            if (item.getDataList() != null) {
+            if (item.getDataList() != null && item.getDataList().size()!=0) {
                 List<DataItem> newChildWithData = dataItemRepository.findAllByIdIn(item.getDataList());
                 for(DataItem data: newChildWithData){
                     newChildren.add(data);
                 }
-                newFolder.put("dataList", newChildWithData);
+                newFolder.put("dataItemList", newChildWithData);
             }
             newFolderList.add(newFolder);//把所有的folder筛选一遍，每一层的folder都有对应的childrenObject
         }
 
         for (JSONObject item : newFolderList) {
-            JSONArray withObjectsFolder = new JSONArray();
+            List<JSONObject> withObjectsFolder = new ArrayList<>();
             List<String> childrenIds = (List<String>) item.get("childrenIds");
-            if(childrenIds!=null){
+            if(childrenIds!=null && childrenIds.size()!=0){
                 for(String childId: childrenIds){
                     for(JSONObject item2 : newFolderList){
                         if(item2.get("id").equals(childId)){
@@ -82,13 +84,14 @@ public class FolderService {
 
                 }
             }
-            List<DataItem> dataItemList = (List<DataItem>) item.get("dataList");
-            if(dataItemList!=null){
-                for(DataItem data: dataItemList){
+            JSONArray dataItemList = (JSONArray) item.get("dataItemList");
+            if(dataItemList!=null &&  dataItemList.size()!=0){
+                for(int i=0;i<dataItemList.size();i++){
+                    JSONObject data = (JSONObject) dataItemList.get(i);
                     withObjectsFolder.add(data);
                 }
             }
-            if(dataItemList!=null ||childrenIds!=null ){
+            if(dataItemList!=null ||(childrenIds!=null && childrenIds.size()!=0) ){
                 item.put("children",withObjectsFolder);
             }
 
@@ -105,7 +108,28 @@ public class FolderService {
         Folder folder = new Folder();
         add.convertTo(folder);
         folder.setCreatorId(userId);
-        return folderRepository.insert(folder);
+        Folder newFolder = folderRepository.insert(folder);
+        if(newFolder.getParent()!="0"){
+            Folder parentFolder = folderRepository.findById(newFolder.getParent()).orElseThrow(MyException::noObject);
+
+            List childrenIds;
+            if( parentFolder.getChildren()!=null&& parentFolder.getChildren().size()!=0){
+                childrenIds =parentFolder.getChildren();
+                childrenIds.add(newFolder.getId());
+
+            } else{
+                childrenIds =new JSONArray();
+                childrenIds.add(newFolder.getId());
+
+            }
+            UpdateFolderChildrenDTO update= UpdateFolderChildrenDTO.builder()
+                    .children(childrenIds)
+                    .build();
+
+            updateFolderChildren(newFolder.getParent(),update,userId);
+        }
+
+        return newFolder;
     }
 
     public Object update(AddFolderDTO add, String userId) {
@@ -133,6 +157,7 @@ public class FolderService {
             folderDataList = folder.getDataList();
             folderDataList.add(addedDataId);
         }
+
         folder.setDataList(folderDataList);
         return folderRepository.save(folder);
 

@@ -39,7 +39,7 @@ public class DataContainerService {
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", resource);
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://" + dataContainer  + ":8081" + "/dataitem/addByStorage" ; ////Step0:根据MD5获取可用的任务服务器
+        String urlStr = "http://" + dataContainer  + ":8083" + "/dataitem/addByStorage" ; ////Step0:根据MD5获取可用的任务服务器
 
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr,form, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
@@ -52,7 +52,7 @@ public class DataContainerService {
     public ResponseEntity<byte[]> download(String id) {
         RestTemplate restTemplate = new RestTemplate();
 //        String urlStr = "http://" + dataContainer + ":8082/data?uid=" + id;
-        String urlStr = "http://" + dataContainer + ":8082/data/" + id;
+        String urlStr = "http://" + dataContainer + ":8083/data/" + id;
         ResponseEntity<byte []> response = restTemplate.exchange(urlStr, HttpMethod.GET,
                 null, byte[].class);
         return  response;
@@ -60,7 +60,7 @@ public class DataContainerService {
 
     public JSONObject upload(MultiValueMap<String, Object> form) {
 //        String urlStr = "http://" + dataContainer + ":8082/dataNoneConfig";
-        String urlStr = "http://" + dataContainer + ":8082/data";
+        String urlStr = "http://" + dataContainer + ":8083/data";
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);

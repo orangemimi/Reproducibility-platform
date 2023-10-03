@@ -134,8 +134,6 @@
                         v-model="scope.row"
                         :data="dataFolderList"
                         :render-after-expand="false"
-                        :key="scope.row"
-                        @change="selectDataDialog(scope.row)"
                       />
                     </template>
                     <!-- <el-button
@@ -334,7 +332,7 @@ import {
   getInstancesInScenario,
   bindScenario,
   getScenarioById,
-  getFolders,
+  getFolders
   //   getInstanceById,
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
@@ -394,7 +392,7 @@ export default {
       boundData: [],
       canInvoke: true,
       modelWithCurrentAllEvents: [],
-      dataFolderList: [],
+      dataFolderList:[],
       invokeForm: {
         ip: "",
         port: "",
@@ -433,26 +431,6 @@ export default {
       );
       // todo --只在project内展示所有project的
     },
-    async selectDataDialog(event) {
-      console.log("event", event);
-      await this.getFolders();
-      this.currentEvent = event;
-    },
-
-    getBoundData() {
-      let dataArray = [];
-      this.boundInstances.forEach((instance) =>
-        instance.behavior.forEach((state) =>
-          state.outputs.forEach((out) => {
-            out.modelName = instance.modelName;
-            out.instanceName = instance.name;
-            dataArray.push(out);
-          })
-        )
-      );
-      this.boundData = dataArray;
-    },
-
     handleExpandChange(row, rows) {
       const isExpend = rows.some((r) => r.id === row.id); // 判断当前行展开状态
       if (isExpend) {
@@ -587,6 +565,46 @@ export default {
       this.$forceUpdate();
     },
     // 控制选择数据dialogue
+    async selectDataDialog(event) {
+      await this.getInstanceStatus(); //refresh instance status
+      await this.getScenario(this.scenarioId); //refresh boundinstance
+      //get all model instances in scenario
+      this.allModelInstanceListInScenario = await getInstancesInScenario(
+        this.scenarioId,
+        "allInstanceInScenario"
+      );
+
+      this.currentEvent = event;
+
+      let dataArray = [];
+      if (this.boundInstances != null) {
+        this.allModelInstanceListInScenario.forEach((instance) => {
+          this.boundInstances.forEach((bound) => {
+            if (bound == instance.id) {
+              dataArray.push(instance);
+            }
+          });
+        });
+        this.boundInstances = dataArray;
+      }
+
+      this.getBoundData();
+      this.selectDataDialogShow = true;
+    },
+
+    getBoundData() {
+      let dataArray = [];
+      this.boundInstances.forEach((instance) =>
+        instance.behavior.forEach((state) =>
+          state.outputs.forEach((out) => {
+            out.modelName = instance.modelName;
+            out.instanceName = instance.name;
+            dataArray.push(out);
+          })
+        )
+      );
+      this.boundData = dataArray;
+    },
 
     // 选择数据提交按钮的方法，数据只是缓存在浏览器中 1、提取并存储文件名 2、将数据的id和url存储起来
     submitDataToEvent(val) {

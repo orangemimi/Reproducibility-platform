@@ -102,10 +102,7 @@ export async function checkTaskStatus(tid) {
 //   );
 // }
 export async function getModelsByPrivacy(form) {
-  return await post(
-    `/models/getPublicModels`,
-    form
-  );
+  return await post(`/models/getPublicModels`, form);
 }
 export async function getMyModels() {
   return await get(`/models/my`);
@@ -248,5 +245,5 @@ export async function updateInstance(id, formData) {
 
 //===============================extra=================================================
 export async function postFile(form) {
-  return await axios.post("http://221.226.60.2:8082/data", form);
+  return await axios.post("http://175.27.137.60:8083/data", form);
 }

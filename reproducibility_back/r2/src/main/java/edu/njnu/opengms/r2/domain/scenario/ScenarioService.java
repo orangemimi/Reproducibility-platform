@@ -3,6 +3,7 @@ package edu.njnu.opengms.r2.domain.scenario;
 
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
+import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
 import edu.njnu.opengms.r2.domain.folder.Folder;
 import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.folder.FolderService;
@@ -35,6 +36,9 @@ public class ScenarioService {
     ModelRepository modelRepository;
 
     @Autowired
+    DataItemRepository dataItemRepository;
+
+    @Autowired
     ModelInstanceRepository modelInstanceRepository;
 
     @Autowired
@@ -59,6 +63,12 @@ public class ScenarioService {
                         obj.put("modelList", modelRepository.findAllById(modelIdList));
                     } else {
                         obj.put("modelList", null);
+                    }
+                    List<String> dataIdList = x.getDataList();
+                    if (modelIdList != null) {
+                        obj.put("dataList", dataItemRepository.findAllById(dataIdList));
+                    } else {
+                        obj.put("dataList", null);
                     }
                     return obj;
                 })
