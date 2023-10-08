@@ -1,51 +1,13 @@
 <template>
   <div class="main">
-    <div class="btnList" v-if="role == 'participant'">
-      <!-- <div class="btnList" > -->
-      <div v-if="!isAddFolder">
-        <div class="btn">
-          <el-upload
-            action
-            :auto-upload="true"
-            :show-file-list="false"
-            :on-change="handleUploadFileChange"
-            ref="upload"
-            :http-request="submitFile"
-            :max-height="tableHeight"
-            multiple
-          >
-            <el-button size="mini">
-              <i class="el-icon-upload"></i>
-            </el-button>
-          </el-upload>
-        </div>
-
-        <div class="btn">
-          <el-button
-            size="mini"
-            @click="addFolderShow"
-            icon="el-icon-folder-add"
-          ></el-button>
-        </div>
-      </div>
-      <div v-else>
-        <el-input v-model="folderName">
-          <template #suffix>
-            <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
-            <i class="el-input__icon el-icon-close" @click="closeAddFolder"></i>
-          </template>
-        </el-input>
-      </div>
-    </div>
     <div class="row-style">
       <el-table
-        ref="multipleTable"
+        ref="multipleDataTableInDialog"
         :data="folderList"
         :span-method="arraySpanMethod"
         tooltip-effect="dark"
         style="width: 100%"
-        max-height="800"
-        :row-style="{ height: '0' }"
+        :max-height="tableHeight"
         :cell-style="{
           color: '#666',
           fontFamily: 'Arial',
@@ -56,11 +18,15 @@
           fontFamily: 'Arial',
           fontSize: '14px',
         }"
-        row-key="id"
-        :tree-props="{ children: 'children' }"
+        :rowKey="
+          (record, index) => {
+            return index + record.id;
+          }
+        "
+        :tree-props="{ children: 'children', hasChildren: true }"
         border
         default-expand-all
-        @row-click="rowClick"
+        @current-change="handleCurrentChange"
         highlight-current-row
       >
         <template slot="empty">
@@ -80,13 +46,24 @@
           </template>
         </el-table-column>
 
-        <!-- <el-table-column label="File size" width="180">
+        <!-- <el-table-column label="File size" width="80">
           <template #default="scope">{{ scope.row.fileSize }}</template>
         </el-table-column> -->
-        <el-table-column label="Upload time" width="200" show-overflow-tooltip>
+        <el-table-column label="Upload time" width="150" show-overflow-tooltip>
           <template #default="scope">{{ scope.row.createTime }}</template>
         </el-table-column>
         <!--TODO-zzy -->
+        <!-- <el-table-column label="Operation" width="120" show-overflow-tooltip>
+          <template #default="scope">
+            <i
+              class="el-icon-edit-outline"
+              style="margin-right:10px"
+              @click="cilckEditDialog"
+            />
+            <i class="el-icon-download" @click="download(scope.row.value)" />
+            还需要一个可视化的按钮 什么kk什么的
+          </template>
+        </el-table-column> -->
       </el-table>
     </div>
   </div>
@@ -100,26 +77,19 @@ import { mapState } from "vuex";
 
 export default {
   props: {
+    boundData: {
+      type: Array,
+    },
     scenarioId: {
       type: String,
     },
   },
 
   components: {},
-
   data() {
     return {
-      uploadFileDialogShow: true, //upload data dialog
       folderList: [],
-      fileItemListFromResource: [],
-      projectId: this.$route.params.id,
-      modelItemList: [],
-      checkAll: false,
-      checkedFileItemList: [],
-      isIndeterminate: false,
-
-      //table
-      multipleSelection: [],
+      projectId: this.$route.params.id, //projectId
 
       //add folder
       isAddFolder: false,
@@ -144,9 +114,18 @@ export default {
         return [1, 3];
       }
     },
+    cilckEditDialog() {
+      this.editDataDialogShow = true;
+    },
+    download(val) {
+      console.log(val);
+    },
+
+    downloadFileResource(data) {
+      window.open(data.address);
+    },
 
     //get all the data
-
     async getFolders() {
       let data = await getFolders();
       let folderList = data[0].children.filter(
@@ -163,16 +142,12 @@ export default {
       // console.log("22222", this.fileList);
     },
 
-    // handleCurrentChange(row) {
-    //   this.currentRow = row;
-    // },
-    rowClick(row) {
-      console.log(row);
+    handleCurrentChange(row) {
       this.currentRow = row;
     },
-    // cancleCurrentRow() {
-    //   this.currentRow = "";
-    // },
+    cancleCurrentRow() {
+      this.currentRow = "";
+    },
 
     addFolderShow() {
       this.folderName = "";
@@ -200,21 +175,18 @@ export default {
 
     //上传文件到服务器
     async submitFile(fileItem) {
+      // console.log(param, this.fileList);
       if (this.currentRow != "") {
-        console.log(fileItem.file);
         let param = fileItem.file;
         let uploadFileForm = new FormData();
         uploadFileForm.append("file", param);
-        // console.log( "datddd",uploadFileForm,
-        //   renderSize(param.size) ,
-        //   this.currentRow.id,)
 
-        let data = await saveData(
+        await saveData(
           uploadFileForm,
+
           renderSize(param.size),
           this.currentRow.id
         );
-        console.log(data);
       } else {
         this.$alert("Please select one folder to upload data", "Warning", {});
       }
@@ -223,15 +195,23 @@ export default {
     collapseClass(params) {
       return params.isFolder === true ? "el-icon-folder" : "el-icon-document";
     },
-    // cancleRow() {
-    //   this.currentRow = "";
-    // },
+    cancleRow() {
+      this.currentRow = "";
+    },
+    submitDataToEvent() {
+      console.log("this.currentRow", this.currentRow);
+      if (this.currentRow != "") {
+        this.$emit("submitDataToEvent", this.currentRow);
+      }
+    },
   },
+
   async mounted() {
     this.$nextTick(() => {
       this.tableHeight = window.innerHeight - 300;
       //后面的50：根据需求空出的高度，自行调整
     });
+
     await this.getFolders();
   },
 };
@@ -251,13 +231,14 @@ export default {
   }
 
   .btnList {
+    margin-top: 10px;
     width: 100%;
     // padding: 0 0 0 35%;
     float: right;
-    margin-top: -35px;
+
     .btn {
       float: right;
-      // margin-right: 1px;
+      margin-right: 10px;
     }
   }
   /* 用来设置当前页面element全局table 选中某行时的背景色*/

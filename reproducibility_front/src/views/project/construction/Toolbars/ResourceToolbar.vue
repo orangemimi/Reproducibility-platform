@@ -2,7 +2,10 @@
 <template>
   <div>
     <div>
-      <div style="float:right;margin-right:10px">
+      <div
+        style="float:right;margin-right:10px"
+        v-show="activeNames == 'Models'"
+      >
         <el-button
           icon="el-icon-upload2"
           size="mini"
@@ -81,7 +84,7 @@
           </el-table>
         </div>
         <div class="modelToolbarTable" v-show="activeNames == 'Data'">
-          <DataTable :scenarioId=" chosenScenario.id"></DataTable>
+          <DataTable :scenarioId="chosenScenario.id"></DataTable>
           <!-- <el-table
             border
             ref="multipleModelTable"
@@ -124,76 +127,32 @@
       <el-dialog
         :visible.sync="selectResourceDialog"
         width="1000px"
-        title="Select resources"
+        title="Select models"
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <el-steps
-          class="steps_cont"
-          :active="stepActive"
-          simple
-          finish-status="wait"
-          process-status="finish"
+        <el-table
+          border
+          ref="multipleModelTableInDialog"
+          :data="allModelsWithUser"
+          @select="handleSelectionChange"
         >
-          <el-step
-            v-for="(item, index) in stepsList"
-            :key="index"
-            :title="item.title"
-            :icon="item.icon"
-            @click.native="choiceStep(index)"
-          ></el-step>
-        </el-steps>
-        <div>
-          <template v-if="stepActive == 0">
-            <el-table
-              border
-              ref="multipleModelTableInDialog"
-              :data="allModelsWithUser"
-              @select="handleSelectionChange"
-            >
-              <el-table-column type="selection" width="55"> </el-table-column>
-              <el-table-column
-                prop="name"
-                label="Name"
-                width="200"
-              ></el-table-column>
-              <el-table-column
-                prop="description"
-                label="Description"
-              ></el-table-column>
-              <el-table-column
-                prop="privacy"
-                label="Privacy"
-                width="100"
-              ></el-table-column>
-            </el-table>
-          </template>
-          <template v-else>
-            <DataTable></DataTable>
-            <!-- <el-table
-              border
-              ref="multipleDataTableInDialog"
-              :data="allModelsWithUser"
-              @select="handleSelectionChange"
-            >
-              <el-table-column type="selection" width="55"> </el-table-column>
-              <el-table-column
-                prop="name"
-                label="Name"
-                width="200"
-              ></el-table-column>
-              <el-table-column
-                prop="description"
-                label="Description"
-              ></el-table-column>
-              <el-table-column
-                prop="privacy"
-                label="Privacy"
-                width="100"
-              ></el-table-column>
-            </el-table> -->
-          </template>
-        </div>
+          <el-table-column type="selection" width="55"> </el-table-column>
+          <el-table-column
+            prop="name"
+            label="Name"
+            width="200"
+          ></el-table-column>
+          <el-table-column
+            prop="description"
+            label="Description"
+          ></el-table-column>
+          <el-table-column
+            prop="privacy"
+            label="Privacy"
+            width="100"
+          ></el-table-column>
+        </el-table>
 
         <span slot="footer" class="dialog-footer">
           <el-button type="primary" @click="addResourceToScenario"
@@ -242,13 +201,7 @@ export default {
 
   data() {
     return {
-      stepActive: 0,
-      stepsList: [
-        { title: "Add model", icon: "el-icon-edit" },
-        { title: "Add data", icon: "el-icon-edit" },
-      ],
       activeNames: "Models",
-
       modelSelection: [],
       resourceCollection: {},
       //mxgraph scrollbar
@@ -283,10 +236,6 @@ export default {
       }
     },
 
-    choiceStep(index) {
-      this.stepActive = index;
-    },
-
     // //init table selection
     // handleCurrentChange(rows) {
     //   if (rows) {
@@ -298,17 +247,12 @@ export default {
     //   }
     // },
     rowClick(row) {
-      console.log(row);
       row.isCurrent = true;
       this.$emit("selectModel", row);
       this.$refs["multipleModelTable"].clearSelection();
       this.$refs["multipleModelTable"].toggleRowSelection(row, true);
     },
 
-    clickModel(val) {
-      val.isCurrent = true;
-      this.$emit("selectModel", val);
-    },
     addResourceInScenario() {
       this.selectResourceDialog = true;
       this.getSelectedResources();

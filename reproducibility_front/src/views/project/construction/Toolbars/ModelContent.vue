@@ -42,6 +42,7 @@
             :row-class-name="tableRowClassName"
             @expand-change="handleExpandChange"
             :span-method="arraySpanMethod"
+            @row-click="rowClick"
           >
             <el-table-column key="need" type="expand" width="30">
               <template slot-scope="props">
@@ -95,57 +96,13 @@
                   <!-- <el-input v-model="scope.row.value"></el-input> -->
                 </div>
                 <div v-if="scope.row.type == 'inputs'">
-                  <div
-                    v-if="
-                      scope.row.hasOwnProperty('value') &&
-                        scope.row.value != '' &&
-                        scope.row.valueName != ''
-                    "
-                  >
-                    <div class="select-data select-data-line">
-                      <div
-                        class="data-name"
-                        style="width: 160px;float:left
-                      "
-                      >
-                        {{ scope.row.valueName }}
-                      </div>
-                      <div>
-                        <el-button
-                          type="success"
-                          icon="el-icon-download"
-                          size="mini"
-                          circle
-                          @click="download(scope.row)"
-                        ></el-button>
-                        <el-button
-                          type="warning"
-                          icon="el-icon-close"
-                          size="mini"
-                          circle
-                          @click="clearData(scope.row)"
-                        ></el-button>
-                      </div>
-                    </div>
-                  </div>
-                  <div v-else>
-                    <template>
-                      <el-tree-select
-                        v-model="scope.row"
-                        :data="dataFolderList"
-                        :render-after-expand="false"
-                        :key="scope.row"
-                        @change="selectDataDialog(scope.row)"
-                      />
-                    </template>
-                    <!-- <el-button
-                      type="primary"
-                      plain
-                      @click="selectDataDialog(scope.row)"
-                    >
-                      Select data
-                    </el-button> -->
-                  </div>
+                  <template>
+                    <SelectTree
+                      :treeData="dataFolderList"
+                      :treeEvent="scope.row"
+                      @refreshData="refreshData"
+                    ></SelectTree>
+                  </template>
                 </div>
               </template>
             </el-table-column>
@@ -339,6 +296,7 @@ import {
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
+import SelectTree from "_com/SelectTree/tree";
 import { dateFormat } from "@/lib/utils";
 export default {
   props: {
@@ -349,7 +307,7 @@ export default {
       type: String,
     },
   },
-  components: { ResourceTable, StateDescription },
+  components: { ResourceTable, StateDescription, SelectTree },
 
   watch: {
     currentModel: {
@@ -374,6 +332,7 @@ export default {
 
   data() {
     return {
+      projectId: this.$route.params.id, //projectId
       modelInstanceName_input: "",
       modelInvokeDialogShow: false,
       scenario: {},
@@ -423,6 +382,16 @@ export default {
   },
 
   methods: {
+    refreshData(val) {
+      if (val) {
+        this.getFolders();
+      }
+      console.log("refresh");
+    },
+    rowClick(row) {
+      console.log("row", row);
+      this.currentRow = row;
+    },
     async getFolders() {
       let data = await getFolders();
       let dataFolderList = data[0].children.filter(
@@ -431,10 +400,10 @@ export default {
       this.dataFolderList = dataFolderList[0].children.filter(
         (item) => (item.tagId = this.scenarioId)
       );
+
       // todo --只在project内展示所有project的
     },
     async selectDataDialog(event) {
-      console.log("event", event);
       await this.getFolders();
       this.currentEvent = event;
     },
@@ -630,16 +599,18 @@ export default {
 
     async startInvoke() {
       this.modelInvokeDialogShow = false;
-      // debugger;
+      debugger;
       try {
         await this.createFilefromParam();
-        this.createInvokeForm();
+        await this.createInvokeForm();
         //invoke
         let data = await invokeSingleModel(this.invokeForm);
+        console.log(data, "invoke");
         let refreshForm = {
           ip: this.invokeForm.ip,
           port: this.invokeForm.port,
         };
+        console.log("refresh form", refreshForm);
         if (data == null) {
           this.$message({
             message: "You have run the model failed",
@@ -671,6 +642,7 @@ export default {
           refreshForm: refreshForm,
           isReproduced: false,
         };
+        console.log(instanceTemp, "instanceTemp");
         await saveInstance(instanceTemp);
       } else {
         await this.updateInstance(status, modelItem.behavior, modelItem.id);
@@ -795,6 +767,9 @@ export default {
       let stateList = this.modelItem.behavior;
       for (let i = 0; i < stateList.length; i++) {
         let events = stateList[i].parameters;
+        if (events.length == 0) {
+          return;
+        }
         for (let j = 0; j < events.length; j++) {
           let content = "";
           // let uploadFileForm = new FormData();
