@@ -23,24 +23,35 @@
           v-if="user.name"
           @command="handleCommond"
         >
-          <avatar
+          <!-- <avatar
             :username="user.name"
             :size="40"
-            style="margin-top:10px"
+            style="margin-top: 10px"
             :title="user.name"
-          ></avatar>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="logout">logout</el-dropdown-item>
-          </el-dropdown-menu>
+          ></avatar> -->
+          <!-- 头像默认图片：https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png -->
+          <el-avatar
+            :username="user.name"
+            :size="50"
+            style="margin-top: 5px;background-color: rgb(137, 139, 131)"
+            :title="user.name"
+          >
+          {{ user.name}}
+          </el-avatar>
+          <template v-slot:dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="logout">logout</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
         </el-dropdown>
       </el-col>
-
       <!-- {{ user }} -->
     </el-row>
   </div>
 </template>
+
 <script>
-import Avatar from "vue-avatar";
+// import Avatar from 'vue-avatar'
 import { mapState, mapActions } from "vuex";
 export default {
   data() {
@@ -91,10 +102,11 @@ export default {
     },
   },
   components: {
-    Avatar,
+    // Avatar,
   },
 };
 </script>
+
 <style scoped>
 .el-menu--horizontal {
   border: none;
@@ -104,7 +116,6 @@ export default {
   text-decoration: none;
   line-height: 60px;
   color: #409eff;
-  /* line-height: 80px; */
   cursor: pointer;
 }
 .app-head {
@@ -112,7 +123,6 @@ export default {
   box-shadow: 0px 1px 12px #d1d1d1;
   text-align: center;
   padding: 0px 40px;
-  /* margin-bottom: 20px !important; */
 }
 .app-head .nav-bar {
   margin: 0px 20px;

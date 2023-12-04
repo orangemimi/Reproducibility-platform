@@ -1,4 +1,3 @@
-<!-- create model resource -->
 <template>
   <div class="main-contain">
     <el-row>
@@ -12,14 +11,23 @@
           </el-form-item>
           <el-form-item label="Data Serice Id">
             <el-input v-model="form.dataServiceId">
-              <el-dropdown slot="append" @command="handclick">
-                <el-button icon="el-icon-more-outline"></el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <div v-for="(item, index) in dataServiceInfo" :key="index">
-                    <el-dropdown-item :command="index">{{ item.name }}</el-dropdown-item>
-                  </div>
-                </el-dropdown-menu>
-              </el-dropdown>
+              <template v-slot:append>
+                <el-dropdown @command="handclick">
+                  <el-button :icon="ElIconMoreOutline"></el-button>
+                  <template v-slot:dropdown>
+                    <el-dropdown-menu>
+                      <div
+                        v-for="(item, index) in dataServiceInfo"
+                        :key="index"
+                      >
+                        <el-dropdown-item :command="index">{{
+                          item.name
+                        }}</el-dropdown-item>
+                      </div>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </template>
             </el-input>
           </el-form-item>
           <el-form-item label="Type">
@@ -40,14 +48,20 @@
               v-model="inputTagValue"
               ref="addTagRef"
               size="small"
-              @keyup.enter.native="handleInputConfirm"
+              @keyup.enter="handleInputConfirm"
               @blur="handleInputConfirm"
               style="margin-bottom: 5px"
             >
-              <template slot="append">+ New Tag</template>
+              <template v-slot:append>+ New Tag</template>
             </el-input>
 
-            <el-tag :key="tag" v-for="tag in form.tags" closable :disable-transitions="false" @close="handleClose(tag)">
+            <el-tag
+              :key="tag"
+              v-for="tag in form.tags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)"
+            >
               {{ tag }}
             </el-tag>
           </el-form-item>
@@ -55,7 +69,10 @@
             <el-input v-model="form.source" />
           </el-form-item>
           <el-form-item label="Image">
-            <add-image @uploadImgResponse="uploadImgResponse" :uploadPath="'dataService/picture'"></add-image>
+            <add-image
+              @uploadImgResponse="uploadImgResponse"
+              :uploadPath="'dataService/picture'"
+            ></add-image>
           </el-form-item>
         </el-form>
       </el-col>
@@ -65,15 +82,10 @@
 </template>
 
 <script>
-import addImage from '_com/AddImage';
-import { saveDataService, getAllProcessing } from '@/api/request';
+import { MoreOutline as ElIconMoreOutline } from '@element-plus/icons'
+import addImage from '_com/AddImage'
+import { saveDataService, getAllProcessing } from '@/api/request'
 export default {
-  components: { addImage },
-
-  watch: {},
-
-  computed: {},
-
   data() {
     return {
       form: {
@@ -82,69 +94,72 @@ export default {
         dataServiceId: '',
         tags: [],
         Privacy: '',
-        type: 'service'
+        type: 'service',
       },
       inputTagValue: '',
-      dataServiceInfo: []
-    };
+      dataServiceInfo: [],
+      ElIconMoreOutline,
+    }
   },
-
+  components: { addImage },
+  watch: {},
+  computed: {},
   methods: {
     async addService() {
-      let data = await saveDataService(this.form);
-      console.log(data);
+      let data = await saveDataService(this.form)
+      console.log(data)
       this.$notify({
         title: 'Success',
         message: 'You have add the model service successfully!',
-        type: 'success'
-      });
+        type: 'success',
+      })
     },
 
     handclick(val) {
       // console.log(val)
-      this.form.name = this.dataServiceInfo[val].name;
-      this.form.dataServiceId = this.dataServiceInfo[val].id;
+      this.form.name = this.dataServiceInfo[val].name
+      this.form.dataServiceId = this.dataServiceInfo[val].id
       // console.log(this.form.name)
       // console.log(this.form.dataServiceId)
     },
 
     async findData(token) {
-      let data = await getAllProcessing({ token: token });
+      let data = await getAllProcessing({ token: token })
 
-      let testJson = eval('(' + data + ')');
+      let testJson = eval('(' + data + ')')
       for (let i = 0; i < testJson.length; i++) {
         this.dataServiceInfo.push({
           name: testJson[i].list.name,
-          id: testJson[i].list.id
-        });
+          id: testJson[i].list.id,
+        })
       }
     },
 
     uploadImgResponse(val) {
-      this.form.thumbnail = val;
+      this.form.thumbnail = val
     },
 
     handleClose(val) {
-      this.form.tags.splice(this.form.tags.indexOf(val), 1);
+      this.form.tags.splice(this.form.tags.indexOf(val), 1)
     },
 
     handleInputConfirm() {
-      let inputTagValue = this.inputTagValue;
+      let inputTagValue = this.inputTagValue
       if (inputTagValue) {
-        this.form.tags.push(inputTagValue);
+        this.form.tags.push(inputTagValue)
       }
-      this.inputTagValue = '';
-    }
+      this.inputTagValue = ''
+    },
   },
-
   mounted() {
     // this.findData("uGi4gMg94+ux4nuugF0M9tlqpCtZFRqem1kl/J2Vra8=")
-  }
-};
+  },
+}
 </script>
+
 <style lang="scss" scoped>
 .main-contain {
-  //   width: 100%;
+  /*//   width: 100%;*/
   .title {
     text-align: center;
     // width: 100%;

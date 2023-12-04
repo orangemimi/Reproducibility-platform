@@ -1,4 +1,3 @@
-<!-- card -->
 <template>
   <div class="main">
     <div :class="item.isCurrent == true ? 'card_main' : 'card_other'">
@@ -23,8 +22,10 @@ export default {
 
   watch: {
     modelFrom: {
+      deep: true,
+
       handler(val) {
-        this.item = val;
+        this.item = val
       },
     },
   },
@@ -35,24 +36,23 @@ export default {
       isOpen: this.isOpenTool,
       openTool: false,
       // toolPreview
-    };
+    }
   },
 
   methods: {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .main {
-  width: 100%;
-  // padding: 5px;
-  // background-color: #3067d61c;
+  width: 100%; /*// padding: 5px;*/ /*// background-color: #3067d61c;*/
   .card_main {
-    /deep/ .el-card:hover {
+    :deep(.el-card:hover) {
       background-color: #3067d61c;
       border: 0.5px solid #25252534;
     }
 
-    /deep/ .el-card__body {
+    :deep(.el-card__body){
       padding: 5px;
       height: 40px;
       background: rgb(221, 238, 249);
@@ -79,12 +79,12 @@ export default {
     }
   }
   .card_other {
-    /deep/ .el-card:hover {
+    :deep(.el-card:hover) {
       background-color: #3067d61c;
       border: 0.5px solid #25252534;
     }
 
-    /deep/ .el-card__body {
+    :deep(.el-card__body) {
       padding: 5px;
       height: 40px;
       background: rgb(253, 253, 253);

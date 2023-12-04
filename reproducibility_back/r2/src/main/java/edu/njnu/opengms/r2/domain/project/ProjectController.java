@@ -9,6 +9,11 @@ import edu.njnu.opengms.r2.domain.project.dto.AddProjectDTO;
 import edu.njnu.opengms.r2.domain.project.dto.UpdateProjectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -23,6 +28,19 @@ public class ProjectController {
     @Autowired
     ProjectService projectService;
 
+    //pdf convert to xml
+    @RequestMapping(value = "/pdf", method = RequestMethod.POST)
+    public JsonResult pdfConvert(@JwtTokenParser(key = "userId") String userId, @RequestParam("pdfFile") MultipartFile pdfFile) throws IOException {
+
+        Runtime.getRuntime().exec("notepad");
+        // 返回包含文件上传相关信息的 JsonResult
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("filename", pdfFile.getOriginalFilename());
+        responseData.put("size", pdfFile.getSize());
+
+        return ResultUtils.success(responseData);
+    }
+
     //create one project
     @RequestMapping(value = "", method = RequestMethod.POST)
     public JsonResult create(@JwtTokenParser(key = "userId") String userId, @RequestBody JSONObject jsonObject) {
@@ -31,6 +49,7 @@ public class ProjectController {
     }
 
     //find one project
+
     @RequestMapping(value = "/info/{projectId}", method = RequestMethod.GET)
     public JsonResult get(@PathVariable("projectId") String projectId, @JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success(projectService.get(projectId));

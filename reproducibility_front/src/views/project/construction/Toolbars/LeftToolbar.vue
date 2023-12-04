@@ -1,19 +1,18 @@
-<!--  -->
 <template>
   <div class="mainLeft">
     <el-row>
       <el-button
         v-show="scenariosToolBarShow"
-        icon="el-icon-document-add"
-        size="mini"
+        :icon="ElIconDocumentAdd"
+        size="default"
         @click="createNewScenario"
         title="add a scenario"
       ></el-button>
 
-      <el-row style="float:right;margin-right:10px">
-        <div style="float:left;margin-right:10px">Binded to reviewer</div>
+      <el-row style="float: right; margin-right: 10px">
+        <div style="float: left; margin:5px 15px  ">Binded to reviewer</div>
         <el-tooltip
-          :content="'Is binded to reviewer: ' + chosenScenario.isBinded"
+          :content="chosenScenario.isBinded?'Is binded to reviewer: ' + chosenScenario.isBinded:'Is binded to reviewer: false'"
           placement="top"
         >
           <el-switch
@@ -27,7 +26,7 @@
     </el-row>
     <el-row style="margin: 10px 0">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item @click.native="scenariosToolBarShow = true"
+        <el-breadcrumb-item @click="scenariosToolBarShow = true"
           >Scenarios</el-breadcrumb-item
         >
         <el-breadcrumb-item v-show="!scenariosToolBarShow">
@@ -49,13 +48,15 @@
         <resource-toolbar
           :chosenScenario="chosenScenario"
           @selectModel="selectModel"
+          @codingOl="codingOl"
         ></resource-toolbar>
       </div>
     </el-row>
     <div class="createScenario">
       <el-dialog
-        :visible.sync="createScenarioDialog"
-        width="1200px"
+        v-model="createScenarioDialog"
+        width="900px"
+        style="height: 600px;"
         title="Create a new scenario"
         :close-on-click-modal="false"
         :destroy-on-close="true"
@@ -70,94 +71,95 @@
 </template>
 
 <script>
+import { DocumentAdd as ElIconDocumentAdd } from '@element-plus/icons-vue'
+import { $emit } from '../../../../utils/gogocodeTransfer'
 import {
   getProjectById,
   getScenarioById,
   getScenariosByProjectId,
-} from "@/api/request";
+} from '@/api/request'
 
-import scenarioCard from "_com/Cards/ScenarioListCard.vue";
-import createScenario from "../create.vue";
-import resourceToolbar from "./ResourceToolbar";
-// import SelectedScenario from "_com/Cards/SelectedScenario.vue";
+// 场景选择
+import scenarioCard from '_com/Cards/ScenarioListCard.vue'
+import createScenario from '../create.vue'
+// 场景和数据选择工具
+import resourceToolbar from './ResourceToolbar.vue'
 export default {
+  data() {
+    return {
+      //projectId
+      projectId: this.$route.params.id,
+      project: {},
+      allScenarioList: [],
+      chosenScenario: {},
+      currentModel: {},
+      scenariosToolBarShow: true,
+      createScenarioDialog: false,
+      //   resourceCollectionOb
+      resourceCollection: {},
+      ElIconDocumentAdd,
+    }
+  },
   components: {
     scenarioCard,
     resourceToolbar,
     createScenario,
     // SelectedScenario
   },
-
   watch: {},
-
   computed: {},
-
-  data() {
-    return {
-      projectId: this.$route.params.id, //projectId
-      project: {},
-      // chosenScenario: {},
-      allScenarioList: [],
-      chosenScenario: {},
-      currentModel: {},
-      scenariosToolBarShow: true,
-      createScenarioDialog: false,
-
-      resourceCollection: {},
-      //   resourceCollectionOb
-    };
-  },
-
   methods: {
     async init() {
-      this.project = await getProjectById(this.projectId);
-      this.allScenarioList = await getScenariosByProjectId(this.projectId);
+      this.project = await getProjectById(this.projectId)
+      this.allScenarioList = await getScenariosByProjectId(this.projectId)
       this.allScenarioList.forEach((element) => {
         if (element.id == this.project.scenario) {
-          element.isBinded = true;
+          element.isBinded = true
         }
-      });
+      })
     },
 
     async chooseScenario(item) {
-      this.scenariosToolBarShow = false;
-      let data = await getScenarioById(item.id);
-      this.chosenScenario = data;
-      this.scenariosToolBarShow = false;
+      this.scenariosToolBarShow = false
+      let data = await getScenarioById(item.id)
+      this.chosenScenario = data
+      this.scenariosToolBarShow = false
     },
 
     createNewScenario() {
-      this.createScenarioDialog = true;
+      this.createScenarioDialog = true
     },
 
     selectModel(val) {
-      this.$emit("selectModel", val, this.chosenScenario.id);
+      $emit(this, 'selectModel', val, this.chosenScenario.id)
       //   this.currentModel = val;
     },
+    codingOl(val) {
+      $emit(this, 'codingOl', val, this.chosenScenario.id)
+    },
     createStatus(val) {
-      if (val == "success") {
-        this.createScenarioDialog = false;
-        this.init();
+      console.log(val,'10101');
+      if (val == 'success') {
+        this.createScenarioDialog = false
+        this.init()
       }
     },
   },
-
   mounted() {
-    this.init();
+    this.init()
   },
-};
+  emits: ['selectModel', 'codingOl'],
+}
 </script>
+
 <style lang="scss" scoped>
 .mainLeft {
   width: 300px;
-  float: left;
-  //   padding: 5px 10px;
-  /* min-height: calc(100vh - 240px); */
-
-  .scenario {
-    // background-color: #6060601c;
-    // width: 300px;
-  }
+  float: left; /*//   padding: 5px 10px;*/
+  // .scenario {
+  //   // background-color: #6060601c;
+  //   // width: 300px;
+  // }
 
   .scenarioCard {
     margin-left: 10px;
@@ -167,14 +169,15 @@ export default {
     }
   }
   .createScenario {
-    .el-dialog__body {
-      height: 200px;
+    overflow: auto;
+    :deep(.el-dialog__body) {
+      height: 100%;
       overflow: auto;
     }
   }
   .selectResource {
     .el-dialog__body {
-      height: 1200px;
+      height: 800px;
       overflow: auto;
     }
   }

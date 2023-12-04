@@ -1,3 +1,20 @@
+<template>
+  <div class="container">
+    <div class="footer">
+      <h2 class="footerTop">
+        <i>Open Geographic Modeling and Simulation</i>
+      </h2>
+      <p class="footerBottom">
+        Copyright © 2013-2023 OpenGMS. All rights reserved.
+      </p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {}
+</script>
+
 <style scoped>
 .footer {
   background-color: #515a6e;
@@ -18,18 +35,3 @@
   font-size: 0.8em;
 }
 </style>
-<template>
-  <div class="container">
-    <div class="footer">
-      <h2 class="footerTop">
-        <i>Open Geographic Modeling and Simulation</i>
-      </h2>
-      <p class="footerBottom">
-        Copyright © 2013-2023 OpenGMS. All rights reserved.
-      </p>
-    </div>
-  </div>
-</template>
-<script>
-export default {};
-</script>

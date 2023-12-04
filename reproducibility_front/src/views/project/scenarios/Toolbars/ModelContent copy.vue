@@ -1,4 +1,3 @@
-<!--  -->
 <template>
   <div>
     <div class="main">
@@ -14,19 +13,19 @@
           <el-button
             type="success"
             size="mini"
-            style="float:right"
+            style="float: right"
             @click="getInstances"
           >
-            <i class="el-icon-setting"></i>&nbsp;Instances
+            <el-icon><el-icon-setting /></el-icon>&nbsp;Instances
           </el-button>
           <el-button
             type="primary"
             size="mini"
             :disabled="!canInvoke"
             @click="initInvoke"
-            style="float:right;margin-right:5px"
+            style="float: right; margin-right: 5px"
           >
-            <i class="el-icon-setting"></i>&nbsp;Invoke
+            <el-icon><el-icon-setting /></el-icon>&nbsp;Invoke
           </el-button>
         </el-col>
       </el-row>
@@ -70,8 +69,8 @@
                       <div
                         v-if="
                           modelInEvent.hasOwnProperty('url') &&
-                            modelInEvent.url != '' &&
-                            modelInEvent.urlName != ''
+                          modelInEvent.url != '' &&
+                          modelInEvent.urlName != ''
                         "
                       >
                         <div class="select-data select-data-line">
@@ -80,14 +79,14 @@
                           </div>
                           <el-button
                             type="success"
-                            icon="el-icon-download"
+                            :icon="ElIconDownload"
                             size="mini"
                             circle
                             @click="download(modelInEvent)"
                           ></el-button>
                           <el-button
                             type="warning"
-                            icon="el-icon-close"
+                            :icon="ElIconClose"
                             size="mini"
                             circle
                             @click="remove(modelInEvent)"
@@ -166,7 +165,7 @@
                         label="Type"
                       ></el-table-column>
                       <el-table-column label="Value" width="180">
-                        <template slot-scope="scope">
+                        <template v-slot="scope">
                           <el-input v-model="scope.row.value"></el-input>
                         </template>
                       </el-table-column>
@@ -208,7 +207,7 @@
                           @click="download(modelOutEvent)"
                           v-if="
                             modelOutEvent.hasOwnProperty('url') &&
-                              modelOutEvent.url != ''
+                            modelOutEvent.url != ''
                           "
                           >Download</el-button
                         >
@@ -220,7 +219,7 @@
                           :class="{ bindClass: modelOutEvent.bind }"
                           v-if="
                             modelOutEvent.hasOwnProperty('url') &&
-                              modelOutEvent.url != ''
+                            modelOutEvent.url != ''
                           "
                           >Bind</el-button
                         >
@@ -239,22 +238,22 @@
     </div>
     <div class="selectData">
       <el-dialog
-        :visible.sync="instanceDialogShow"
+        v-model="instanceDialogShow"
         width="900px"
         title="Insatnces"
         :close-on-click-modal="false"
         :destroy-on-close="true"
       >
-        <el-table :data="modelInstanceList" style="width: 100%;">
+        <el-table :data="modelInstanceList" style="width: 100%">
           <el-table-column type="expand">
-            <template slot-scope="props">
+            <template v-slot="props">
               <h1>Model Configuration</h1>
               <br />
               <hr />
               <!-- {{ props.row }} -->
               <el-table
                 :data="dataTable(props.row)"
-                style="width: 100%;"
+                style="width: 100%"
                 :row-class-name="tableRowClassName"
               >
                 <el-table-column label="Name" prop="name"> </el-table-column>
@@ -262,7 +261,7 @@
                 <el-table-column label="Description" prop="description">
                 </el-table-column>
                 <el-table-column label="Data Download or Parameters Value">
-                  <template slot-scope="scope">
+                  <template v-slot="scope">
                     <div v-if="scope.row.type == 'parameters'">
                       Parameter Value：{{
                         props.row.parameters[0].datasetItem.UdxDeclaration[0]
@@ -275,7 +274,7 @@
                       round
                       @click="download(scope.row, props.row)"
                     >
-                      <i class="el-icon-download"></i>Download</el-button
+                      <el-icon><el-icon-download /></el-icon>Download</el-button
                     >
                   </template>
                 </el-table-column>
@@ -286,7 +285,7 @@
           <el-table-column label="createTime" prop="createTime">
           </el-table-column>
           <el-table-column label="statusEnum" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-tag
                 v-if="scope.row.status === '2'"
                 type="success"
@@ -304,15 +303,15 @@
             </template>
           </el-table-column>
           <el-table-column label="Operation">
-            <template slot-scope="props">
+            <template v-slot="props">
               <el-button
                 v-show="props.row.status === '2'"
                 :type="isBound(props.row) ? 'success' : 'primary'"
                 round
                 @click="toggleBindStatus(props.row)"
               >
-                <i class="el-icon-check"></i>
-                {{ isBound(props.row) ? "bound" : "bind" }}
+                <el-icon><el-icon-check /></el-icon>
+                {{ isBound(props.row) ? 'bound' : 'bind' }}
               </el-button>
             </template>
           </el-table-column>
@@ -323,7 +322,7 @@
 
     <div class="selectData">
       <el-dialog
-        :visible.sync="selectDataDialogShow"
+        v-model="selectDataDialogShow"
         width="900px"
         title="Select data from resource center or upload"
         :close-on-click-modal="false"
@@ -337,7 +336,7 @@
     </div>
 
     <el-dialog
-      :visible.sync="modelInvokeDialogShow"
+      v-model="modelInvokeDialogShow"
       width="500px"
       title="Enter the instance name to invoke the model"
       :close-on-click-modal="false"
@@ -347,18 +346,26 @@
         v-model="modelInstanceName_input"
         placeholder="请输入内容"
       ></el-input>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="modelInvokeDialogShow = false">Cancle</el-button>
-        <el-button type="primary" @click="startInvoke"
-          >Start to invoke</el-button
-        >
-      </span>
+      <template v-slot:footer>
+        <span class="dialog-footer">
+          <el-button @click="modelInvokeDialogShow = false">Cancle</el-button>
+          <el-button type="primary" @click="startInvoke"
+            >Start to invoke</el-button
+          >
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import ResourceTable from "./ResourceTable.vue";
+import {
+  Setting as ElIconSetting,
+  Download as ElIconDownload,
+  Check as ElIconCheck,
+  Close as ElIconClose,
+} from '@element-plus/icons-vue'
+import ResourceTable from './ResourceTable.vue'
 import {
   saveData,
   invokeSingleModel,
@@ -370,49 +377,18 @@ import {
   bindScenario,
   getScenarioById,
   //   getInstanceById,
-} from "@/api/request";
-import { renderSize } from "@/utils/utils";
-import { mapState } from "vuex";
-import { dateFormat } from "@/lib/utils";
+} from '@/api/request'
+import { renderSize } from '@/utils/utils'
+import { mapState } from 'vuex'
+import { dateFormat } from '@/lib/utils'
 export default {
-  props: {
-    currentModel: {
-      type: Object,
-    },
-    scenarioId: {
-      type: String,
-    },
-  },
-  components: { ResourceTable },
-
-  watch: {
-    currentModel: {
-      async handler(newVal) {
-        if (Object.hasOwnProperty.call(newVal, "md5")) {
-          this.modelItem = newVal;
-          this.canInvoke = true;
-          await this.initTask();
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-
-  computed: {
-    ...mapState({
-      userId: (state) => state.user.userId,
-    }),
-    //把获取数据中的name字段分开
-  },
-
   data() {
     return {
-      modelInstanceName_input: "",
+      modelInstanceName_input: '',
       modelInvokeDialogShow: false,
       scenario: {},
       boundInstances: [],
-      selectedDataName: "",
+      selectedDataName: '',
       selectedDataEvent: [],
       modelItem: this.currentEvent,
       modelInstance: {},
@@ -421,142 +397,176 @@ export default {
       instanceDialogShow: false,
       activeNames: 0,
       selectDataDialogShow: false,
-      currentEvent: "",
+      currentEvent: '',
       timer: {},
       recordOutput: {},
       refreshForm: {},
       boundData: [],
       canInvoke: true,
       invokeForm: {
-        ip: "",
-        port: "",
-        pid: "",
-        username: "",
+        ip: '',
+        port: '',
+        pid: '',
+        username: '',
         inputs: [
           {
-            statename: "",
-            event: "",
-            url: "",
-            tag: "",
+            statename: '',
+            event: '',
+            url: '',
+            tag: '',
           },
         ],
         outputs: [
           {
-            statename: "",
-            event: "",
+            statename: '',
+            event: '',
             template: {
-              type: "", //id|none
-              value: "", //if tyoe=none value=""
+              type: '', //id|none
+              value: '', //if tyoe=none value=""
             },
           },
         ],
       },
-    };
+      ElIconDownload,
+      ElIconClose,
+    }
   },
-
+  components: {
+    ResourceTable,
+    ElIconSetting,
+    ElIconDownload,
+    ElIconCheck,
+  },
+  props: {
+    currentModel: {
+      type: Object,
+    },
+    scenarioId: {
+      type: String,
+    },
+  },
+  watch: {
+    currentModel: {
+      async handler(newVal) {
+        if (Object.hasOwnProperty.call(newVal, 'md5')) {
+          this.modelItem = newVal
+          this.canInvoke = true
+          await this.initTask()
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
+  computed: {
+    ...mapState({
+      userId: (state) => state.user.userId,
+    }),
+    //把获取数据中的name字段分开
+  },
   methods: {
     isBound(row) {
       // 检查按钮是否已绑定
       if (this.boundInstances != null) {
-        return this.boundInstances.includes(row.id);
+        return this.boundInstances.includes(row.id)
       }
-      return false;
+      return false
     },
     async toggleBindStatus(row) {
       // 切换按钮的状态
       if (this.isBound(row)) {
         // 执行解绑逻辑
-        this.unBindInstanceId(row);
+        this.unBindInstanceId(row)
         this.$message({
           showClose: true,
-          message: "Unbind successfully",
-          type: "info",
-        });
+          message: 'Unbind successfully',
+          type: 'info',
+        })
       } else {
         // 执行绑定逻辑
-        this.bindInstanceId(row);
+        this.bindInstanceId(row)
         this.$message({
           showClose: true,
-          message: "Binding successful",
-          type: "success",
-        });
+          message: 'Binding successful',
+          type: 'success',
+        })
       }
     },
     async bindInstanceId(row) {
-      this.boundInstances.push(row.id);
-      await this.refreshBoundInstancesInScenario();
+      this.boundInstances.push(row.id)
+      await this.refreshBoundInstancesInScenario()
     },
     async unBindInstanceId(row) {
-      const index = this.boundInstances.indexOf(row.id);
+      const index = this.boundInstances.indexOf(row.id)
       if (index !== -1) {
-        this.boundInstances.splice(index, 1);
+        this.boundInstances.splice(index, 1)
       }
-      await this.refreshBoundInstancesInScenario();
+      await this.refreshBoundInstancesInScenario()
     },
 
     async refreshBoundInstancesInScenario() {
-      let update = { instances: this.boundInstances };
-      await bindScenario(this.scenarioId, update);
+      let update = { instances: this.boundInstances }
+      await bindScenario(this.scenarioId, update)
     },
     tableRowClassName({ row, rowIndex }) {
-      row.rowIndex = rowIndex;
+      row.rowIndex = rowIndex
     },
     // 下载按钮
     download(data) {
       if (data.value) {
-        let urls = data.value;
+        let urls = data.value
         // 创建一个链接元素
-        const link = document.createElement("a");
-        link.href = urls;
-        link.target = "_blank"; // 在新窗口中打开链接
-        link.download = data.name; // 设置下载的文件名
+        const link = document.createElement('a')
+        link.href = urls
+        link.target = '_blank' // 在新窗口中打开链接
+        link.download = data.name // 设置下载的文件名
         // 模拟点击链接，触发下载
-        link.click();
+        link.click()
       } else {
         this.$message({
           showClose: true,
-          message: "Data lost",
-          type: "warning",
-        });
+          message: 'Data lost',
+          type: 'warning',
+        })
       }
     },
     // 处理展开表的数据，让input、output和parameter依次输出
     dataTable(val) {
-      let newVal = [];
+      let newVal = []
       val.behavior.forEach((state) => {
         state.inputs.forEach((item) => {
           let data = {
             stateName: state.name,
             name: item.name,
-            type: "inputs",
+            type: 'inputs',
             description: item.description,
             value: item.value,
-          };
-          newVal.push(data);
-        });
+          }
+          newVal.push(data)
+        })
         state.outputs.forEach((item) => {
           let data = {
             stateName: state.name,
             name: item.name,
-            type: "outputs",
+            type: 'outputs',
             description: item.description,
             value: item.value,
-          };
-          newVal.push(data);
-        });
+          }
+          newVal.push(data)
+        })
         state.parameters.forEach((item) => {
           let data = {
             stateName: state.name,
             name: item.name,
-            type: "parameters",
+            type: 'parameters',
             description: item.description,
             value: item.value,
-          };
-          newVal.push(data);
-        });
-      });
+          }
+          newVal.push(data)
+        })
+      })
 
-      return newVal;
+      return newVal
     },
     // 过滤方法，没有udxNode变量就加一个，暂时不知道udxNode是干啥的
     // filterUdxNode(event) {
@@ -585,155 +595,155 @@ export default {
     isDataSelected(modelInEvent) {
       // 使用 some 方法检查是否存在匹配的对象
       return this.selectedDataEvent.some((item) => {
-        return item.value === modelInEvent.value;
-      });
+        return item.value === modelInEvent.value
+      })
     },
     // 选择数据后清除数据
     clearData(modelInEvent) {
       // console.log(modelInEvent,'111');
       let index = this.selectedDataEvent.findIndex((item) => {
-        return item.value === modelInEvent.value;
-      });
+        return item.value === modelInEvent.value
+      })
       if (index !== -1) {
-        this.selectedDataEvent.splice(index, 1);
+        this.selectedDataEvent.splice(index, 1)
       }
       // 这两个属性是选择数据后新增的，起码要清空
-      this.currentEvent = modelInEvent;
-      this.currentEvent.value = null;
-      this.currentEvent.dataId = null;
+      this.currentEvent = modelInEvent
+      this.currentEvent.value = null
+      this.currentEvent.dataId = null
     },
     // 控制选择数据dialogue
     async selectDataDialog(event) {
-      await this.getInstanceStatus(); //refresh instance status
-      await this.getScenario(this.scenarioId); //refresh boundinstance
+      await this.getInstanceStatus() //refresh instance status
+      await this.getScenario(this.scenarioId) //refresh boundinstance
       //get all model instances in scenario
       this.allModelInstanceListInScenario = await getInstancesInScenario(
         this.scenarioId,
-        "allInstanceInScenario"
-      );
+        'allInstanceInScenario'
+      )
 
-      this.currentEvent = event;
+      this.currentEvent = event
 
-      let dataArray = [];
+      let dataArray = []
       if (this.boundInstances != null) {
         this.allModelInstanceListInScenario.forEach((instance) => {
           this.boundInstances.forEach((bound) => {
             if (bound == instance.id) {
-              dataArray.push(instance);
+              dataArray.push(instance)
             }
-          });
-        });
-        this.boundInstances = dataArray;
+          })
+        })
+        this.boundInstances = dataArray
       }
 
-      this.getBoundData();
-      this.selectDataDialogShow = true;
+      this.getBoundData()
+      this.selectDataDialogShow = true
     },
 
     getBoundData() {
-      let dataArray = [];
+      let dataArray = []
       this.boundInstances.forEach((instance) =>
         instance.behavior.forEach((state) =>
           state.outputs.forEach((out) => {
-            out.modelName = instance.modelName;
-            out.instanceName = instance.name;
-            dataArray.push(out);
+            out.modelName = instance.modelName
+            out.instanceName = instance.name
+            dataArray.push(out)
           })
         )
-      );
-      this.boundData = dataArray;
+      )
+      this.boundData = dataArray
     },
 
     // 选择数据提交按钮的方法，数据只是缓存在浏览器中 1、提取并存储文件名 2、将数据的id和url存储起来
     submitDataToEvent(val) {
-      let fileName = val.name + val.suffix;
-      let data = {};
-      data.fileName = fileName;
-      data.value = val.value;
+      let fileName = val.name + val.suffix
+      let data = {}
+      data.fileName = fileName
+      data.value = val.value
       if (data.value) {
-        this.selectedDataEvent.push(data);
+        this.selectedDataEvent.push(data)
       } else {
         this.$message({
           showClose: true,
-          message: "Data failure",
-          type: "warning",
-        });
+          message: 'Data failure',
+          type: 'warning',
+        })
       }
-      this.currentEvent.value = val.value;
-      this.currentEvent.dataId = val.id;
-      this.selectDataDialogShow = false;
+      this.currentEvent.value = val.value
+      this.currentEvent.dataId = val.id
+      this.selectDataDialogShow = false
     },
     getFileName(val) {
       // 使用 find 方法查找匹配的元素
       let matchedElement = this.selectedDataEvent.find((item) => {
-        return item.value === val.value;
-      });
+        return item.value === val.value
+      })
       if (matchedElement) {
         // 如果找到匹配的元素，获取其 fileName 属性的值
-        var fileName = matchedElement.fileName;
+        var fileName = matchedElement.fileName
       }
-      return fileName;
+      return fileName
     },
     async getInstances() {
-      await this.getScenario(this.scenarioId);
-      this.instanceDialogShow = true;
+      await this.getScenario(this.scenarioId)
+      this.instanceDialogShow = true
       this.modelInstanceList = await getInstancesInScenario(
         this.scenarioId,
         this.modelItem.id
-      );
-      await this.getInstanceStatus();
+      )
+      await this.getInstanceStatus()
     },
 
     async getScenario(scenarioId) {
-      this.scenario = await getScenarioById(scenarioId);
-      if (Object.prototype.hasOwnProperty.call(this.scenario, "instances")) {
-        this.boundInstances = this.scenario.instances;
+      this.scenario = await getScenarioById(scenarioId)
+      if (Object.prototype.hasOwnProperty.call(this.scenario, 'instances')) {
+        this.boundInstances = this.scenario.instances
       }
     },
     getInstanceStatus() {
       this.modelInstanceList.forEach(async (instance) => {
         if (instance.status == 0) {
-          await this.getOutputs(instance, instance.refreshForm);
+          await this.getOutputs(instance, instance.refreshForm)
           //表示正在运行
         }
-      });
+      })
     },
 
     // 运行invoke
     initInvoke() {
       this.modelInstanceName_input =
-        this.modelItem.name + "  ||  " + dateFormat(new Date());
-      this.modelInvokeDialogShow = true;
+        this.modelItem.name + '  ||  ' + dateFormat(new Date())
+      this.modelInvokeDialogShow = true
     },
 
     async startInvoke() {
       // debugger;
       try {
-        await this.createFilefromParam();
-        this.createInvokeForm();
+        await this.createFilefromParam()
+        this.createInvokeForm()
         //invoke
-        let data = await invokeSingleModel(this.invokeForm);
+        let data = await invokeSingleModel(this.invokeForm)
         let refreshForm = {
           ip: this.invokeForm.ip,
           port: this.invokeForm.port,
-        };
+        }
         if (data == null) {
           this.$message({
-            message: "You have run the model failed",
-            type: "error",
-          });
-          await this.emitInstance(-1, this.modelItem, refreshForm);
+            message: 'You have run the model failed',
+            type: 'error',
+          })
+          await this.emitInstance(-1, this.modelItem, refreshForm)
         } else {
-          refreshForm.tid = data.data.tid;
-          await this.emitInstance(0, this.modelItem, refreshForm);
+          refreshForm.tid = data.data.tid
+          await this.emitInstance(0, this.modelItem, refreshForm)
         }
       } catch {
         this.$message({
-          type: "info",
-          message: "invoke failed",
-        });
+          type: 'info',
+          message: 'invoke failed',
+        })
       }
-      this.modelInvokeDialogShow = false;
+      this.modelInvokeDialogShow = false
     },
     // 创建运行时的instance
     async emitInstance(status, modelItem, refreshForm) {
@@ -748,10 +758,10 @@ export default {
           modelId: modelItem.id,
           refreshForm: refreshForm,
           isReproduced: false,
-        };
-        await saveInstance(instanceTemp);
+        }
+        await saveInstance(instanceTemp)
       } else {
-        await this.updateInstance(status, modelItem.behavior, modelItem.id);
+        await this.updateInstance(status, modelItem.behavior, modelItem.id)
       }
     },
 
@@ -759,30 +769,30 @@ export default {
       await updateInstance(instanceId, {
         behavior: behavior,
         status: status,
-      });
+      })
     },
 
     async getOutputs(instance, refreshForm) {
       if (instance.status != 2) {
-        let { data } = await getRecordofSingleModel(refreshForm);
+        let { data } = await getRecordofSingleModel(refreshForm)
         if (data.status != instance.status) {
-          instance.status = data.status;
+          instance.status = data.status
           if (data.status == 2) {
-            let isURLExist = true;
+            let isURLExist = true
             data.outputs.forEach((out) => {
-              if (out.url == "") {
-                isURLExist = false;
+              if (out.url == '') {
+                isURLExist = false
               }
-            });
+            })
             if (isURLExist) {
-              let instanceTemp = this.getStateEventOut(instance, data);
+              let instanceTemp = this.getStateEventOut(instance, data)
               await this.updateInstance(
                 instance.status,
                 instanceTemp.behavior,
                 instance.id
-              );
+              )
             } else {
-              await this.updateInstance(-1, instance.behavior, instance.id);
+              await this.updateInstance(-1, instance.behavior, instance.id)
             }
 
             // let data3 = await updateInstance(this.scenarioId, stepResource);
@@ -792,72 +802,68 @@ export default {
     },
 
     getStateEventOut(instance, record) {
-      let stateList = instance.behavior;
-      let outputUrl = record.outputs;
+      let stateList = instance.behavior
+      let outputUrl = record.outputs
       outputUrl.forEach((el) => {
         stateList.forEach((state, index) => {
           if (state.name == el.statename) {
             state.outputs.forEach((event, eventIndex) => {
               if (el.event == event.name) {
-                this.$set(
-                  instance.behavior[index].outputs[eventIndex],
-                  "value",
-                  el.url
-                );
+                instance.behavior[index].outputs[eventIndex]['value'] = el.url
               }
-            });
+            })
           }
-        });
-      });
+        })
+      })
 
-      return instance;
+      return instance
     },
     // 创建一个invokeForm，清洗参数，将各数据放到invokeForm中
     createInvokeForm() {
-      let stateList = this.modelItem.behavior;
-      let input = [];
-      let output = [];
+      let stateList = this.modelItem.behavior
+      let input = []
+      let output = []
       // debugger;
       for (let i = 0; i < stateList.length; i++) {
-        let state = stateList[i];
-        let allInputsWithPara = state.inputs.concat(state.parameters);
-        let detail = {};
+        let state = stateList[i]
+        let allInputsWithPara = state.inputs.concat(state.parameters)
+        let detail = {}
         for (let j = 0; j < allInputsWithPara.length; j++) {
           //判断数据类型 如果是input--对应url
 
-          detail["statename"] = state.name;
-          detail["event"] = allInputsWithPara[j].name;
+          detail['statename'] = state.name
+          detail['event'] = allInputsWithPara[j].name
 
-          if (Object.hasOwnProperty.call(allInputsWithPara[j], "value")) {
-            detail["tag"] = allInputsWithPara[j].name;
-            detail["url"] = allInputsWithPara[j].value;
-            input.push(detail);
+          if (Object.hasOwnProperty.call(allInputsWithPara[j], 'value')) {
+            detail['tag'] = allInputsWithPara[j].name
+            detail['url'] = allInputsWithPara[j].value
+            input.push(detail)
           } else {
-            continue;
+            continue
           }
         }
 
         for (let j = 0; j < state.outputs.length; j++) {
-          let template = {};
-          let outputTemplate = state.outputs[j].datasetItem;
-          if (outputTemplate.type === "external") {
+          let template = {}
+          let outputTemplate = state.outputs[j].datasetItem
+          if (outputTemplate.type === 'external') {
             template = {
-              type: "id",
+              type: 'id',
               value: outputTemplate.externalId,
-            };
+            }
           } else {
             template = {
-              type: "none",
-              value: "",
-            };
+              type: 'none',
+              value: '',
+            }
           }
-          detail["template"] = template;
-          output.push(detail);
+          detail['template'] = template
+          output.push(detail)
         }
       }
 
-      this.invokeForm.inputs = input;
-      this.invokeForm.outputs = output;
+      this.invokeForm.inputs = input
+      this.invokeForm.outputs = output
     },
     // 点击state使其收缩的事件，感觉没啥用啊
     handleChange() {},
@@ -865,36 +871,36 @@ export default {
     // 将参数绑定为一个xml文件，上传，返回url绑定到mdl
     async createFilefromParam() {
       // console.log("111", this.modelItem);
-      let stateList = this.modelItem.behavior;
+      let stateList = this.modelItem.behavior
 
       for (let i = 0; i < stateList.length; i++) {
-        let events = stateList[i].parameters;
+        let events = stateList[i].parameters
 
         for (let j = 0; j < events.length; j++) {
           //判断如果是参数的话，重新绑定成为一个文件 之后上传 返回url绑定到mdl中去
-          let content = "";
+          let content = ''
           // let uploadFileForm = new FormData();
 
           let udxNodeList =
-            events[j].datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode;
+            events[j].datasetItem.UdxDeclaration[0].UdxNode[0].UdxNode
           // events[j].datasetItem.UdxDeclaration[0].UdxNode;
 
           for (let k = 0; k < udxNodeList.length; k++) {
-            if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
+            if (Object.hasOwnProperty.call(udxNodeList[k], 'value')) {
               // content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
-              content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`;
+              content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`
             }
           }
-          if (content != "") {
-            content = "<Dataset> " + content + " </Dataset>";
-            let file = new File([content], events[j].name + ".xml", {
-              type: "text/plain",
-            });
+          if (content != '') {
+            content = '<Dataset> ' + content + ' </Dataset>'
+            let file = new File([content], events[j].name + '.xml', {
+              type: 'text/plain',
+            })
             // uploadFileForm.append("file", file);
 
             // this.createConfigFile();
 
-            await this.submitUpload(i, j, file);
+            await this.submitUpload(i, j, file)
           }
         }
       }
@@ -902,48 +908,42 @@ export default {
     // 上传文件，并保留url
     async submitUpload(stateIndex, eventIndex, fileItem) {
       // let param = fileItem.file;
-      let uploadFileForm = new FormData();
-      uploadFileForm.append("file", fileItem);
+      let uploadFileForm = new FormData()
+      uploadFileForm.append('file', fileItem)
       let data = await saveData(
         uploadFileForm,
         renderSize(fileItem.size),
-        "intermediate"
-      );
-      this.$set(
-        this.modelItem.behavior[stateIndex].parameters[eventIndex],
-        "value",
-        // data.value
-        data
-      );
+        'intermediate'
+      )
+      this.modelItem.behavior[stateIndex].parameters[eventIndex]['value'] = data
     },
     //在点击model的时候就初始化一个task，获取模型所在位置的ip，端口，md5值（模型的唯一标识符）
     async initTask() {
       //get task ip port ...
-      let { data } = await initTask(this.modelItem.md5);
+      let { data } = await initTask(this.modelItem.md5)
 
-      if (data == undefined || data == "") {
-        this.canInvoke = false;
-        this.$message.error("This model cannot be executed now");
+      if (data == undefined || data == '') {
+        this.canInvoke = false
+        this.$message.error('This model cannot be executed now')
       } else {
-        this.canInvoke = true;
-        this.invokeForm.ip = data.host;
-        this.invokeForm.port = data.port;
-        this.invokeForm.pid = this.modelItem.md5; //md5
-        this.invokeForm.username = this.userId;
+        this.canInvoke = true
+        this.invokeForm.ip = data.host
+        this.invokeForm.port = data.port
+        this.invokeForm.pid = this.modelItem.md5 //md5
+        this.invokeForm.username = this.userId
       }
     },
   },
-
-  beforeDestroy() {
-    clearInterval(this.timer);
+  beforeUnmount() {
+    clearInterval(this.timer)
   },
-
   async mounted() {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .selectData {
-  /deep/.el-dialog {
+  ::v-deep.el-dialog {
     height: 800px;
     overflow: auto;
   }

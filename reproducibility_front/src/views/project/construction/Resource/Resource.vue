@@ -11,7 +11,7 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="Date" width="180" :sortable="true" prop="date">
         <template #default="scope">
-          <i class="el-icon-time"></i>
+          <el-icon><el-icon-time /></el-icon>
           <span style="margin-left: 10px">{{ scope.row.updateTime }}</span>
         </template>
       </el-table-column>
@@ -85,7 +85,7 @@
 
     <el-dialog
       title="Add resource"
-      :visible.sync="addResourceDialogShow"
+      v-model="addResourceDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -94,7 +94,7 @@
 
     <el-dialog
       title="Edit resource"
-      :visible.sync="editResourceDialogShow"
+      v-model="editResourceDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -108,21 +108,22 @@
 </template>
 
 <script>
+import { Time as ElIconTime } from '@element-plus/icons-vue'
 import {
   getDataItemsByProjectId,
   deleteDataItemById,
   batchDelete,
   updatePerformanceById,
-} from "@/api/request";
-import addResource from "./components/AddResource.vue";
-import { dateFormat } from "@/utils/utils";
-import { mapState } from "vuex";
+} from '@/api/request'
+import addResource from './components/AddResource.vue'
+import { dateFormat } from '@/utils/utils'
+import { mapState } from 'vuex'
 
 export default {
   components: {
     addResource,
+    ElIconTime,
   },
-
   data() {
     return {
       dataItemList: [],
@@ -132,182 +133,175 @@ export default {
       editResourceDialogShow: false,
       editParameter: {},
       selection: [],
-    };
+    }
   },
   computed: {
     ...mapState({
       role: (state) => state.permission.role,
     }),
   },
-
   methods: {
     async dataItem(val) {
-      await updatePerformanceById("resource", this.projectId, {
-        content: "add resource",
-      });
-      console.log(val);
-      let date = new Date();
-      console.log(dateFormat(date, "yyyy/MM/dd hh:mm"));
+      await updatePerformanceById('resource', this.projectId, {
+        content: 'add resource',
+      })
+      console.log(val)
+      let date = new Date()
+      console.log(dateFormat(date, 'yyyy/MM/dd hh:mm'))
       this.dataItemList.push({
-        updateTime: dateFormat(date, "yyyy/MM/dd hh:mm"),
+        updateTime: dateFormat(date, 'yyyy/MM/dd hh:mm'),
         name: val.name,
         format: val.format,
         type: val.type,
         description: val.description,
         id: val.id,
-      });
-      this.addResourceDialogShow = false;
+      })
+      this.addResourceDialogShow = false
     },
 
     async update(val) {
-      await updatePerformanceById(
-        "resource",
-        this.projectId,
-        "update resource"
-      );
-      console.log(val);
+      await updatePerformanceById('resource', this.projectId, 'update resource')
+      console.log(val)
       this.dataItemList.forEach((dataItem) => {
         if (dataItem.id == val.id) {
-          dataItem.name = val.name;
-          dataItem.format = val.type;
-          dataItem.type = val.dataType;
-          dataItem.description = val.desc;
+          dataItem.name = val.name
+          dataItem.format = val.type
+          dataItem.type = val.dataType
+          dataItem.description = val.desc
         }
-      });
-      console.log(this.dataItemList);
-      this.editResourceDialogShow = false;
+      })
+      console.log(this.dataItemList)
+      this.editResourceDialogShow = false
     },
 
     handleEdit(row) {
-      console.log(row);
-      this.editParameter = row;
-      this.editResourceDialogShow = true;
+      console.log(row)
+      this.editParameter = row
+      this.editResourceDialogShow = true
     },
     async handleDelete(index, row) {
       this.$confirm(
-        "This operation will permanently delete the file. Do you want to continue?",
-        "Tips",
+        'This operation will permanently delete the file. Do you want to continue?',
+        'Tips',
         {
-          confirmButtonText: "comfirm",
-          cancelButtonText: "cancel",
-          type: "warning",
+          confirmButtonText: 'comfirm',
+          cancelButtonText: 'cancel',
+          type: 'warning',
         }
       )
         .then(async () => {
-          await deleteDataItemById(row.id);
+          await deleteDataItemById(row.id)
           await updatePerformanceById(
-            "resource",
+            'resource',
             this.projectId,
-            "delete resource"
-          );
+            'delete resource'
+          )
           this.dataItemList.forEach((item, itemIndex) => {
             if (item.id == row.id) {
-              this.dataItemList.splice(itemIndex, 1);
+              this.dataItemList.splice(itemIndex, 1)
             }
-          });
+          })
           this.$message({
-            type: "success",
-            message: "Delete succeeded!",
-          });
+            type: 'success',
+            message: 'Delete succeeded!',
+          })
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "Deletion cancelled!",
-          });
-        });
+            type: 'info',
+            message: 'Deletion cancelled!',
+          })
+        })
     },
 
     select(selection) {
-      this.selection = [];
+      this.selection = []
       selection.forEach((item) => {
-        this.selection.push(item.id);
-      });
+        this.selection.push(item.id)
+      })
     },
     selectAll(selection) {
-      this.selection = [];
+      this.selection = []
       selection.forEach((item) => {
-        this.selection.push(item.id);
-      });
+        this.selection.push(item.id)
+      })
     },
     async deleteBtn() {
       if (this.selection.length > 0) {
         this.$confirm(
-          "This operation will permanently delete the file. Do you want to continue?",
-          "Tips",
+          'This operation will permanently delete the file. Do you want to continue?',
+          'Tips',
           {
-            confirmButtonText: "comfirm",
-            cancelButtonText: "cancel",
-            type: "warning",
+            confirmButtonText: 'comfirm',
+            cancelButtonText: 'cancel',
+            type: 'warning',
           }
         )
           .then(async () => {
-            await batchDelete(this.selection);
+            await batchDelete(this.selection)
             await updatePerformanceById(
-              "resource",
+              'resource',
               this.projectId,
-              "delete resource"
-            );
+              'delete resource'
+            )
             this.dataItemList.forEach((item, itemIndex) => {
               this.selection.forEach((select) => {
                 if (item.id == select) {
-                  this.dataItemList.splice(itemIndex, 1);
+                  this.dataItemList.splice(itemIndex, 1)
                 }
-              });
-            });
+              })
+            })
             this.$message({
-              type: "success",
-              message: "Delete succeeded!",
-            });
+              type: 'success',
+              message: 'Delete succeeded!',
+            })
           })
           .catch(() => {
             this.$message({
-              type: "info",
-              message: "Deletion cancelled!",
-            });
-          });
+              type: 'info',
+              message: 'Deletion cancelled!',
+            })
+          })
       } else {
         this.$notify({
-          title: "warning",
-          message: "Please select the data to delete!",
-          type: "warning",
-        });
+          title: 'warning',
+          message: 'Please select the data to delete!',
+          type: 'warning',
+        })
       }
     },
 
     //get all the data
     async getDataCollection() {
-      let data = await getDataItemsByProjectId(this.projectId);
+      let data = await getDataItemsByProjectId(this.projectId)
       data.forEach((item) => {
-        item.updateTime = dateFormat(item.updateTime, "yyyy/MM/dd hh:mm");
-      });
-      this.dataItemList = data;
-      console.log(data);
+        item.updateTime = dateFormat(item.updateTime, 'yyyy/MM/dd hh:mm')
+      })
+      this.dataItemList = data
+      console.log(data)
     },
     async getDataAsOperator() {
-      let data = await getDataItemsByProjectId(this.projectId);
-      this.dataItemListFromResource = data;
-      this.$refs.multipleTable.toggleAllSelection();
+      let data = await getDataItemsByProjectId(this.projectId)
+      this.dataItemListFromResource = data
+      this.$refs.multipleTable.toggleAllSelection()
     },
   },
   async mounted() {
-    if (this.role == "builder") {
-      await this.getDataCollection();
+    if (this.role == 'builder') {
+      await this.getDataCollection()
     }
-    if (this.role == "rebuilder_operator") {
-      await this.getDataAsOperator();
+    if (this.role == 'rebuilder_operator') {
+      await this.getDataAsOperator()
     }
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
 .main {
   padding: 20px 10px;
-
   height: 100%;
   width: 100%;
-
   .row-style {
     padding: 0 10px;
     height: 100%;
@@ -332,7 +326,7 @@ export default {
   }
 
   .drawer {
-    /deep/.el-drawer__body {
+    :deep(.el-drawer__body) {
       height: 0;
       // height:0 overflow;flex:1
     }

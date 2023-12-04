@@ -1,4 +1,3 @@
-<!-- data upload information -->
 <template>
   <div class="main">
     <data-upload-form
@@ -10,9 +9,8 @@
 </template>
 
 <script>
-import dataUploadForm from "./DataUploadForm.vue";
-// import addImage from '_com/AddImage';
-
+import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
+import dataUploadForm from './DataUploadForm.vue'
 export default {
   components: {
     dataUploadForm,
@@ -22,25 +20,24 @@ export default {
       type: Object,
     },
   },
-
   data() {
     return {
-      activeName: "file",
+      activeName: 'file',
       // form: {}
-    };
+    }
   },
-
   methods: {
     uploadSuccess(val) {
-      this.$emit("uploadSuccess", val);
+      $emit(this, 'uploadSuccess', val)
     },
   },
-
   mounted() {
     // console.log(this.initFormData)
   },
-};
+  emits: ['uploadSuccess'],
+}
 </script>
+
 <style lang="scss" scoped>
 .main {
   height: 100%;

@@ -6,9 +6,15 @@
         <div class="title">{{ modelItem.label }}</div>
         <div class="bottom">
           <div class="type">
-            <el-tag size="small" :type="modelItem.classify == 'model' ? 'danger' : 'warning'">{{ modelItem.classify }}</el-tag>
+            <el-tag
+              size="small"
+              :type="modelItem.classify == 'model' ? 'danger' : 'warning'"
+              >{{ modelItem.classify }}</el-tag
+            >
           </div>
-          <el-button type="text" size="mini" class="btn" @click="clickView">View</el-button>
+          <el-button type="text" size="mini" class="btn" @click="clickView"
+            >View</el-button
+          >
         </div>
       </div>
     </div>
@@ -16,46 +22,49 @@
 </template>
 
 <script>
-import { getPictureByDOI } from '@/api/request';
-import { imgBase64 } from '@/lib/utils';
+import { getPictureByDOI } from '@/api/request'
+import { imgBase64 } from '@/lib/utils'
 export default {
   props: {
     modelItem: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
     return {
-      image: ''
-    };
+      image: '',
+    }
   },
   methods: {
     imgPath(snapshot, name) {
       if (snapshot != undefined || snapshot != null || snapshot != '') {
-        return snapshot;
+        return snapshot
       } else {
-        return imgBase64(name);
+        return imgBase64(name)
       }
     },
     clickView() {
-      window.open('http://geomodeling.njnu.edu.cn/computableModel/' + this.modelItem.doi, '_blank');
+      window.open(
+        'http://geomodeling.njnu.edu.cn/computableModel/' + this.modelItem.doi,
+        '_blank'
+      )
     },
     async getPictureByDOI() {
-      let data = await getPictureByDOI(this.modelItem.doi);
-      this.image = data;
+      let data = await getPictureByDOI(this.modelItem.doi)
+      this.image = data
     },
     async init() {
       if (this.modelItem.classify == 'model') {
-        await this.getPictureByDOI();
+        await this.getPictureByDOI()
       } else {
-        this.image = '';
+        this.image = ''
       }
-    }
+    },
   },
   async mounted() {
-    await this.init();
-  }
-};
+    await this.init()
+  },
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,11 @@
 <template>
   <div class="mainContain" v-if="cell != null">
-    <el-row class="dataInfo" v-if="cell.type == 'modelServiceInput' || cell.type == 'modelServiceOutput'">
+    <el-row
+      class="dataInfo"
+      v-if="
+        cell.type == 'modelServiceInput' || cell.type == 'modelServiceOutput'
+      "
+    >
       <div class="data">
         <div class="dataTitle">State name:</div>
         <div class="dataDetail">
@@ -28,7 +33,10 @@
       </div>
     </el-row>
 
-    <el-row class="dataInfo" v-if="cell.type == 'dataServiceInput' || cell.type == 'dataServiceOutput'">
+    <el-row
+      class="dataInfo"
+      v-if="cell.type == 'dataServiceInput' || cell.type == 'dataServiceOutput'"
+    >
       <div class="data">
         <div class="dataTitle">Name:</div>
         <div class="dataDetail">
@@ -47,8 +55,17 @@
       <el-divider class="eventDivider"></el-divider>
     </el-row>
     <el-row>
-      <div v-if="cell.type == 'modelServiceOutput' || cell.type == 'dataServiceOutput'">
-        <div v-if="cell.nodeAttribute.value != '' && cell.nodeAttribute.value != undefined">
+      <div
+        v-if="
+          cell.type == 'modelServiceOutput' || cell.type == 'dataServiceOutput'
+        "
+      >
+        <div
+          v-if="
+            cell.nodeAttribute.value != '' &&
+            cell.nodeAttribute.value != undefined
+          "
+        >
           <el-button>DownLoad</el-button>
         </div>
         <div v-else>Please run this task to get the output!</div>
@@ -71,7 +88,12 @@
               class="uploadContent"
               @change="changeSelectResource"
             >
-              <el-option v-for="(item, dataIndex) in paramsDataList" :key="dataIndex" :label="item.name" :value="item.id"></el-option>
+              <el-option
+                v-for="(item, dataIndex) in paramsDataList"
+                :key="dataIndex"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </div>
           <div v-else>
@@ -82,7 +104,12 @@
               class="uploadContent"
               @change="changeSelectResource"
             >
-              <el-option v-for="(item, dataIndex) in fileDataList" :key="dataIndex" :label="item.name" :value="item.id"></el-option>
+              <el-option
+                v-for="(item, dataIndex) in fileDataList"
+                :key="dataIndex"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </div>
         </div>
@@ -97,7 +124,12 @@
             class="uploadContent"
             @change="changeSelectResource"
           >
-            <el-option v-for="(item, dataIndex) in paramsDataList" :key="dataIndex" :label="item.name" :value="item.id"></el-option>
+            <el-option
+              v-for="(item, dataIndex) in paramsDataList"
+              :key="dataIndex"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </div>
         <div v-else>
@@ -108,7 +140,12 @@
             class="uploadContent"
             @change="changeSelectResource"
           >
-            <el-option v-for="(item, dataIndex) in fileDataList" :key="dataIndex" :label="item.name" :value="item.id"></el-option>
+            <el-option
+              v-for="(item, dataIndex) in fileDataList"
+              :key="dataIndex"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </div>
       </div>
@@ -117,23 +154,20 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { getDataItemsByProjectId } from '@/api/request';
-// import { hasProperty } from '@/utils/utils';
-
+import { $on, $off, $once, $emit } from '../../utils/gogocodeTransfer'
+import { mapState } from 'vuex'
+import { getDataItemsByProjectId } from '@/api/request'
 export default {
   props: {
     cell: {
-      type: Object
-    }
+      type: Object,
+    },
   },
-
   computed: {
     ...mapState({
-      role: state => state.permission.role
-    })
+      role: (state) => state.permission.role,
+    }),
   },
-
   data() {
     return {
       upload: false,
@@ -145,31 +179,30 @@ export default {
       ops: {
         bar: {
           background: '#808695',
-          keepShow: true
-        }
+          keepShow: true,
+        },
       },
       selectDataName: '',
-      selectDataItem: {}
-    };
+      selectDataItem: {},
+    }
   },
-
   methods: {
     changeSwitch() {
-      this.$emit('isUpload', this.upload);
+      $emit(this, 'isUpload', this.upload)
     },
     async init() {
-      await this.getResources();
+      await this.getResources()
     },
 
     async getResources() {
-      let data = await getDataItemsByProjectId(this.projectId);
-      this.dataItemList = data; //id list
+      let data = await getDataItemsByProjectId(this.projectId)
+      this.dataItemList = data //id list
       for (let i = 0; i < data.length; i++) {
         if (data[i].format != 'parameter') {
-          this.fileDataList.push(data[i]);
+          this.fileDataList.push(data[i])
         } else {
           // data[i].numValue =data[i].value;
-          this.paramsDataList.push(data[i]);
+          this.paramsDataList.push(data[i])
         }
       }
     },
@@ -179,38 +212,44 @@ export default {
         value: '',
         dataSelectId: '',
         name: '',
-        type: ''
-      };
-      this.dataItemList.forEach(item => {
+        type: '',
+      }
+      this.dataItemList.forEach((item) => {
         if (item.id == id) {
-          dataSelect.value = item.value;
-          dataSelect.dataSelectId = id;
-          dataSelect.name = item.name;
-          dataSelect.type = item.format;
+          dataSelect.value = item.value
+          dataSelect.dataSelectId = id
+          dataSelect.name = item.name
+          dataSelect.type = item.format
         }
-      });
+      })
 
-      this.selectDataItem = dataSelect;
+      this.selectDataItem = dataSelect
 
-      this.$emit('dataSelect', dataSelect);
-    }
+      $emit(this, 'dataSelect', dataSelect)
+    },
   },
   mounted() {
-    console.log(this.cell);
-    if (this.cell.type == 'modelServiceInput' || this.cell.type == 'dataServiceInput') {
-      this.selectDataItem = JSON.parse(JSON.stringify(this.cell.nodeAttribute.dataSelect));
+    console.log(this.cell)
+    if (
+      this.cell.type == 'modelServiceInput' ||
+      this.cell.type == 'dataServiceInput'
+    ) {
+      this.selectDataItem = JSON.parse(
+        JSON.stringify(this.cell.nodeAttribute.dataSelect)
+      )
     }
 
     if (this.cell.type == 'dataServiceOutput') {
       if (this.cell.nodeAttribute.upload) {
-        this.upload = true;
+        this.upload = true
       } else {
-        this.upload = false;
+        this.upload = false
       }
     }
-    this.init();
-  }
-};
+    this.init()
+  },
+  emits: ['isUpload', 'dataSelect'],
+}
 </script>
 
 <style lang="scss" scoped>
@@ -238,7 +277,6 @@ export default {
     width: 100%;
   }
 }
-
 .eventDivider {
   >>> .el-divider--horizontal {
     margin: 5px 0;

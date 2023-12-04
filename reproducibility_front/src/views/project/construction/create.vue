@@ -1,11 +1,12 @@
-<!--  -->
 <template>
   <div class="main">
     <el-col :span="18" :offset="2">
       <el-form ref="form" :model="form" label-width="150px">
-        <el-form-item label="Name">
+        <el-form-item label="New Scenario Name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
+        <br>
+        <br>
         <el-form-item label="Scenerio Type">
           <el-radio v-model="form.type" label="sequentModels"
             >Sequent models</el-radio
@@ -16,10 +17,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer">
-        <!-- <el-button @click="resourceCollectDialog = false" size="mini"
-                >Cancle</el-button
-              > -->
-        <el-button type="primary" @click="setScenario()" size="mini"
+        <!-- <el-button @click="resourceCollectDialog = false" size="default"
+          >Cancel</el-button
+        > -->
+        <el-button type="primary" @click="setScenario()" size="default"
           >Create</el-button
         >
       </div>
@@ -28,6 +29,7 @@
 </template>
 
 <script>
+import { $emit } from "../../../utils/gogocodeTransfer";
 import {
   getProjectById,
   getModelsByPrivacy,
@@ -56,27 +58,27 @@ export default {
       isSearching: false,
     };
   },
-
   methods: {
     // transfer----------
     async currentModelChange(val) {
       await this.getPublicModels(val - 1);
     },
     async getPublicModels(val) {
-      let data = await getModelsByPrivacy("public", val, 20);
+      // console.log(val,'001');
+      // let data = await getModelsByPrivacy("public", val, 20);
 
-      this.total = data.totalElements;
-      this.modelList = data.content;
+      // this.total = data.totalElements;
+      // this.modelList = data.content;
 
-      var currentModelList = this.modelList.map((value) => {
-        return {
-          label: value.name,
-          key: value.id,
-          obj: value,
-        };
-      });
-      // 初始化数据
-      this.currentModelList = currentModelList;
+      // var currentModelList = this.modelList.map((value) => {
+      //   return {
+      //     label: value.name,
+      //     key: value.id,
+      //     obj: value,
+      //   };
+      // });
+      // // 初始化数据
+      // this.currentModelList = currentModelList;
     },
 
     // clearSearch() {
@@ -96,6 +98,7 @@ export default {
     },
 
     async setScenario() {
+      $emit(this, "createStatus", "success");
       let data = await saveScenario({
         projectId: this.projectId,
         name: this.form.name,
@@ -107,9 +110,9 @@ export default {
       this.project.scenario = data.id;
       await updateProject(this.projectId, this.project);
       if (this.isOverOne) {
-        this.$emit("createStatus", "success");
+        $emit(this, "createStatus", "success");
       } else {
-        this.$router.push({
+        this.$router.push({ 
           path: `/project/${this.projectId}/scenarios`,
         });
       }
@@ -118,11 +121,11 @@ export default {
   async mounted() {
     this.project = await getProjectById(this.$route.params.id);
 
-    if (this.project.scenario != null && this.project.scenario != "") {
-      this.$router.push({
-        path: `/project/${this.projectId}/scenarios`,
-      });
-    }
+    // if (this.project.scenario != null && this.project.scenario != '') {
+    //   this.$router.push({
+    //     path: `/project/${this.projectId}/scenarios`,
+    //   })
+    // }
     // console.log(this.project);
     if (
       this.project.resourceCollection != null &&
@@ -133,36 +136,46 @@ export default {
     this.init();
     // this.getData();
   },
+  emits: ["createStatus"],
 };
 </script>
 
 <style lang="scss" scoped>
 .main {
   width: 100%;
-  padding: 20px;
+  padding: 80px  5px;
+  .scenarioCard{
+    .el-card__body {
+      min-height: calc(100vh - 240px);
+    }
+  }
+  .createScenario {
+    overflow: auto;
+    :deep(.el-dialog__body) {
+      height: 801px;
+      overflow: auto;
+    }
+  }
 }
-
 .dialog-footer {
+  margin-top: 200px;
   float: right;
-
-  /* margin-bottom: 10px; */
 }
-
 .transfer {
   .mainContainer {
-    /deep/ .el-transfer-panel__body {
+    :deep(.el-transfer-panel__body) {
       height: 480px;
     }
-    /deep/ .el-transfer-panel {
+    :deep(.el-transfer-panel) {
       width: 250px;
     }
-    /deep/ .el-transfer-panel__list {
+    :deep(.el-transfer-panel__list) {
       height: 450px;
     }
-    /deep/ .el-transfer-panel__list.is-filterable {
+    :deep(.el-transfer-panel__list.is-filterable) {
       height: 400px;
     }
-    /deep/ .el-transfer__buttons .el-button {
+    :deep(.el-transfer__buttons .el-button) {
       display: block;
       margin-left: 0;
     }

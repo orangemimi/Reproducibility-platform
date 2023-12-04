@@ -29,4 +29,8 @@ public class ResultUtils {
         jsonResult.setData(null);
         return jsonResult;
     }
+    public static JsonResult error(String msg) {
+        return error(ResultEnum.CODE_WRONG.getCode(),msg);
+    }
+
 }

@@ -74,8 +74,7 @@ public class ProjectService {
         Project result= projectRepository.save(proj);
 
         //create project folder
-
-        Folder mainFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
+        Folder mainFolder = folderRepository.findByCreatorIdAndName(userId, "Main");
         AddFolderDTO addFolderDTO = AddFolderDTO.builder()
                 .level(1)
                 .tagId(proj.getId())

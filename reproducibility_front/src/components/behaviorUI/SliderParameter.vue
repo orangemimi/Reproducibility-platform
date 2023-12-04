@@ -9,21 +9,20 @@
     ></el-slider>
   </div>
 </template>
+
 <script>
 export default {
   props: {
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     initParameter: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   created() {
-    this.initParameter.value = new Number(this.initParameter.value).valueOf();
-  }
-};
+    this.initParameter.value = new Number(this.initParameter.value).valueOf()
+  },
+}
 </script>
-
-<style></style>

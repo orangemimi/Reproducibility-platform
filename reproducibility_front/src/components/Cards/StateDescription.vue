@@ -1,4 +1,3 @@
-<!-- card -->
 <template>
   <div class="main">
     <el-card class="cardBody" shadow="hover">
@@ -24,8 +23,10 @@ export default {
 
   watch: {
     stateItem: {
+      deep: true,
+
       handler(val) {
-        this.item = val;
+        this.item = val
       },
     },
   },
@@ -34,23 +35,23 @@ export default {
     return {
       item: this.stateItem,
       // toolPreview
-    };
+    }
   },
 
   methods: {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .main {
   width: 100%;
-  padding: 0;
-
-  // /deep/ .el-card:hover {
+  padding: 0; /*// ::v-deep .el-card:hover {
+*/
   //   background-color: #3067d61c;
   //   border: 0.5px solid #25252534;
   // }
 
-  /deep/ .el-card__body {
+  :deep(.el-card__body)  {
     padding: 5px;
     // height: 40px;
     background: rgb(221, 238, 249);

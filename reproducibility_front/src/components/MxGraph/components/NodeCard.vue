@@ -1,12 +1,12 @@
 <template>
-  <div class style="width:100%">
+  <div class style="width: 100%">
     <el-col :span="24">
       <div class="card">
         <!-- <img
-          v-bind="nodeInfo"
-          :src="`/static/images/ele/${nodeInfo}`"
-          :alt="nodeInfo.title"
-        />-->
+              v-bind="nodeInfo"
+              :src="`/static/images/ele/${nodeInfo}`"
+              :alt="nodeInfo.title"
+            />-->
         <!-- <i :class="nodeInfo"></i> -->
         <div>
           <span>{{ nodeInfo.toolName }}</span>
@@ -23,39 +23,40 @@
 export default {
   props: {
     item: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   watch: {
     item: {
       handler(val) {
-        this.nodeInfo = val;
+        this.nodeInfo = val
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   components: {},
   data() {
     return {
-      nodeInfo: this.item
-    };
+      nodeInfo: this.item,
+    }
   },
   methods: {},
   created() {},
-  mounted() {}
-};
+  mounted() {},
+}
 </script>
+
 <style scoped>
 .card {
   text-align: center;
   height: 50px;
   line-height: 50px;
   margin-bottom: 20px;
-
   transition: all 0.2s ease-in-out;
   border-radius: 4px;
   background: #ffffff;
-  box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.13), 0px 0px 2.9px rgba(0, 0, 0, 0.11);
+  box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.13),
+    0px 0px 2.9px rgba(0, 0, 0, 0.11);
 }
 .card:hover {
   cursor: pointer;

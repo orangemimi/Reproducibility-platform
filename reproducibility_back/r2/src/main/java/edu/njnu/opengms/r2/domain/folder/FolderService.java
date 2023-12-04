@@ -55,7 +55,8 @@ public class FolderService {
             newFolder.put("parent", item.getParent());
             newFolder.put("childrenIds", item.getChildren());
             newFolder.put("isFolder", true);
-
+            newFolder.put("tagId", item.getTagId());
+            //如果文件夹里有数据，就把数据也传出去
             JSONArray newChildren = new JSONArray();
             if (item.getDataList() != null && item.getDataList().size()!=0) {
                 List<DataItem> newChildWithData = dataItemRepository.findAllByIdIn(item.getDataList());
@@ -99,7 +100,6 @@ public class FolderService {
         List<JSONObject> returnFolders = newFolderList.stream()
                 .filter(s->s.get("level").equals(0))
                 .collect(Collectors.toList());
-;
         return  returnFolders;
 
     }

@@ -1,4 +1,3 @@
-<!--  -->
 <template>
   <div class="main">
     <!-- <el-row :gutter="20"> -->
@@ -6,7 +5,7 @@
     <el-col :span="3" class="scenario">
       <el-row> </el-row>
       <el-row>
-        <h3 style="text-align:center;margin-bottom: 10px;">Scenario list</h3>
+        <h3 style="text-align: center; margin-bottom: 10px">Scenario list</h3>
         <!-- TODO-ZZY ADD NEW SCENARIO -->
         <div
           v-for="(item, key) in allScenarioList"
@@ -15,9 +14,7 @@
         >
           <scenario-card :secnarioForm="item"></scenario-card>
         </div>
-        <el-button @click="createNewScenario">
-          + New scienario
-        </el-button>
+        <el-button @click="createNewScenario"> + New scienario </el-button>
       </el-row>
     </el-col>
 
@@ -25,9 +22,7 @@
       <div class="scenarioCard">
         <el-card>
           <el-col :span="4">
-            <h3 style="text-align:left;margin-bottom: 10px;">
-              Resources
-            </h3>
+            <h3 style="text-align: left; margin-bottom: 10px">Resources</h3>
 
             <resource-toolbar
               :modelList="chosenScenario.resourceCollection.modelList"
@@ -35,8 +30,8 @@
             ></resource-toolbar>
           </el-col>
           <el-col :span="20">
-            <el-row style="float:right;margin-right:10px">
-              <div style="float:left;margin-right:10px">
+            <el-row style="float: right; margin-right: 10px">
+              <div style="float: left; margin-right: 10px">
                 Binded to reviewer
               </div>
               <el-tooltip
@@ -64,7 +59,7 @@
 
     <div class="createScenario">
       <el-dialog
-        :visible.sync="createScenarioDialog"
+        v-model="createScenarioDialog"
         width="1200px"
         title="Create a new scenario"
         :close-on-click-modal="false"
@@ -86,13 +81,13 @@ import {
   getProjectById,
   getScenarioById,
   getScenariosByProjectId,
-} from "@/api/request";
+} from '@/api/request'
 
-import scenarioCard from "_com/Cards/ScenarioListCard.vue";
-import createScenario from "./../construction/index.vue";
+import scenarioCard from '_com/Cards/ScenarioListCard.vue'
+import createScenario from './../construction/index.vue'
 
-import resourceToolbar from "./Toolbars/ResourceToolbar";
-import modelContent from "./Toolbars/ModelContent";
+import resourceToolbar from './Toolbars/ResourceToolbar'
+import modelContent from './Toolbars/ModelContent.vue'
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
   components: {
@@ -116,61 +111,59 @@ export default {
       chosenScenario: {},
       currentModel: {},
       createScenarioDialog: false,
-    };
+    }
   },
 
   methods: {
     async init() {
-      this.project = await getProjectById(this.projectId);
+      this.project = await getProjectById(this.projectId)
 
-      this.chosenScenario = await getScenarioById(this.project.scenario);
-      this.chosenScenario.isBinded = true;
-      this.currentModel = this.chosenScenario.resourceCollection.modelList[0];
+      this.chosenScenario = await getScenarioById(this.project.scenario)
+      this.chosenScenario.isBinded = true
+      this.currentModel = this.chosenScenario.resourceCollection.modelList[0]
 
-      this.allScenarioList = await getScenariosByProjectId(this.projectId);
-      let binded = {};
+      this.allScenarioList = await getScenariosByProjectId(this.projectId)
+      let binded = {}
       this.allScenarioList.forEach((element, index) => {
         if (element.id == this.project.scenario) {
-          element.isBinded = true;
-          binded = element;
-          this.allScenarioList.splice(index, 1);
+          element.isBinded = true
+          binded = element
+          this.allScenarioList.splice(index, 1)
         }
-      });
+      })
 
-      this.allScenarioList.unshift(binded);
+      this.allScenarioList.unshift(binded)
     },
 
     async chooseScenario(item) {
-      this.chosenScenario = await getScenarioById(item.id);
-      this.chosenScenario.isBinded = true;
+      this.chosenScenario = await getScenarioById(item.id)
+      this.chosenScenario.isBinded = true
     },
 
     createNewScenario() {
-      this.createScenarioDialog = true;
+      this.createScenarioDialog = true
     },
 
     selectModel(val) {
-      this.currentModel = val;
+      this.currentModel = val
     },
     createStatus(val) {
-      if (val == "success") {
-        this.createScenarioDialog = false;
-        this.init();
+      if (val == 'success') {
+        this.createScenarioDialog = false
+        this.init()
       }
     },
   },
 
   mounted() {
-    this.init();
+    this.init()
   },
-};
+}
 </script>
+
 <style lang="scss">
 .main {
-  width: 100%;
-  // padding: 5px 10px;
-  /* min-height: calc(100vh - 240px); */
-
+  width: 100%; /*// padding: 5px 10px;*/
   .scenario {
     background-color: #3067d61c;
   }

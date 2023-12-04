@@ -15,8 +15,7 @@
 
           <div
             class="infinite-list-wrapper"
-            style="overflow:auto; margin:40px 30px 0 0
-            "
+            style="overflow: auto; margin: 40px 30px 0 0"
           >
             <ul class="list">
               <li
@@ -46,28 +45,29 @@
 </template>
 
 <script>
-import config from "./components/config.vue";
-import { get } from "@/axios";
+import { $on, $off, $once, $emit } from '../../../../utils/gogocodeTransfer'
+import config from './components/config.vue'
+import { get } from '@/axios'
 
 export default {
   data() {
     return {
       id: this.$route.params.id,
       choosenService: null,
-      choosenServiceType: "",
+      choosenServiceType: '',
       modelServices: [],
       dataServices: {},
       // dataProcessServices: [],
-    };
+    }
   },
   methods: {
     goBack() {
-      this.$emit("getPageFlag", "echarts");
+      $emit(this, 'getPageFlag', 'echarts')
     },
     async load() {
-      let { modelServices } = await get("/g2s/{id}/computeServices", null, {
+      let { modelServices } = await get('/g2s/{id}/computeServices', null, {
         id: this.id,
-      });
+      })
       // debugger;
       modelServices.forEach((modelService) => {
         if (modelService.behavior.parameters != null) {
@@ -76,37 +76,38 @@ export default {
               parameter.defaultValue != null ||
               parameter.defaultValue != undefined
             ) {
-              parameter.value = parameter.defaultValue;
+              parameter.value = parameter.defaultValue
             }
-          });
+          })
         }
-      });
-      this.modelServices = modelServices;
+      })
+      this.modelServices = modelServices
 
-      this.choosenService = this.modelServices[0];
-      this.choosenServiceType = "MODEL";
-      this.getDataServices();
+      this.choosenService = this.modelServices[0]
+      this.choosenServiceType = 'MODEL'
+      this.getDataServices()
     },
     show(choosen, type) {
-      this.choosenService = {};
-      this.type = "";
-      this.$set(this, "choosenService", choosen);
-      this.$set(this, "choosenServiceType", type);
-      this.getDataServices();
+      this.choosenService = {}
+      this.type = ''
+      this['choosenService'] = choosen
+      this['choosenServiceType'] = type
+      this.getDataServices()
     },
     async getDataServices() {
-      let id = this.$route.params.id;
-      let dataServices = await get("/g2s/{id}/dataServices", null, {
+      let id = this.$route.params.id
+      let dataServices = await get('/g2s/{id}/dataServices', null, {
         id,
-      });
-      this.dataServices = dataServices;
+      })
+      this.dataServices = dataServices
     },
   },
   mounted() {
     // this.load();
   },
   components: { config },
-};
+  emits: ['getPageFlag'],
+}
 </script>
 
 <style scoped>

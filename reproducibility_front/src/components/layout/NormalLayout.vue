@@ -8,14 +8,14 @@
         <router-view name="main"></router-view>
       </el-main>
       <!-- <el-footer>
-        <router-view name="footer"></router-view>
-      </el-footer> -->
+            <router-view name="footer"></router-view>
+          </el-footer> -->
     </el-container>
   </div>
 </template>
 
 <script>
-export default {};
+export default {}
 </script>
 
 <style scoped>

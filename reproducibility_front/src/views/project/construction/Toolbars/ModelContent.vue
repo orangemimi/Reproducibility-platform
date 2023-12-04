@@ -1,7 +1,9 @@
-<!--  -->
 <template>
-  <div>
-    <div class="main">
+  <el-container style="width: 100%; height: 100%">
+    <div v-if="codingOlShow" class="main">
+      <coding-OL :scenarioId="scenarioId"></coding-OL>
+    </div>
+    <div v-else-if="modelItem" class="main">
       <el-row class="title">
         <el-col>{{ modelItem.name }}</el-col>
       </el-row>
@@ -13,106 +15,112 @@
         <el-col :span="7">
           <el-button
             type="success"
-            size="mini"
-            style="float:right"
+            size="normal"
+            style="float: right"
             @click="getInstances"
           >
-            <i class="el-icon-setting"></i>&nbsp;Instances
+            <el-icon><el-icon-setting /></el-icon>&nbsp;Instances
           </el-button>
           <el-button
             type="primary"
-            size="mini"
+            size="normal"
             :disabled="!canInvoke"
             @click="initInvoke"
-            style="float:right;margin-right:5px"
+            style="float: right; margin-right: 5px"
           >
-            <i class="el-icon-setting"></i>&nbsp;Invoke
+            <el-icon><el-icon-setting /></el-icon>&nbsp;Invoke
           </el-button>
         </el-col>
       </el-row>
       <el-row class="table">
-        <div v-for="(state, index) in modelItem.behavior" :key="index">
-          <el-row>
-            <state-description :stateItem="state"></state-description>
-          </el-row>
+        <el-col>
+          <div v-for="(state, index) in modelItem.behavior" :key="index">
+            <el-row>
+              <state-description :stateItem="state"></state-description>
+            </el-row>
 
-          <el-table
-            border
-            :data="filterCurrentAllEventsWithStates(state)"
-            :row-class-name="tableRowClassName"
-            @expand-change="handleExpandChange"
-            :span-method="arraySpanMethod"
-            @row-click="rowClick"
-          >
-            <el-table-column key="need" type="expand" width="30">
-              <template slot-scope="props">
-                <el-table
-                  border
-                  :data="props.row.datasetItem.UdxDeclarationNew"
-                >
-                  <el-table-column prop="name" label="Event name" width="180">
-                  </el-table-column>
-                  <el-table-column
-                    prop="description"
-                    label="Description"
-                  ></el-table-column>
-                  <el-table-column
-                    width="150"
-                    prop="type"
-                    label="Type"
-                  ></el-table-column>
-                  <el-table-column width="150" prop="value" label="Value">
-                    <template slot-scope="scope">
-                      <el-input v-model="scope.row.value"></el-input>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </template>
-            </el-table-column>
-            <el-table-column label="Event name" width="180">
-              <template slot-scope="scope">
-                <span class="event_name" :title="scope.row.name">
-                  <span
-                    v-show="scope.row.isOptional == false"
-                    style="color: red"
-                    >*</span
+            <el-table
+              border
+              :data="filterCurrentAllEventsWithStates(state)"
+              :row-class-name="tableRowClassName"
+              @expand-change="handleExpandChange"
+              :span-method="arraySpanMethod"
+              @row-click="rowClick"
+              style="width: 100%"
+            >
+              <!-- <el-table-column key="need" type="expand" width="30">
+                <template v-slot="props">
+                  <el-table
+                    border
+                    :data="props.row.datasetItem.UdxDeclarationNew"
                   >
-                  {{ scope.row.name }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="description"
-              label="Description"
-            ></el-table-column>
-            <el-table-column
-              width="110"
-              prop="type"
-              label="Type"
-            ></el-table-column>
-            <el-table-column label="Value" width="260">
-              <template slot-scope="scope">
-                <div v-if="scope.row.type == 'parameters'">
-                  <!-- <el-input v-model="scope.row.value"></el-input> -->
-                </div>
-                <div v-if="scope.row.type == 'inputs'">
-                  <template>
+                    <el-table-column prop="name" label="Event name" width="180">
+                    </el-table-column>
+                    <el-table-column
+                      prop="description"
+                      label="Description"
+                    ></el-table-column>
+                    <el-table-column
+                      width="150"
+                      prop="type"
+                      label="Type"
+                    ></el-table-column>
+                    <el-table-column width="150" prop="value" label="Value">
+                      <template v-slot="scope">
+                        <el-input v-model="scope.row.value"></el-input>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </template>
+              </el-table-column> -->
+              <el-table-column label="Event name" width="180">
+                <template v-slot="scope">
+                  <span class="event_name" :title="scope.row.name">
+                    <span
+                      v-show="scope.row.isOptional == false"
+                      style="color: red"
+                      >*</span
+                    >
+                    {{ scope.row.name }}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="description"
+                label="Description"
+              ></el-table-column>
+              <el-table-column
+                width="110"
+                prop="type"
+                label="Type"
+              ></el-table-column>
+              <el-table-column label="Value" width="260">
+                <template v-slot="scope">
+                  <div v-if="scope.row.type == 'parameters'">
+                    <!-- <button @click="test(scope)">123</button> -->
+                    <el-input
+                      v-model="scope.row.inputValue"
+                      @change="parametersInput(scope, scope.row)"
+                    ></el-input>
+                    <!-- <el-input :value="" @change="parametersInput(scope.row)"></el-input> -->
+                  </div>
+                  <div v-if="scope.row.type == 'inputs'">
                     <SelectTree
                       :treeData="dataFolderList"
                       :treeEvent="scope.row"
                       @refreshData="refreshData"
                     ></SelectTree>
-                  </template>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-col>
       </el-row>
     </div>
     <div class="selectData">
       <el-dialog
-        :visible.sync="instanceDialogShow"
+        v-model="instanceDialogShow"
         width="900px"
         title="Insatnces"
         :close-on-click-modal="false"
@@ -120,12 +128,12 @@
       >
         <el-table
           :data="modelInstanceList"
-          style="width: 100%;"
+          style="width: 100%"
           :row-class-name="tableRowClassNameofInstance"
           @expand-change="handleExpandChange"
         >
           <el-table-column type="expand">
-            <template slot-scope="props">
+            <template v-slot="props">
               <h1>Model Configuration</h1>
               <br />
               <hr />
@@ -140,7 +148,7 @@
                   </el-row>
                   <el-table
                     :data="filterCurrentAllEventsWithStates(state)"
-                    style="width: 100%;"
+                    style="width: 100%"
                     :row-class-name="tableRowClassName"
                     type="expand"
                   >
@@ -152,41 +160,41 @@
                     </el-table-column>
 
                     <el-table-column label="Data Download or Parameters Value">
-                      <template slot-scope="scope">
+                      <template v-slot="scope">
                         <div v-if="scope.row.type == 'parameters'">
-                          <template slot-scope="props">
-                            <el-table
-                              border
-                              :data="props.row.datasetItem.UdxDeclarationNew"
-                            >
-                              <el-table-column
-                                prop="name"
-                                label="Event name"
-                                width="180"
+                          <!-- <template v-slot="props">
+                              <el-table
+                                border
+                                :data="props.row.datasetItem.UdxDeclarationNew"
                               >
-                              </el-table-column>
-                              <el-table-column
-                                prop="description"
-                                label="Description"
-                              ></el-table-column>
-                              <el-table-column
-                                width="150"
-                                prop="type"
-                                label="Type"
-                              ></el-table-column>
-                              <el-table-column
-                                width="150"
-                                prop="value"
-                                label="Value"
-                              >
-                                <template slot-scope="scope">
-                                  <el-input
-                                    v-model="scope.row.value"
-                                  ></el-input>
-                                </template>
-                              </el-table-column>
-                            </el-table>
-                          </template>
+                                <el-table-column
+                                  prop="name"
+                                  label="Event name"
+                                  width="180"
+                                >
+                                </el-table-column>
+                                <el-table-column
+                                  prop="description"
+                                  label="Description"
+                                ></el-table-column>
+                                <el-table-column
+                                  width="150"
+                                  prop="type"
+                                  label="Type"
+                                ></el-table-column>
+                                <el-table-column
+                                  width="150"
+                                  prop="value"
+                                  label="Value"
+                                >
+                                  <template v-slot="scope">
+                                    <el-input
+                                      v-model="scope.row.value"
+                                    ></el-input>
+                                  </template>
+                                </el-table-column>
+                              </el-table>
+                            </template> -->
                         </div>
                         <el-button
                           v-else
@@ -194,7 +202,8 @@
                           round
                           @click="download(scope.row, props.row)"
                         >
-                          <i class="el-icon-download"></i>Download</el-button
+                          <el-icon><el-icon-download /></el-icon
+                          >Download</el-button
                         >
                       </template>
                     </el-table-column>
@@ -207,32 +216,46 @@
           <el-table-column label="createTime" prop="createTime">
           </el-table-column>
           <el-table-column label="statusEnum" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-tag
-                v-if="scope.row.status === '2'"
+                v-if="scope.row.status == '2'"
                 type="success"
                 disable-transitions
               >
                 Success
               </el-tag>
               <el-tag
-                v-else-if="scope.row.status === '-1'"
-                type="info"
+                v-else-if="scope.row.status == '-1'"
+                type="error"
                 disable-transitions
                 >Failure
               </el-tag>
-              <el-tag v-else type="info" disable-transitions>Running </el-tag>
+              <el-tag
+                v-else-if="scope.row.status == '0'"
+                type="primary"
+                disable-transitions
+                >initialized
+              </el-tag>
+              <el-tag
+                v-else-if="scope.row.status == '1'"
+                type="primary"
+                disable-transitions
+                >started
+              </el-tag>
+              <el-tag v-else type="error" disable-transitions
+                >{{ scope.row.status }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column label="Operation">
-            <template slot-scope="props">
+            <template v-slot="props">
               <el-button
                 v-show="props.row.status === '2'"
                 :type="isBound(props.row) ? 'success' : 'primary'"
                 round
                 @click="toggleBindStatus(props.row)"
               >
-                <i class="el-icon-check"></i>
+                <el-icon><el-icon-check /></el-icon>
                 {{ isBound(props.row) ? "bound" : "bind" }}
               </el-button>
             </template>
@@ -244,7 +267,7 @@
 
     <div class="selectData">
       <el-dialog
-        :visible.sync="selectDataDialogShow"
+        v-model="selectDataDialogShow"
         width="900px"
         title="Select data from resource center or upload"
         :close-on-click-modal="false"
@@ -258,7 +281,7 @@
     </div>
 
     <el-dialog
-      :visible.sync="modelInvokeDialogShow"
+      v-model="modelInvokeDialogShow"
       width="500px"
       title="Enter the instance name to invoke the model"
       :close-on-click-modal="false"
@@ -268,25 +291,34 @@
         v-model="modelInstanceName_input"
         placeholder="请输入内容"
       ></el-input>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="modelInvokeDialogShow = false">Cancle</el-button>
-        <el-button type="primary" @click="startInvoke"
-          >Start to invoke</el-button
-        >
-      </span>
+      <template v-slot:footer>
+        <span class="dialog-footer">
+          <el-button @click="modelInvokeDialogShow = false">Cancel</el-button>
+          <el-button type="primary" @click="startInvoke"
+            >Start to invoke</el-button
+          >
+        </span>
+      </template>
     </el-dialog>
-  </div>
+  </el-container>
 </template>
 
 <script>
+import {
+  Setting as ElIconSetting,
+  Download as ElIconDownload,
+  Check as ElIconCheck,
+} from "@element-plus/icons-vue";
 import ResourceTable from "./DataTable.vue";
 import StateDescription from "_com/Cards/StateDescription.vue";
+import codingOL from "../../../../components/codingOL/codingOL.vue";
 import {
   saveData,
   invokeSingleModel,
   initTask,
   saveInstance,
   updateInstance,
+  getInstanceById,
   getRecordofSingleModel,
   getInstancesInScenario,
   bindScenario,
@@ -296,9 +328,18 @@ import {
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
-import SelectTree from "_com/SelectTree/tree";
+import SelectTree from "_com/SelectTree/tree.vue";
 import { dateFormat } from "@/lib/utils";
 export default {
+  components: {
+    ResourceTable,
+    StateDescription,
+    SelectTree,
+    codingOL,
+    ElIconSetting,
+    ElIconDownload,
+    ElIconCheck,
+  },
   props: {
     currentModel: {
       type: Object,
@@ -306,9 +347,10 @@ export default {
     scenarioId: {
       type: String,
     },
+    codingOlShow: {
+      type: Boolean,
+    },
   },
-  components: { ResourceTable, StateDescription, SelectTree },
-
   watch: {
     currentModel: {
       async handler(newVal) {
@@ -322,16 +364,15 @@ export default {
       immediate: true,
     },
   },
-
   computed: {
     ...mapState({
       userId: (state) => state.user.userId,
     }),
     //把获取数据中的name字段分开
   },
-
   data() {
     return {
+      codingShow: false,
       projectId: this.$route.params.id, //projectId
       modelInstanceName_input: "",
       modelInvokeDialogShow: false,
@@ -380,26 +421,53 @@ export default {
       },
     };
   },
-
   methods: {
+    print(val) {
+      console.log(val, "-----print-----");
+    },
+    parametersInput(scope, row) {
+      console.log(scope, row, "101");
+      for (let behavior of this.currentModel.behavior) {
+        for (let parameter of behavior.parameters) {
+          if (row.eventId === parameter.eventId) {
+            parameter.value = row.inputValue;
+          }
+        }
+      }
+    },
     refreshData(val) {
       if (val) {
         this.getFolders();
       }
-      console.log("refresh");
+      // console.log("refresh");
     },
     rowClick(row) {
-      console.log("row", row);
+      // console.log("row", row);
       this.currentRow = row;
     },
     async getFolders() {
       let data = await getFolders();
       let dataFolderList = data[0].children.filter(
-        (item) => (item.tagId = this.projectId)
+        (item) => item.tagId == this.projectId
       );
       this.dataFolderList = dataFolderList[0].children.filter(
-        (item) => (item.tagId = this.scenarioId)
+        (item) => item.tagId == this.scenarioId
       );
+      //将绑定所有实例的输出数据也添加到dataFolderList当中
+      var boundInstanceOutput = [];
+      var OutputFolderList = {};
+      if (this.scenarioId) {
+        this.scenario = await getScenarioById(this.scenarioId);
+        this.boundInstances = this.scenario.instances;
+        for (var boundInstance of this.boundInstances) {
+          var instance = await getInstanceById(boundInstance);
+          boundInstanceOutput.push(...instance.behavior[0].outputs);
+        }
+        OutputFolderList.name = "Output of bound instances";
+        OutputFolderList.children = boundInstanceOutput;
+        console.log(OutputFolderList, "over");
+        this.dataFolderList.push(OutputFolderList);
+      }
 
       // todo --只在project内展示所有project的
     },
@@ -431,15 +499,15 @@ export default {
       }
     },
     arraySpanMethod({ row, columnIndex }) {
-      if (row.type == "parameters") {
-        if (columnIndex === 3) {
-          return {
-            // 删除第一列（columnIndex === 0），第3、4行单元格
-            rowspan: 1,
-            colspan: 2,
-          };
-        }
-      }
+      // if (row.type == "parameters") {
+      //   if (columnIndex === 3) {
+      //     return {
+      //       // 删除第一列（columnIndex === 0），第3、4行单元格
+      //       rowspan: 1,
+      //       colspan: 2,
+      //     };
+      //   }
+      // }
     },
 
     tableRowClassName({ row, rowIndex }) {
@@ -566,6 +634,7 @@ export default {
     },
 
     async getInstances() {
+      console.log(this.boundInstances, "bound");
       await this.getScenario(this.scenarioId);
       this.instanceDialogShow = true;
       this.modelInstanceList = await getInstancesInScenario(
@@ -596,21 +665,25 @@ export default {
         this.modelItem.name + "  ||  " + dateFormat(new Date());
       this.modelInvokeDialogShow = true;
     },
-
+    // 开始invoke模型
     async startInvoke() {
       this.modelInvokeDialogShow = false;
-      debugger;
+      // debugger;
       try {
+        console.log("1");
         await this.createFilefromParam();
+        console.log("2");
         await this.createInvokeForm();
         //invoke
+        console.log(this.invokeForm, "3");
+
         let data = await invokeSingleModel(this.invokeForm);
-        console.log(data, "invoke");
+        console.log(data, data.data, "invoke");
         let refreshForm = {
           ip: this.invokeForm.ip,
           port: this.invokeForm.port,
         };
-        console.log("refresh form", refreshForm);
+        console.log("refresh form", refreshForm, data);
         if (data == null) {
           this.$message({
             message: "You have run the model failed",
@@ -619,11 +692,16 @@ export default {
           await this.emitInstance(-1, this.modelItem, refreshForm);
         } else {
           refreshForm.tid = data.data.tid;
+          console.log("4");
           await this.emitInstance(0, this.modelItem, refreshForm);
         }
+        this.$message({
+          message: "Start calculation",
+          type: "success",
+        });
       } catch {
         this.$message({
-          type: "info",
+          type: "error",
           message: "invoke failed",
         });
       }
@@ -693,11 +771,7 @@ export default {
           if (state.name == el.statename) {
             state.outputs.forEach((event, eventIndex) => {
               if (el.event == event.name) {
-                this.$set(
-                  instance.behavior[index].outputs[eventIndex],
-                  "value",
-                  el.url
-                );
+                instance.behavior[index].outputs[eventIndex]["value"] = el.url;
               }
             });
           }
@@ -726,7 +800,7 @@ export default {
               statename: state.name,
               event: item.name,
               tag: item.name,
-              value: item.value,
+              url: item.value,
             };
 
             this.invokeForm.inputs.push(detail);
@@ -765,19 +839,41 @@ export default {
     // 将参数绑定为一个xml文件，上传，返回url绑定到mdl
     async createFilefromParam() {
       let stateList = this.modelItem.behavior;
+      console.log(stateList, "0");
       for (let i = 0; i < stateList.length; i++) {
         let events = stateList[i].parameters;
         if (events.length == 0) {
           return;
         }
+        console.log("1.1");
         for (let j = 0; j < events.length; j++) {
           let content = "";
           // let uploadFileForm = new FormData();
-          let udxNodeList = events[j].datasetItem.UdxDeclarationNew;
+
+          //这一块应该是重新梳理过的模型结构，是新改的，但是跟以前的不适配，暂时注释掉
+          // let udxNodeList = events[j].datasetItem.UdxDeclarationNew;
+          // for (let k = 0; k < udxNodeList.length; k++) {
+          //   if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
+          //     content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
+          //     // content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`;
+
+          //   }
+          // }
+
+          let udxNodeList = events[j].datasetItem.UdxDeclaration;
+          console.log(udxNodeList, "1.2");
           for (let k = 0; k < udxNodeList.length; k++) {
-            if (Object.hasOwnProperty.call(udxNodeList[k], "value")) {
-              content += `<XDO name="${udxNodeList[k].name}" kernelType="${udxNodeList[k].type}" value="${udxNodeList[k].value}" />`;
-              // content += `<XDO name="${udxNodeList[k].name}" kernelType="real" value="${udxNodeList[k].value}" />`;
+            console.log(udxNodeList[k].UdxNode[0].UdxNode[0], "1.3");
+            udxNodeList[k].UdxNode[0].UdxNode[0].value = events[j].inputValue;
+            if (
+              Object.hasOwnProperty.call(
+                udxNodeList[k].UdxNode[0].UdxNode[0],
+                "value"
+              )
+            ) {
+              content += `<XDO name="${udxNodeList[k].UdxNode[0].UdxNode[0].name}" kernelType="string" value="${udxNodeList[k].UdxNode[0].UdxNode[0].value}" />`;
+              // content += `<XDO name="${udxNodeList[k].UdxNode[0].UdxNode[0].name}" kernelType=${udxNodeList[k].UdxNode[0].UdxNode[0].type} value="${udxNodeList[k].UdxNode[0].UdxNode[0].value}" />`;
+              // content += `<XDO name="${udxNodeList[k].name}" kernelType="real"${udxNodeList[k].UdxNode[0].UdxNode[0].type} value="${udxNodeList[k].value}" />`;
             }
           }
           console.log("content", content);
@@ -805,18 +901,14 @@ export default {
         renderSize(fileItem.size),
         "intermediate"
       );
-      this.$set(
-        this.modelItem.behavior[stateIndex].parameters[eventIndex],
-        "value",
-        // data.value
-        data
-      );
+      this.modelItem.behavior[stateIndex].parameters[eventIndex]["value"] =
+        data;
     },
     //在点击model的时候就初始化一个task，获取模型所在位置的ip，端口，md5值（模型的唯一标识符）
     async initTask() {
       //get task ip port ...
+      console.log(this.modelItem.md5, "md5");
       let { data } = await initTask(this.modelItem.md5);
-
       if (data == undefined || data == "") {
         this.canInvoke = false;
         this.$message.error("This model cannot be executed now");
@@ -829,40 +921,42 @@ export default {
       }
     },
   },
-
-  beforeDestroy() {
+  beforeUnmount() {
     clearInterval(this.timer);
   },
-
   async mounted() {
     this.getFolders();
   },
 };
 </script>
+
 <style lang="scss" scoped>
 .selectData {
-  /deep/.el-dialog {
+  :deep(.el-dialog) {
     height: 800px;
     overflow: auto;
   }
-  /deep/ .run-loading .el-table__expand-column .cell {
+  :deep(.run-loading .el-table__expand-column .cell) {
     display: none;
   }
 }
 .main {
-  .table {
-    /deep/ .el-table .parameter-row {
+  width: 100%;
+  height: 100%;
+  :deep(.table) {
+    width: 100%;
+    :deep(.el-table .parameter-row) {
       background: oldlace;
     }
 
-    /deep/ .el-table .input-row {
+    :deep(.el-table .input-row) {
       background: #f0f9eb;
     }
-    /deep/ .input-row .el-table__expand-column .cell {
+    :deep(.input-row .el-table__expand-column .cell) {
       display: none;
     }
 
-    /deep/ .output-row .el-table__expand-column .cell {
+    :deep(.output-row .el-table__expand-column .cell) {
       display: none;
     }
   }

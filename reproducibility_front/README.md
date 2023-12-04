@@ -1,56 +1,18 @@
-# r2
+# Vue 3 + TypeScript + Vite
 
-## Project setup
-```
-npm install
-```
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Recommended IDE Setup
 
-### Compiles and minifies for production
-```
-npm run build
-```
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-### Run your tests
-```
-npm run test
-```
+## Type Support For `.vue` Imports in TS
 
-### Lints and fixes files
-```
-npm run lint
-```
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
 
-### PORT设置
+If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
 
-- socketServer 7999
-- geoserver 8080
-- container 8081
-- r2 back 8082
-- r2 front 8083
-
-
-### 说明
-
-- 1.目前的数据服务下载是直接挂靠的容器的下载接口，并没有从复现研究平台进行转发
-- 2.服务的枚举 注意数据处理服务的 简称是PROCESS
-
-## 模拟验证服务
-
-获取数据的参考模板
-
-```javascript
-var dataUrl="http://localhost:8081/data_service/fetch/5eb12f37a6e62808b4922837";
-(async () => {
-        try {
-            let res = await fetch(dataUrl);
-            let text = await res.text();
-        } catch (e) {
-            console.log(e);
-        }
-})();
-```
+1. Disable the built-in TypeScript Extension
+   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
+   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
+2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.

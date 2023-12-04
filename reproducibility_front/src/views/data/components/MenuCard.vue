@@ -10,7 +10,9 @@
       <el-col class="row" :span="24">
         <div><span>排列方式</span></div>
       </el-col>
-      <el-col style="margin-top: 10px"><el-divider class="divider"></el-divider></el-col>
+      <el-col style="margin-top: 10px"
+        ><el-divider class="divider"></el-divider
+      ></el-col>
       <el-col class="row" :span="24">
         <div><span>分组依据</span></div>
       </el-col>
@@ -20,7 +22,9 @@
       <el-col class="row" :span="24">
         <div><span>复制</span></div>
       </el-col>
-      <el-col style="margin-top: 10px"><el-divider class="divider"></el-divider></el-col>
+      <el-col style="margin-top: 10px"
+        ><el-divider class="divider"></el-divider
+      ></el-col>
       <el-col class="row" :span="24">
         <div><span>粘贴</span></div>
       </el-col>
@@ -35,34 +39,34 @@
 </template>
 
 <script>
+import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
 export default {
   props: {
     position: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   computed: {
     styleVar() {
       return {
         '--left': this.position.x + 'px',
-        '--top': this.position.y + 'px'
-      };
-    }
+        '--top': this.position.y + 'px',
+      }
+    },
   },
   methods: {
     clickHander(type) {
-      this.$emit('menu', type);
-    }
+      $emit(this, 'menu', type)
+    },
   },
-
-  mounted() {}
-};
+  mounted() {},
+  emits: ['menu'],
+}
 </script>
 
 <style lang="scss" scoped>
 .card {
-  width: 200px;
-  //   height: 200px;
+  width: 200px; /*//   height: 200px;*/
   background-color: #202020;
   position: absolute;
   left: var(--left);

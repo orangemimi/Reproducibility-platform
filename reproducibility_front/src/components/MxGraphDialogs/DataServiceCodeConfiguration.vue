@@ -1,4 +1,3 @@
-<!--  -->
 <template>
   <div class="main">
     <el-form ref="form" :model="form" label-width="120px">
@@ -12,20 +11,41 @@
         <el-input v-model="form.token" size="mini"></el-input>
       </el-form-item>
       <el-form-item label="Dependency List">
-        <data-service-table :currentTable="form.dependencyItemList" :currentType="'dependency'" @addItem="addItem"></data-service-table>
+        <data-service-table
+          :currentTable="form.dependencyItemList"
+          :currentType="'dependency'"
+          @addItem="addItem"
+        ></data-service-table>
       </el-form-item>
       <el-form-item label="Input List">
-        <data-service-table :currentTable="form.inputItemList" :currentType="'input'" @addItem="addItem"></data-service-table>
+        <data-service-table
+          :currentTable="form.inputItemList"
+          :currentType="'input'"
+          @addItem="addItem"
+        ></data-service-table>
       </el-form-item>
       <el-form-item label="Parameter List">
-        <data-service-table :currentTable="form.parameteItemrList" :currentType="'parameter'" @addItem="addItem"></data-service-table>
+        <data-service-table
+          :currentTable="form.parameteItemrList"
+          :currentType="'parameter'"
+          @addItem="addItem"
+        ></data-service-table>
       </el-form-item>
       <el-form-item label="Output List">
-        <data-service-table :currentTable="form.outputItemList" :currentType="'output'" @addItem="addItem"></data-service-table>
+        <data-service-table
+          :currentTable="form.outputItemList"
+          :currentType="'output'"
+          @addItem="addItem"
+        ></data-service-table>
       </el-form-item>
       <el-form-item label="Type">
         <el-select class="code-mode-select" v-model="mode" @change="changeMode">
-          <el-option v-for="mode in modes" :key="mode.value" :label="mode.label" :value="mode.value"></el-option>
+          <el-option
+            v-for="mode in modes"
+            :key="mode.value"
+            :label="mode.label"
+            :value="mode.value"
+          ></el-option>
         </el-select>
       </el-form-item>
 
@@ -42,9 +62,9 @@
 </template>
 
 <script>
-import codeMirror from '_com/CodeMirror/CodeMirror';
-import dataServiceTable from '_com/MxGraphDialogs/DataServiceCodeTable';
-import { postDataServiceCode } from '@/api/request';
+import codeMirror from '_com/CodeMirror/CodeMirror'
+import dataServiceTable from '_com/MxGraphDialogs/DataServiceCodeTable'
+import { postDataServiceCode } from '@/api/request'
 export default {
   components: { codeMirror, dataServiceTable },
 
@@ -59,24 +79,24 @@ export default {
       modes: [
         {
           value: 'clike',
-          label: 'C'
+          label: 'C',
         },
         {
           value: 'html',
-          label: 'XML/HTML'
+          label: 'XML/HTML',
         },
         {
           value: 'x-java',
-          label: 'Java'
+          label: 'Java',
         },
         {
           value: 'x-python',
-          label: 'Python'
+          label: 'Python',
         },
         {
           value: 'x-sql',
-          label: 'SQL'
-        }
+          label: 'SQL',
+        },
       ],
       currentCode: '',
       form: {
@@ -87,45 +107,46 @@ export default {
         inputItemList: [],
         outputItemList: [],
         parameteItemrList: [],
-        code: ''
-      }
-    };
+        code: '',
+      },
+    }
   },
 
   methods: {
     changeMode() {},
     async submit() {
-      console.log(this.form);
-      await postDataServiceCode(this.form);
+      console.log(this.form)
+      await postDataServiceCode(this.form)
     },
     codeInput(val) {
-      this.currentCode = val;
-      this.form.code = val;
+      this.currentCode = val
+      this.form.code = val
     },
     addItem(val) {
       let item = {
         name: '',
         description: '',
-        type: ''
-      };
+        type: '',
+      }
       if (val == 'dependency') {
-        this.form.dependencyItemList.push(item);
+        this.form.dependencyItemList.push(item)
       }
       if (val == 'input') {
-        this.form.inputItemList.push(item);
+        this.form.inputItemList.push(item)
       }
       if (val == 'parameter') {
-        this.form.parameteItemrList.push(item);
+        this.form.parameteItemrList.push(item)
       }
       if (val == 'output') {
-        this.form.outputItemList.push(item);
+        this.form.outputItemList.push(item)
       }
-    }
+    },
   },
 
-  mounted() {}
-};
+  mounted() {},
+}
 </script>
+
 <style lang="scss" scoped>
 .main {
   .el-form-item {

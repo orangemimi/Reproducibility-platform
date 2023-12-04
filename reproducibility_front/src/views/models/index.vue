@@ -10,15 +10,13 @@
         <el-row class="top-info">
           <el-row class="top-title">Models</el-row>
           <el-row class="top-desc">Various, useful Models.</el-row>
-          <el-row class="top-desc"
-            >Collected by generous community of OpenGMS Team. 🎁</el-row
-          >
+          <el-row class="top-desc">Collected by generous community of OpenGMS Team. 🎁</el-row>
           <el-row class="input-container">
             <el-input
-              @keyup.enter.native="searchData"
+              @keyup.enter="searchData"
               v-model="value"
               placeholder=""
-              prefix-icon="el-icon-search"
+              :prefix-icon="ElIconSearch"
             ></el-input>
           </el-row>
           <el-row class="search-note"
@@ -33,7 +31,7 @@
         </el-row>
       </div>
     </div>
-    <div style="text-align: center;">
+    <div style="text-align: center">
       <el-pagination
         layout="prev, pager, next, jumper"
         :total="total"
@@ -51,32 +49,35 @@
           <el-col :span="6" v-for="(item, index) in data" :key="index">
             <div class="main-container">
               <el-card class="box-card" v-if="item.type == 'service'">
-                <el-col :span="4">
-                  <img :src="imgPath(item.snapshot, item.name)" />
-                </el-col>
-                <el-col :span="20">
-                  <div class="content">
-                    <h3 class="title" :title="item.name">{{ item.name }}</h3>
-                    <p class="desc" :title="item.description">
-                      {{ item.description }}
-                    </p>
-                  </div>
-                  <div>
-                    <el-button
-                      class="config-btn"
-                      type="success"
-                      @click="
-                        operateModel(item.id, judgeModelIsContained(item.id))
-                      "
-                      :icon="
-                        judgeModelIsContained(item.id)
-                          ? 'el-icon-remove'
-                          : 'el-icon-shopping-cart-2'
-                      "
-                      circle
-                    />
-                  </div>
-                </el-col>
+                <el-row>
+                  <el-col :span="4">
+                    <img :src="imgPath(item.snapshot, item.name)" />
+                  </el-col>
+                  <el-col :span="20">
+                    <div class="content">
+                      <h3 class="title" :title="item.name">{{ item.name }}</h3>
+                      <p class="desc" :title="item.description">
+                        {{ item.description }}
+                      </p>
+                    </div>
+                    <div>
+                      <el-button
+                        class="config-btn"
+                        type="success"
+                        @click="
+                          operateModel(item.id, judgeModelIsContained(item.id))
+                        "
+                        :icon="
+                          judgeModelIsContained(item.id)
+                            ? 'Remove'
+                            : 'ShoppingCart'
+                        "
+                        circle
+                      />
+                    </div>
+                  </el-col>
+                </el-row>
+
               </el-card>
             </div>
           </el-col>
@@ -87,7 +88,7 @@
     <!-- add model -->
     <el-dialog
       title="Add model in Reproducibilty"
-      :visible.sync="addModelDialogShow"
+      v-model="addModelDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -97,17 +98,18 @@
 </template>
 
 <script>
-import { updateUsersModel, getModelsByPrivacy, getUser } from "@/api/request";
+import { Search as ElIconSearch } from '@element-plus/icons-vue'
+import { updateUsersModel, getModelsByPrivacy, getUser } from '@/api/request'
 // import { addModelByMD5Local } from "@/api/request";
 // import serviceCard from "_com/Cards/ModelCardInPortal.vue";
-import createModel from "./create";
-import { imgBase64 } from "@/lib/utils";
+import createModel from './create.vue'
+import { imgBase64 } from '@/lib/utils'
 export default {
   data() {
     return {
       data: [],
       is_extending: false,
-      value: "",
+      value: '',
       pageFilter: {
         pageSize: 20,
         page: 0,
@@ -118,100 +120,102 @@ export default {
       modelList: [],
       selectedModels: [],
       currentUser: {},
-    };
+      ElIconSearch,
+    }
   },
   computed: {
     noMore() {
-      return this.count >= 20;
+      return this.count >= 20
     },
     disabled() {
-      return this.loading || this.noMore;
+      return this.loading || this.noMore
     },
   },
   methods: {
     imgPath(snapshot, name) {
       if (snapshot != undefined) {
-        return snapshot;
+        return snapshot
       } else {
-        return imgBase64(name);
+        return imgBase64(name)
       }
     },
     async operateModel(id, isContained) {
-      let newarray = [];
+      let newarray = []
       if (isContained) {
         //remove
-        newarray = this.selectedModels.filter((item) => item != id);
+        newarray = this.selectedModels.filter((item) => item != id)
       } else {
         if (this.selectedModels.length == 0) {
-          newarray = this.selectedModels = [id];
+          newarray = this.selectedModels = [id]
         } else {
-          newarray = this.selectedModels.concat(id);
+          newarray = this.selectedModels.concat(id)
         }
       }
-      let data = await updateUsersModel(newarray);
-      this.selectedModels = data.modelList;
-      console.log("newnew", newarray, data);
+      let data = await updateUsersModel(newarray)
+      this.selectedModels = data.modelList
+      console.log('newnew', newarray, data)
     },
 
     async getPublicModels(val) {
       let data = await getModelsByPrivacy({
-        privacy: "public",
+        privacy: 'public',
         currentPage: val,
         pageSize: 20,
-        key: "",
-      });
-      this.total = data.totalElements;
-      this.data = data.content;
+        key: '',
+      })
+      this.total = data.totalElements
+      this.data = data.content
+      console.log(this.data,'111');
     },
 
     judgeModelIsContained(modelId) {
-      return this.selectedModels.some((select) => select == modelId);
+      return this.selectedModels.some((select) => select == modelId)
     },
     async init() {
-      this.currentUser = await getUser();
+      this.currentUser = await getUser()
       if (
-        Object.prototype.hasOwnProperty.call(this.currentUser, "modelList") &&
+        Object.prototype.hasOwnProperty.call(this.currentUser, 'modelList') &&
         this.currentUser.modelList != null
       ) {
-        this.selectedModels = this.currentUser.modelList;
+        this.selectedModels = this.currentUser.modelList
       } else {
-        this.selectedModels = [];
+        this.selectedModels = []
       }
-      await this.getPublicModels(0);
+      await this.getPublicModels(0)
     },
     async currentChange(val) {
       this.data = (
         await getModelsByPrivacy({
-          privacy: "public",
+          privacy: 'public',
           currentPage: val - 1,
           pageSize: 20,
-          key: "",
+          key: '',
         })
-      ).content;
+      ).content
     },
     async searchData() {
       let params = {
         page: 0,
         pageSize: 20,
         searchText: this.value,
-      };
+      }
 
       let data = await getModelsByPrivacy({
-        privacy: "public",
+        privacy: 'public',
         currentPage: params.page,
         pageSize: params.pageSize,
         key: this.value,
-      });
-      this.total = data.totalElements;
-      this.data = data.content;
-      this.$forceUpdate();
+      })
+      this.total = data.totalElements
+      this.data = data.content
+      this.$forceUpdate()
     },
   },
   mounted() {
-    this.init();
+    this.init()
   },
   components: { createModel },
-};
+}
 </script>
 
 <style lang="scss">
@@ -236,15 +240,18 @@ export default {
     }
 
     .top-info {
+      display: flex;
+      flex-direction: column;
       position: absolute;
       left: 50%;
       top: 50%;
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;
-      font-family: Arial, Georgia, Times, "Times New Roman", serif;
+      font-family: Arial, Georgia, Times, 'Times New Roman', serif;
       .el-row {
         margin: 0.5rem 0;
+        margin-bottom: 3px;
       }
       .top-title {
         font-size: 3.5rem;
@@ -290,7 +297,7 @@ export default {
         height: 120px;
         /* 相对定位 */
         position: relative;
-        /deep/.el-card__body {
+        :deep(.el-card__body) {
           padding: 10px;
         }
         .content {

@@ -17,7 +17,9 @@
           :on-exceed="handleExceed"
           :on-remove="handRemove"
         >
-          <el-button size="small" type="success" style="margin-top: 10px">Select</el-button>
+          <el-button size="small" type="success" style="margin-top: 10px"
+            >Select</el-button
+          >
           <template #tip>
             <div class="el-upload__tip">Select the file you want to upload</div>
           </template>
@@ -29,47 +31,49 @@
 </template>
 
 <script>
-import { addFileItem } from '@/api/request';
+import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
+import { addFileItem } from '@/api/request'
 export default {
   props: {
     stack: {
-      type: Array
-    }
+      type: Array,
+    },
   },
   data() {
     return {
       form: {
-        name: ''
+        name: '',
       },
-      selectedFile: ''
-    };
+      selectedFile: '',
+    }
   },
   methods: {
     formHandleChange(file) {
-      this.selectedFile = file;
+      this.selectedFile = file
     },
     handleExceed() {
-      this.$message.warning(`当前限制选择 1 个文件`);
+      this.$message.warning(`当前限制选择 1 个文件`)
     },
     handRemove() {
-      this.selectedFile = '';
+      this.selectedFile = ''
     },
     submit() {
-      this.addFileItem();
+      this.addFileItem()
     },
     async addFileItem() {
       if (this.selectedFile != '') {
-        let formData = new FormData();
-        formData.append('name', this.form.name);
-        formData.append('parent', this.stack[this.stack.length - 1]);
-        formData.append('storey', this.stack.length - 1);
-        formData.append('datafile', this.selectedFile.raw);
-        let data = await addFileItem(formData);
-        this.$emit('uploadData', data);
+        let formData = new FormData()
+        formData.append('name', this.form.name)
+        formData.append('parent', this.stack[this.stack.length - 1])
+        formData.append('storey', this.stack.length - 1)
+        formData.append('datafile', this.selectedFile.raw)
+        let data = await addFileItem(formData)
+        $emit(this, 'uploadData', data)
       }
-    }
-  }
-};
+    },
+  },
+  emits: ['uploadData'],
+}
 </script>
 
 <style lang="scss" scoped>

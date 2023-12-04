@@ -15,10 +15,10 @@
           >
           <el-row class="input-container">
             <el-input
-              @keyup.enter.native="searchData"
+              @keyup.enter="searchData"
               v-model="value"
               placeholder=""
-              prefix-icon="el-icon-search"
+              :prefix-icon="ElIconSearch"
             ></el-input>
           </el-row>
           <el-row class="search-note"
@@ -84,7 +84,7 @@
     <!-- add model -->
     <el-dialog
       title="Add model in Reproducibilty"
-      :visible.sync="addModelDialogShow"
+      v-model="addModelDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -94,38 +94,39 @@
 </template>
 
 <script>
-import { getDataServiceByPortal } from "@/api/request";
-import dataServiceCard from "./components/DataServiceCard.vue";
-import createModel from "./create";
+import { Search as ElIconSearch } from '@element-plus/icons'
+import { getDataServiceByPortal } from '@/api/request'
+import dataServiceCard from './components/DataServiceCard.vue'
+import createModel from './create'
 export default {
   data() {
     return {
       data: [],
       total: 0,
-      value: "",
-      method: "conversion",
+      value: '',
+      method: 'conversion',
       select: 1,
       addModelDialogShow: false,
-    };
+      ElIconSearch,
+    }
   },
-
   methods: {
     searchData() {
-      this.getData(this.method, this.value);
+      this.getData(this.method, this.value)
     },
 
     async changeSelect(val) {
       if (val == 1 && this.select != 1) {
-        await this.getData("conversion", "");
-        this.method = "conversion";
+        await this.getData('conversion', '')
+        this.method = 'conversion'
       } else if (val == 2 && this.select != 2) {
-        await this.getData("processing", "");
-        this.method = "processing";
+        await this.getData('processing', '')
+        this.method = 'processing'
       } else if (val == 3 && this.select != 3) {
-        await this.getData("visualization", "");
-        this.method = "visualization";
+        await this.getData('visualization', '')
+        this.method = 'visualization'
       }
-      this.select = val;
+      this.select = val
     },
 
     async getData(method, searchText) {
@@ -134,11 +135,11 @@ export default {
         page: 1,
         pageSize: 12,
         searchText: searchText,
-      };
-      let data = await getDataServiceByPortal(jsonData);
+      }
+      let data = await getDataServiceByPortal(jsonData)
 
-      this.data = data.data.list;
-      this.total = data.data.total;
+      this.data = data.data.list
+      this.total = data.data.total
     },
 
     async currentChange(val, method) {
@@ -146,18 +147,18 @@ export default {
         method: method,
         page: val,
         pageSize: 12,
-        searchText: "",
-      };
-      let data = await getDataServiceByPortal(jsonData);
-      this.data = data.data.list;
-      this.total = data.data.total;
+        searchText: '',
+      }
+      let data = await getDataServiceByPortal(jsonData)
+      this.data = data.data.list
+      this.total = data.data.total
     },
   },
   mounted() {
-    this.getData(this.method, "");
+    this.getData(this.method, '')
   },
   components: { dataServiceCard, createModel },
-};
+}
 </script>
 
 <style lang="scss">
@@ -188,7 +189,7 @@ export default {
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;
-      font-family: Arial, Georgia, Times, "Times New Roman", serif;
+      font-family: Arial, Georgia, Times, 'Times New Roman', serif;
       .el-row {
         margin: 0.5rem 0;
       }

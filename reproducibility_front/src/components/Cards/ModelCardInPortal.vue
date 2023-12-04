@@ -13,7 +13,7 @@
           class="config-btn"
           type="success"
           @click="addModelToUser(item.id)"
-          icon="el-icon-shopping-cart-2"
+          :icon="ElIconShoppingCart - 2"
         ></el-button>
       </el-col>
     </el-card>
@@ -41,7 +41,7 @@
         <el-button
           class="config-btn"
           @click="view(item.id)"
-          icon="el-icon-shopping-cart-2"
+          :icon="ElIconShoppingCart - 2"
           circle
         ></el-button>
       </el-col>
@@ -52,12 +52,12 @@
         :style="select ? 'float: right;color: red;' : 'float: right'"
       >
         <i class="iconfont icon-gouwuche" v-if="select == false"></i>
-        <el-badge :value="badgeNum" :max="10" class="item" v-else>
+        <el-badge :model-value="badgeNum" :max="10" class="item" v-else>
           <i class="iconfont icon-gouwuche"></i>
         </el-badge>
       </el-button>
     </el-card>
-    <el-dialog :visible.sync="dialogVisible" width="30%">
+    <el-dialog v-model="dialogVisible" width="30%">
       <el-row :gutter="20">
         <el-col
           :span="6"
@@ -91,41 +91,45 @@
 </template>
 
 <script>
-import { imgBase64 } from "@/lib/utils";
-import { getComputableModels } from "@/api/request";
+import { imgBase64 } from '@/lib/utils'
+import { getComputableModels } from '@/api/request'
 export default {
-  props: ["item", "type"],
+  props: ['item', 'type'],
   data() {
     return {
       select: false,
       computableModels: [],
       dialogVisible: false,
-      description: "",
+      description: '',
       selectNum: -1,
       selectNumArr: [],
       selectArr: [],
       badgeNum: 0,
-    };
+    }
   },
   watch: {
     item: {
+      deep: true,
+
       handler(val) {
-        let temp = JSON.parse(localStorage.selectModels);
+        let temp = JSON.parse(localStorage.selectModels)
         for (let i = 0; i < temp.length; i++) {
           if (val.oid == temp[i].oid) {
-            this.select = true;
-            break;
+            this.select = true
+            break
           } else {
-            this.select = false;
+            this.select = false
           }
         }
       },
     },
-    "$store.state.user.selectNum": {
+    '$store.state.user.selectNum': {
+      deep: true,
+
       handler(val) {
         if (val == 0) {
-          this.select = false;
-          this.badgeNum = 0;
+          this.select = false
+          this.badgeNum = 0
         }
       },
     },
@@ -133,33 +137,33 @@ export default {
   methods: {
     init() {
       if (localStorage.selectModels != undefined) {
-        let temp = JSON.parse(localStorage.selectModels);
+        let temp = JSON.parse(localStorage.selectModels)
         for (let i = 0; i < temp.modelItem.length; i++) {
           if (
             this.item.oid == temp.modelItem[i].id &&
             temp.modelItem[i].count > 0
           ) {
-            this.select = true;
-            this.badgeNum = temp.modelItem[i].count;
-            break;
+            this.select = true
+            this.badgeNum = temp.modelItem[i].count
+            break
           }
         }
       }
     },
     imgPath(snapshot, name) {
       if (snapshot != undefined) {
-        return snapshot;
+        return snapshot
       } else {
-        return imgBase64(name);
+        return imgBase64(name)
       }
     },
   },
   mounted() {
-    this.init();
+    this.init()
     // console.log(this.item)
     // console.log(this.item.snapshot)
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -167,11 +171,9 @@ export default {
   margin: 10px 2%;
   width: 95%;
   transition: box-shadow 0.1s ease;
-
   height: 120px;
-  /* 相对定位 */
   position: relative;
-  /deep/.el-card__body {
+  :deep(.el-card__body) {
     padding: 10px;
   }
   .content {
@@ -220,8 +222,7 @@ export default {
   height: 30px;
   line-height: 30px;
   text-align: center;
-  border: solid 1px;
-  // max-height: 50px;
+  border: solid 1px; /*// max-height: 50px;*/
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

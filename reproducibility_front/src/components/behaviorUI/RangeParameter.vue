@@ -11,42 +11,41 @@
     </el-row>
   </div>
 </template>
+
 <script>
 export default {
   props: {
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     initParameter: {
-      type: Object
-    }
+      type: Object,
+    },
   },
 
   computed: {
     from: {
       get() {
-        return this.initParameter.value.split("-")[0];
+        return this.initParameter.value.split('-')[0]
       },
       set(newValue) {
-        let toValue = this.initParameter.value.split("-")[1];
-        this.initParameter.value = `${newValue}-${toValue}`;
-        return newValue;
-      }
+        let toValue = this.initParameter.value.split('-')[1]
+        this.initParameter.value = `${newValue}-${toValue}`
+        return newValue
+      },
     },
     to: {
       get() {
-        return this.initParameter.value.split("-")[1];
+        return this.initParameter.value.split('-')[1]
       },
       set(newValue) {
-        let fromValue = this.initParameter.value.split("-")[0];
-        this.initParameter.value = `${fromValue}-${newValue}`;
-        return newValue;
-      }
-    }
+        let fromValue = this.initParameter.value.split('-')[0]
+        this.initParameter.value = `${fromValue}-${newValue}`
+        return newValue
+      },
+    },
   },
-  methods: {}
-};
+  methods: {},
+}
 </script>
-
-<style></style>

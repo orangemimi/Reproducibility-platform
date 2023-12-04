@@ -11,7 +11,7 @@
             :http-request="submitUpload"
           >
             <el-button size="mini">
-              <i class="el-icon-upload"></i>
+              <el-icon><el-icon-upload /></el-icon>
               Upload
             </el-button>
           </el-upload>
@@ -24,8 +24,8 @@
       <div v-else>
         <el-input v-model="folderName">
           <template #suffix>
-            <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
-            <i class="el-input__icon el-icon-close" @click="closeAddFolder"></i>
+            <el-icon class="el-input__icon"><el-icon-check /></el-icon>
+            <el-icon class="el-input__icon"><el-icon-close /></el-icon>
           </template>
         </el-input>
       </div>
@@ -46,9 +46,7 @@
         @current-change="handleCurrentChange"
         highlight-current-row
       >
-        <template slot="empty">
-          Please upload a file
-        </template>
+        <template v-slot:empty> Please upload a file </template>
 
         <el-table-column label="Name" show-overflow-tooltip>
           <template #default="scope">
@@ -76,17 +74,17 @@
     <div class="contentBottom">
       <div class="selectFile" v-show="currentRow != ''">
         <!-- {{ currentRow }} -->
-        <div style="float:left">
+        <div style="float: left">
           {{ currentRow.name }} . {{ currentRow.suffix }}
         </div>
-        <i class="el-icon-error" style="float:right;" @click="cancleRow" />
+        <el-icon style="float: right"><el-icon-error /></el-icon>
       </div>
     </div>
 
     <!-- upload data -->
     <el-dialog
       title="Upload data"
-      :visible.sync="uploadFileDialogShow"
+      v-model="uploadFileDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -97,22 +95,32 @@
 
 <script>
 import {
+  Upload as ElIconUpload,
+  Check as ElIconCheck,
+  Close as ElIconClose,
+  Error as ElIconError,
+} from '@element-plus/icons'
+import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
+import {
   getFileItemsByJwtUserId,
   getFileItemByCreatorId,
   saveFileItem,
   updateFileItemById,
   postDataContainer,
-} from "@/api/request";
+} from '@/api/request'
 // import dataUpload from './FileUpload'; //dialogcontent
-import dataUploadInfo from "./DataUploadInfo"; //dialogcontent
-import { getUuid, getSuffix, renderSize, getTime } from "@/utils/utils";
-import { mapState } from "vuex";
+import dataUploadInfo from './DataUploadInfo' //dialogcontent
+import { getUuid, getSuffix, renderSize, getTime } from '@/utils/utils'
+import { mapState } from 'vuex'
 
 export default {
   components: {
     dataUploadInfo,
+    ElIconUpload,
+    ElIconCheck,
+    ElIconClose,
+    ElIconError,
   },
-
   data() {
     return {
       uploadFileDialogShow: false, //upload data dialog
@@ -129,10 +137,10 @@ export default {
 
       //add folder
       isAddFolder: false,
-      folderName: "",
-      currentRow: "",
+      folderName: '',
+      currentRow: '',
       // fileItemListDirect: []
-    };
+    }
   },
   computed: {
     ...mapState({
@@ -144,51 +152,50 @@ export default {
         this.fileItemList != null ||
         this.fileItemList != undefined
       ) {
-        return this.fileItemList.filter((item) => item.userUpload == true);
+        return this.fileItemList.filter((item) => item.userUpload == true)
       } else {
-        return [];
+        return []
       }
     },
   },
-
   methods: {
     //close the dialog
     uploadSuccess(val) {
       if (val) {
-        this.uploadFileDialogShow = false;
+        this.uploadFileDialogShow = false
       }
     },
 
     downloadFileResource(data) {
-      window.open(data.address);
+      window.open(data.address)
     },
 
     //get all the data
     async getFileCollection() {
-      let data = await getFileItemsByJwtUserId();
+      let data = await getFileItemsByJwtUserId()
       // let data = await get(`/fileItems`);
-      this.fileItemList = data;
+      this.fileItemList = data
       // this.fileItemListDirect = this.getFileItemListDirect();
 
       // await this.getSelectedFile();
     },
 
     getFileItemListDirect() {
-      if (this.role == "builder") {
+      if (this.role == 'builder') {
         if (
           this.fileItemList.length != 0 ||
           this.fileItemList != null ||
           this.fileItemList != undefined
         ) {
-          return this.fileItemList.filter((item) => item.userUpload == true);
+          return this.fileItemList.filter((item) => item.userUpload == true)
         } else {
-          return [];
+          return []
         }
       }
-      if (this.role == "rebuilder_operator") {
-        return this.fileItemListFromResource;
+      if (this.role == 'rebuilder_operator') {
+        return this.fileItemListFromResource
       }
-      return [];
+      return []
     },
 
     //init table selection
@@ -196,13 +203,13 @@ export default {
       if (rows) {
         this.$nextTick(() => {
           rows.forEach((row) => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        });
+            this.$refs.multipleTable.toggleRowSelection(row)
+          })
+        })
       } else {
-        this.$refs.multipleTable.clearSelection();
+        this.$refs.multipleTable.clearSelection()
       }
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
 
     //selection change
@@ -233,98 +240,99 @@ export default {
     // },
 
     handleCurrentChange(row) {
-      this.currentRow = row;
-      this.$emit("returnFileUrl", row);
+      this.currentRow = row
+      $emit(this, 'returnFileUrl', row)
     },
     cancleCurrentRow() {
-      this.currentRow = "";
+      this.currentRow = ''
     },
 
     async getFileAsOperator() {
-      let data = await getFileItemByCreatorId(this.projectId);
-      this.fileItemListFromResource = data;
-      this.$refs.multipleTable.toggleAllSelection();
+      let data = await getFileItemByCreatorId(this.projectId)
+      this.fileItemListFromResource = data
+      this.$refs.multipleTable.toggleAllSelection()
       // console.log('DATA', data);
     },
 
     addFolderShow() {
-      this.folderName = "";
-      this.isAddFolder = true;
+      this.folderName = ''
+      this.isAddFolder = true
     },
     closeAddFolder() {
-      this.isAddFolder = false;
+      this.isAddFolder = false
     },
 
     async uploadFolder() {
       let form = {
-        alia: "",
+        alia: '',
         name: this.folderName,
         folder: true,
-        description: "",
-        privacy: "discoverable",
-        parent: "",
+        description: '',
+        privacy: 'discoverable',
+        parent: '',
         children: [],
         userUpload: true,
-      };
-      await this.saveProjectResource(form);
+      }
+      await this.saveProjectResource(form)
     },
 
     //上传文件到服务器
     async submitUpload(param) {
-      let uploadFileForm = new FormData();
-      uploadFileForm.append("file", param.file);
-      let data = await postDataContainer(uploadFileForm);
+      let uploadFileForm = new FormData()
+      uploadFileForm.append('file', param.file)
+      let data = await postDataContainer(uploadFileForm)
 
-      console.log("submitupload", data);
+      console.log('submitupload', data)
 
       let form = {
         name: data.file_name,
-        alia: "",
-        source: "",
-        thumbnail: "",
-        privacy: "",
+        alia: '',
+        source: '',
+        thumbnail: '',
+        privacy: '',
         suffix: getSuffix(param.file.name),
         fileSize: renderSize(param.file.size),
-        address: `http://175.27.137.60:8083/data/${data.id}`,
+        address: `http://112.4.132.6:8083/data/${data.id}`,
         projectId: this.projectId,
         userUpload: true,
         children: [],
-        parent: "",
+        parent: '',
         folder: false,
-      };
+      }
 
-      await this.saveProjectResource(form);
+      await this.saveProjectResource(form)
     },
 
     async saveProjectResource(form) {
-      if (this.currentRow == "") {
-        let data = await saveFileItem(form);
-        this.fileItemList.push(data);
+      if (this.currentRow == '') {
+        let data = await saveFileItem(form)
+        this.fileItemList.push(data)
       } else {
-        form.parent = this.currentRow.id;
-        form.id = getUuid();
-        form.createTime = getTime();
-        let parentFile = this.currentRow;
+        form.parent = this.currentRow.id
+        form.id = getUuid()
+        form.createTime = getTime()
+        let parentFile = this.currentRow
         if (parentFile.children == null) {
-          parentFile.children = [];
+          parentFile.children = []
         }
-        parentFile.children.push(form);
-        await updateFileItemById(parentFile.id, parentFile);
+        parentFile.children.push(form)
+        await updateFileItemById(parentFile.id, parentFile)
       }
       //  this.fileItemListDirect
     },
 
     collapseClass(params) {
-      return params.folder === true ? "el-icon-folder" : "el-icon-document";
+      return params.folder === true ? 'el-icon-folder' : 'el-icon-document'
     },
     cancleRow() {
-      this.currentRow = "";
+      this.currentRow = ''
     },
   },
   async mounted() {
-    await this.getFileCollection();
+    await this.getFileCollection()
   },
-};
+  emits: ['returnFileUrl'],
+}
 </script>
 
 <style lang="scss" scoped>
@@ -332,7 +340,6 @@ export default {
   padding: 0 10px;
   height: 100%;
   width: 100%;
-
   .row-style {
     padding: 0 10px;
     height: 100%;
