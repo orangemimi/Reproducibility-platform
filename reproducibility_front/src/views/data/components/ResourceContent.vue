@@ -12,9 +12,7 @@
         :row-style="{ height: '0' }"
         :cell-style="{ padding: '4px' }"
       >
-        <template slot="empty">
-          Please upload a file
-        </template>
+        <template v-slot:empty> Please upload a file </template>
         <el-table-column type="selection" width="50"></el-table-column>
         <el-table-column label="Name" show-overflow-tooltip>
           <template #default="scope">{{ scope.row.name }}</template>
@@ -45,7 +43,7 @@
     <!-- upload data -->
     <el-dialog
       :title="'Upload data to '"
-      :visible.sync="uploadDataDialogShow"
+      v-model="uploadDataDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -63,9 +61,9 @@ import {
   getResourcesById,
   updateResources,
   getDataItemsByJwtUserId,
-} from "@/api/request";
+} from '@/api/request'
 // import dataUpload from './DataUpload'; //dialogcontent
-import DataUploadForm from "./DataUploadForm"; //dialogcontent
+import DataUploadForm from './DataUploadForm' //dialogcontent
 export default {
   props: {
     projectInfo: {
@@ -75,10 +73,12 @@ export default {
 
   watch: {
     projectInfo: {
+      deep: true,
+
       handler(val) {
         if (val != null) {
-          this.projectId = val.id;
-          this.getDataCollection();
+          this.projectId = val.id
+          this.getDataCollection()
         }
       },
     },
@@ -102,7 +102,7 @@ export default {
 
       //table
       multipleSelection: [],
-    };
+    }
   },
   computed: {
     dataItemListDirect() {
@@ -111,9 +111,9 @@ export default {
         this.dataItemList != null ||
         this.dataItemList != undefined
       ) {
-        return this.dataItemList.filter((item) => item.isDirect == true);
+        return this.dataItemList.filter((item) => item.isDirect == true)
       } else {
-        return [];
+        return []
       }
     },
   },
@@ -122,66 +122,66 @@ export default {
     //close the dialog
     uploadSuccess(val) {
       if (val) {
-        this.uploadDataDialogShow = false;
+        this.uploadDataDialogShow = false
       }
     },
 
     downloadDataResource(data) {
-      window.open(data.url);
+      window.open(data.url)
     },
 
     //get all the data
     async getDataCollection() {
-      let data = await getDataItemsByJwtUserId();
+      let data = await getDataItemsByJwtUserId()
       // let data = await get(`/dataItems`);
-      this.dataItemList = data;
+      this.dataItemList = data
 
-      await this.getSelectedData();
+      await this.getSelectedData()
     },
 
     //get resources
     async getSelectedData() {
-      let data = await getResourcesById(this.projectId);
-      let dataSelected = data;
+      let data = await getResourcesById(this.projectId)
+      let dataSelected = data
       this.multipleSelection = this.dataItemListDirect.filter((item) =>
         dataSelected.some((selection) => selection.id == item.id)
-      );
-      this.toggleSelection(this.multipleSelection);
+      )
+      this.toggleSelection(this.multipleSelection)
     },
 
     //init table selection
     toggleSelection(rows) {
       if (rows) {
         rows.forEach((row) => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
+          this.$refs.multipleTable.toggleRowSelection(row)
+        })
       } else {
-        this.$refs.multipleTable.clearSelection();
+        this.$refs.multipleTable.clearSelection()
       }
     },
 
     //selection change
     handleSelectionChange(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = val
     },
 
     //submit
     async submitBtn() {
       if (this.multipleSelection.length == 0) {
         this.$notify({
-          title: "Warning",
-          message: "You have not select any data!",
-          type: "warning",
-        });
+          title: 'Warning',
+          message: 'You have not select any data!',
+          type: 'warning',
+        })
       } else {
-        let filter = [];
+        let filter = []
         this.multipleSelection.forEach((ele) => {
-          filter.push(ele.id);
-        });
+          filter.push(ele.id)
+        })
         // console.log(filter);
         await updateResources(this.projectId, {
           dataItemCollection: filter,
-        });
+        })
         // let data = await patch(`resources/data/${this.projectId}`, {
         //   dataItemCollection: filter
         // });
@@ -192,7 +192,7 @@ export default {
   async mounted() {
     // await this.getDataCollection();
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -200,7 +200,6 @@ export default {
   padding: 0 10px;
   height: 100%;
   width: 100%;
-
   .row-style {
     padding: 0 10px;
     height: 100%;

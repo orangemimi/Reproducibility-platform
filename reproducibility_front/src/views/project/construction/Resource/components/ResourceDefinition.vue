@@ -3,10 +3,14 @@
     <vue-scroll style="height: 320px" :ops="ops">
       <div class="resource">
         <div v-for="(item, index) in modelList" :key="'index1' + index">
-          <resource-card :modelItem="{ type: 'Model', data: item }"></resource-card>
+          <resource-card
+            :modelItem="{ type: 'Model', data: item }"
+          ></resource-card>
         </div>
         <div v-for="(item, index) in dataserverList" :key="'index2' + index">
-          <resource-card :modelItem="{ type: 'Dataserver', data: item }"></resource-card>
+          <resource-card
+            :modelItem="{ type: 'Dataserver', data: item }"
+          ></resource-card>
         </div>
       </div>
     </vue-scroll>
@@ -14,8 +18,8 @@
 </template>
 
 <script>
-import ResourceCard from './ResourceCard.vue';
-import { getModelsByProjectId, getAllByProjectId } from '@/api/request';
+import ResourceCard from './ResourceCard.vue'
+import { getModelsByProjectId, getAllByProjectId } from '@/api/request'
 export default {
   data() {
     return {
@@ -32,37 +36,37 @@ export default {
           specifyBorderRadius: false,
           minSize: 0,
           size: '6px',
-          disable: false
+          disable: false,
         },
         scrollPanel: {
           scrollingY: false,
-          scrollingX: true
-        }
-      }
-    };
+          scrollingX: true,
+        },
+      },
+    }
   },
   components: {
-    ResourceCard
+    ResourceCard,
   },
 
   methods: {
     async getModelsByProjectId() {
-      let data = await getModelsByProjectId(this.projectId);
-      this.modelList = data;
+      let data = await getModelsByProjectId(this.projectId)
+      this.modelList = data
     },
     async getAllByProjectId() {
-      let data = await getAllByProjectId(this.projectId);
-      this.dataserverList = data;
+      let data = await getAllByProjectId(this.projectId)
+      this.dataserverList = data
     },
     async init() {
-      await this.getModelsByProjectId();
-      await this.getAllByProjectId();
-    }
+      await this.getModelsByProjectId()
+      await this.getAllByProjectId()
+    },
   },
   async mounted() {
-    await this.init();
-  }
-};
+    await this.init()
+  },
+}
 </script>
 
 <style lang="scss" scoped>

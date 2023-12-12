@@ -17,25 +17,23 @@ export default {
   props: {
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     initParameter: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   computed: {
     options() {
-      let options = [];
-      Object.entries(this.initParameter.keyValue).forEach(element => {
+      let options = []
+      Object.entries(this.initParameter.keyValue).forEach((element) => {
         options.push({
           label: element[1],
-          value: element[0]
-        });
-      });
-      return options;
-    }
-  }
-};
+          value: element[0],
+        })
+      })
+      return options
+    },
+  },
+}
 </script>
-
-<style></style>

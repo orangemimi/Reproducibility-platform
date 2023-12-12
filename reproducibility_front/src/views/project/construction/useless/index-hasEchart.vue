@@ -1,14 +1,19 @@
 <template>
   <div>
     <div
-      style="width:100%;margin-top:20px;padding:15px;background-color:#f8f8f9"
+      style="
+        width: 100%;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f8f9;
+      "
       :style="{ height: contentHeight - 140 + 'px' }"
       ref="steps"
     ></div>
 
     <el-dialog
       title="Public resource selection"
-      :visible.sync="resourceCollectDialog"
+      v-model="resourceCollectDialog"
       :close-on-click-modal="false"
       width="60%"
     >
@@ -20,18 +25,18 @@
             class="input-with-select"
             size="small"
           >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="searchModelByName"
-              v-if="!isSearching"
-            ></el-button>
-            <el-button
-              slot="append"
-              icon="el-icon-close"
-              @click="clearSearch"
-              v-else
-            ></el-button>
+            <template v-slot:append>
+              <el-button
+                :icon="ElIconSearch"
+                @click="searchModelByName"
+                v-if="!isSearching"
+              ></el-button>
+              <el-button
+                :icon="ElIconClose"
+                @click="clearSearch"
+                v-else
+              ></el-button>
+            </template>
           </el-input>
         </el-col>
       </el-row>
@@ -42,7 +47,7 @@
           v-model="selectedModelsWithId"
           @change="
             (value) => {
-              selectChange(value, 'model');
+              selectChange(value, 'model')
             }
           "
           :titles="['Public models', 'Selected models']"
@@ -73,7 +78,7 @@
 
     <el-dialog
       title="Create one scenerio computational processes"
-      :visible.sync="createScenarioDialog"
+      v-model="createScenarioDialog"
       :close-on-click-modal="false"
       width="60%"
     >
@@ -110,8 +115,12 @@
 </template>
 
 <script>
-import echarts from "echarts";
-import { mapState } from "vuex";
+import {
+  Search as ElIconSearch,
+  Close as ElIconClose,
+} from '@element-plus/icons-vue'
+import echarts from 'echarts'
+import { mapState } from 'vuex'
 import {
   getProjectById,
   getModelsByPrivacy,
@@ -120,21 +129,20 @@ import {
   updateProject,
   // getScenarioById,
   saveScenario,
-} from "@/api/request";
+} from '@/api/request'
 export default {
   data() {
     return {
-      projectId: this.$route.params.id, //projectId
+      //projectId
+      projectId: this.$route.params.id,
       project: {},
       resourceCollectDialog: false,
       modelList: [],
-
       chart: {},
       contentHeight: window.innerHeight - 200,
-
       ops: {
         bar: {
-          background: "#808695",
+          background: '#808695',
           keepShow: true,
         },
       },
@@ -145,113 +153,115 @@ export default {
         page: 0,
       },
       total: 0,
-      keyword: "",
+      keyword: '',
       isSearching: false,
       createScenarioDialog: false,
       typeOptions: [
-        { label: "Sequent models", value: "sequentModels" },
-        { label: "Integrate Task", value: "integrateTask" },
+        { label: 'Sequent models', value: 'sequentModels' },
+        { label: 'Integrate Task', value: 'integrateTask' },
       ],
       scenarioInfoFormInit: null,
-      scenarioInfoForm: { type: "sequentModels" },
+      scenarioInfoForm: { type: 'sequentModels' },
       hasScenario: false,
       selectedSecnario: {},
-    };
+      ElIconSearch,
+      ElIconClose,
+    }
   },
   computed: {
-    ...mapState(["user"]),
+    ...mapState(['user']),
   },
   methods: {
     // transfer----------
     async currentModelChange(val) {
-      await this.getPublicModels(val - 1);
+      await this.getPublicModels(val - 1)
     },
     async getPublicModels(val) {
-      let data = await getModelsByPrivacy("public", val, 20);
+      let data = await getModelsByPrivacy('public', val, 20)
 
-      this.total = data.totalElements;
-      this.modelList = data.content;
+      this.total = data.totalElements
+      this.modelList = data.content
 
       var currentModelList = this.modelList.map((value) => {
         return {
           label: value.name,
           key: value.id,
           obj: value,
-        };
-      });
+        }
+      })
       // 初始化数据
-      this.currentModelList = currentModelList;
+      this.currentModelList = currentModelList
     },
 
     // 穿梭搜索
     async searchModelByName() {
-      let data = await getPublicModelListByIgnoreName(this.keyword);
-      this.modelList = data;
+      let data = await getPublicModelListByIgnoreName(this.keyword)
+      this.modelList = data
       var currentModelList = this.modelList.map((value) => {
         return {
           label: value.name,
           key: value.id,
           obj: value,
-        };
-      });
+        }
+      })
       // 初始化数据
-      this.currentModelList = currentModelList;
-      this.isSearching = true;
+      this.currentModelList = currentModelList
+      this.isSearching = true
     },
     clearSearch() {
-      this.keyword = "";
-      this.init();
-      this.isSearching = false;
+      this.keyword = ''
+      this.init()
+      this.isSearching = false
     },
 
     async filterQueryModel(text, val) {
-      let data = await getPublicModelListByIgnoreName(text, val, 20);
-      console.log(data);
-      this.total = data.totalElements;
-      this.modelList = data.content;
+      let data = await getPublicModelListByIgnoreName(text, val, 20)
+      console.log(data)
+      this.total = data.totalElements
+      this.modelList = data.content
 
       var currentModelList = this.modelList.map((value) => {
         return {
           label: value.name,
           key: value.id,
           obj: value,
-        };
-      });
+        }
+      })
       // 初始化数据
-      this.currentModelList = currentModelList;
+      this.currentModelList = currentModelList
     },
 
     init() {
-      this.getPublicModels(0);
+      this.getPublicModels(0)
     },
 
     selectChange(value, type) {
-      if (type == "model") {
-        this.modelList = value;
+      if (type == 'model') {
+        this.modelList = value
       }
     },
 
     initEchart() {
       let option = {
         animationDurationUpdate: 500,
-        animationEasingUpdate: "quinticInOut",
+        animationEasingUpdate: 'quinticInOut',
         legend: {
           show: true,
           data: [
             {
-              name: "Model collection",
-              icon: "circle",
+              name: 'Model collection',
+              icon: 'circle',
             },
             {
-              name: "Computational process construction",
-              icon: "circle",
+              name: 'Computational process construction',
+              icon: 'circle',
             },
           ],
         },
         series: [
           {
-            type: "graph",
-            layout: "none",
+            type: 'graph',
+            layout: 'none',
             legendHoverLink: true,
             roam: this.procedureDrag,
             label: {
@@ -259,22 +269,22 @@ export default {
                 show: true,
               },
             },
-            edgeSymbol: ["circle", "arrow"],
+            edgeSymbol: ['circle', 'arrow'],
             edgeSymbolSize: [4, 10],
             focusNodeAdjacency: true,
             data: [
               {
-                name: "Model collection",
-                category: "Model collection",
-                label: "资源收集",
+                name: 'Model collection',
+                category: 'Model collection',
+                label: '资源收集',
                 symbolSize: 45,
                 x: 700,
                 y: 500,
               },
               {
-                name: "Computational process construction",
-                category: "Computational process construction",
-                label: "模拟计算",
+                name: 'Computational process construction',
+                category: 'Computational process construction',
+                label: '模拟计算',
                 symbolSize: 45,
                 x: 800,
                 y: 500,
@@ -282,20 +292,20 @@ export default {
             ],
             categories: [
               {
-                name: "Model collection",
+                name: 'Model collection',
               },
               {
-                name: "Computational process construction",
+                name: 'Computational process construction',
               },
             ],
             links: [
               {
-                source: "Model collection",
-                target: "Computational process construction",
+                source: 'Model collection',
+                target: 'Computational process construction',
               },
               {
-                source: "Computational process construction",
-                target: "Simulation  evaluation",
+                source: 'Computational process construction',
+                target: 'Simulation  evaluation',
               },
             ],
             lineStyle: {
@@ -307,34 +317,34 @@ export default {
             },
           },
         ],
-      };
-      this.chart = echarts.init(this.$refs.steps);
-      this.chart.setOption(option);
-      this.chart.on("dblclick", ({ data }) => {
-        let type = data.name;
+      }
+      this.chart = echarts.init(this.$refs.steps)
+      this.chart.setOption(option)
+      this.chart.on('dblclick', ({ data }) => {
+        let type = data.name
         switch (type) {
-          case "Model collection":
+          case 'Model collection':
             {
-              this.resourceCollectDialog = true;
+              this.resourceCollectDialog = true
             }
-            break;
-          case "Computational process construction":
+            break
+          case 'Computational process construction':
             {
-              this.createScenarioDialog = true;
+              this.createScenarioDialog = true
             }
-            break;
+            break
         }
-      });
+      })
     },
 
     async setResourceCollect() {
       let data = await updateresourceCollection(
         this.projectId,
-        "modelList",
+        'modelList',
         this.selectedModelsWithId
-      );
-      this.project = data;
-      this.resourceCollectDialog = false;
+      )
+      this.project = data
+      this.resourceCollectDialog = false
     },
 
     async setScenerio() {
@@ -342,37 +352,37 @@ export default {
         projectId: this.projectId,
         name: this.scenarioInfoForm.name,
         type: this.scenarioInfoForm.type,
-      });
-      this.project.scenario = data.id;
-      await updateProject(this.projectId, this.project);
+      })
+      this.project.scenario = data.id
+      await updateProject(this.projectId, this.project)
       // this.createScenarioDialog = false;
       this.$router.push({
         path: `/project/${this.projectId}/scenarios`,
-      });
+      })
     },
   },
   async mounted() {
-    this.project = await getProjectById(this.$route.params.id);
+    this.project = await getProjectById(this.$route.params.id)
 
-    if (this.project.scenario != null && this.project.scenario != "") {
-      this.hasScenario = true;
+    if (this.project.scenario != null && this.project.scenario != '') {
+      this.hasScenario = true
 
       this.$router.push({
         path: `/project/${this.projectId}/scenarios`,
-      });
+      })
     }
     // console.log(this.project);
     if (
       this.project.resourceCollection != null &&
       this.project.resourceCollection.modelList != null
     ) {
-      this.selectedModelsWithId = this.project.resourceCollection.modelList;
+      this.selectedModelsWithId = this.project.resourceCollection.modelList
     }
-    this.init();
-    this.initEchart();
+    this.init()
+    this.initEchart()
     // this.getData();
   },
-};
+}
 </script>
 
 <style scoped>
@@ -384,28 +394,23 @@ export default {
   font-size: 13px;
   color: #999;
 }
-
 .bottom {
   margin-top: 13px;
   line-height: 12px;
 }
-
 .button {
   padding: 0;
   float: right;
 }
-
 .image {
   width: 100%;
   display: block;
 }
-
 .clearfix:before,
 .clearfix:after {
   display: table;
-  content: "";
+  content: '';
 }
-
 .clearfix:after {
   clear: both;
 }
@@ -431,10 +436,7 @@ export default {
 }
 .dialog-footer {
   float: right;
-
-  /* margin-bottom: 10px; */
 }
-
 .pageClass {
   position: relative;
   bottom: 30px;

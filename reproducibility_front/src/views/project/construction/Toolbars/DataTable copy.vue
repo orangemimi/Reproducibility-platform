@@ -12,7 +12,7 @@
         :cell-style="{ padding: '4px' }"
         :rowKey="
           (record, index) => {
-            return index + record.id;
+            return index + record.id
           }
         "
         :tree-props="{ children: 'children', hasChildren: true }"
@@ -21,9 +21,7 @@
         @current-change="handleCurrentChange"
         highlight-current-row
       >
-        <template slot="empty">
-          Please upload a file
-        </template>
+        <template v-slot:empty> Please upload a file </template>
 
         <el-table-column label="Name" show-overflow-tooltip>
           <template #default="scope">
@@ -42,20 +40,20 @@
           <template #default="scope">{{ scope.row.fileSize }}</template>
         </el-table-column>
         <!-- <el-table-column label="Upload time" width="200" show-overflow-tooltip>
-          <template #default="scope">{{ scope.row.createTime }}</template>
-        </el-table-column> -->
+              <template #default="scope">{{ scope.row.createTime }}</template>
+            </el-table-column> -->
         <!--TODO-zzy -->
         <!-- <el-table-column label="Operation" width="120" show-overflow-tooltip>
-          <template #default="scope">
-            <i
-              class="el-icon-edit-outline"
-              style="margin-right:10px"
-              @click="cilckEditDialog"
-            />
-            <i class="el-icon-download" @click="download(scope.row.value)" />
-            还需要一个可视化的按钮 什么kk什么的
-          </template>
-        </el-table-column> -->
+              <template #default="scope">
+                <i
+                  class="el-icon-edit-outline"
+                  style="margin-right:10px"
+                  @click="cilckEditDialog"
+                />
+                <i class="el-icon-download" @click="download(scope.row.value)" />
+                还需要一个可视化的按钮 什么kk什么的
+              </template>
+            </el-table-column> -->
       </el-table>
     </div>
 
@@ -63,10 +61,10 @@
       <div class="contentBottom">
         <div class="selectFile" v-show="currentRow != ''">
           <!-- {{ currentRow }} -->
-          <div style="float:left">
+          <div style="float: left">
             {{ currentRow.name }}{{ currentRow.suffix }}
           </div>
-          <i class="el-icon-error" style="float:right;" @click="cancleRow" />
+          <el-icon style="float: right"><el-icon-error /></el-icon>
         </div>
       </div>
     </el-col>
@@ -87,7 +85,7 @@
               multiple
             >
               <el-button size="mini">
-                <i class="el-icon-upload"></i>
+                <el-icon><el-icon-upload /></el-icon>
                 Upload
               </el-button>
             </el-upload>
@@ -100,11 +98,8 @@
         <div v-else>
           <el-input v-model="folderName">
             <template #suffix>
-              <i class="el-input__icon el-icon-check" @click="uploadFolder"></i>
-              <i
-                class="el-input__icon el-icon-close"
-                @click="closeAddFolder"
-              ></i>
+              <el-icon class="el-input__icon"><el-icon-check /></el-icon>
+              <el-icon class="el-input__icon"><el-icon-close /></el-icon>
             </template>
           </el-input>
         </div>
@@ -124,7 +119,7 @@
         :cell-style="{ padding: '4px' }"
         :rowKey="
           (record, index) => {
-            return index + record.id;
+            return index + record.id
           }
         "
         :tree-props="{ children: 'children', hasChildren: true }"
@@ -147,11 +142,8 @@
         </el-table-column>
         <!--TODO-zzy -->
         <el-table-column label="Operation" width="120" show-overflow-tooltip>
-          <template #default="scope">
-            <i
-              class="el-icon-upload"
-              @click="uploadToDataRepository(scope.row.value)"
-            />
+          <template #default>
+            <el-icon><el-icon-upload /></el-icon>
           </template>
         </el-table-column>
       </el-table>
@@ -165,22 +157,33 @@
 </template>
 
 <script>
-import { saveData, addFolder, getFolders } from "@/api/request";
+import {
+  Error as ElIconError,
+  Upload as ElIconUpload,
+  Check as ElIconCheck,
+  Close as ElIconClose,
+} from '@element-plus/icons-vue'
+import { $on, $off, $once, $emit } from '../../../../utils/gogocodeTransfer'
+import { saveData, addFolder, getFolders } from '@/api/request'
 // import dataUpload from './FileUpload'; //dialogcontent
-import { renderSize } from "@/utils/utils";
-import { mapState } from "vuex";
+import { renderSize } from '@/utils/utils'
+import { mapState } from 'vuex'
 
 export default {
+  components: {
+    ElIconError,
+    ElIconUpload,
+    ElIconCheck,
+    ElIconClose,
+  },
   props: {
     boundData: {
       type: Array,
     },
-    scenarioId:{
-      type:String
-    }
+    scenarioId: {
+      type: String,
+    },
   },
-
-  components: {},
   data() {
     return {
       folderList: [],
@@ -188,118 +191,121 @@ export default {
 
       //add folder
       isAddFolder: false,
-      folderName: "",
-      currentRow: "",
+      folderName: '',
+      currentRow: '',
       // fileItemListDirect: []
 
       fileList: [],
       editDataDialogShow: false,
-    };
+    }
   },
   computed: {
     ...mapState({
       role: (state) => state.permission.role,
     }),
   },
-
   methods: {
     arraySpanMethod({ row }) {
       if (row.isFolder) {
-        return [1, 3];
+        return [1, 3]
       }
     },
     cilckEditDialog() {
-      this.editDataDialogShow = true;
+      this.editDataDialogShow = true
     },
     download(val) {
-      console.log(val);
+      console.log(val)
     },
 
     downloadFileResource(data) {
-      window.open(data.address);
+      window.open(data.address)
     },
 
     //get all the data
     async getFolders() {
-      let data = await getFolders();
-      let folderList =  data[0].children.filter((item)=>item.tagId = this.projectId)
-      this.folderList = folderList[0].children.filter((item)=>item.tagId = this.scenarioId)
+      let data = await getFolders()
+      let folderList = data[0].children.filter(
+        (item) => (item.tagId = this.projectId)
+      )
+      this.folderList = folderList[0].children.filter(
+        (item) => (item.tagId = this.scenarioId)
+      )
       // todo --只在project内展示所有project的
     },
 
     handleUploadFileChange(file, fileList) {
-      this.fileList = fileList;
+      this.fileList = fileList
       // console.log("22222", this.fileList);
     },
 
     handleCurrentChange(row) {
-      this.currentRow = row;
+      this.currentRow = row
     },
     cancleCurrentRow() {
-      this.currentRow = "";
+      this.currentRow = ''
     },
 
     addFolderShow() {
-      this.folderName = "";
-      this.isAddFolder = true;
+      this.folderName = ''
+      this.isAddFolder = true
     },
     closeAddFolder() {
-      this.isAddFolder = false;
+      this.isAddFolder = false
     },
 
     async uploadFolder() {
       let form = {
         name: this.folderName,
-        parent: "0",
+        parent: '0',
         level: 0,
         children: [],
-      };
-      if (this.currentRow != "") {
-        form.parent = this.currentRow.id;
-        form.level = this.currentRow.level + 1;
       }
-      await addFolder(form);
-      this.isAddFolder = false;
-      await this.getFolders();
+      if (this.currentRow != '') {
+        form.parent = this.currentRow.id
+        form.level = this.currentRow.level + 1
+      }
+      await addFolder(form)
+      this.isAddFolder = false
+      await this.getFolders()
     },
 
     //上传文件到服务器
     async submitFile(fileItem) {
       // console.log(param, this.fileList);
-      if (this.currentRow != "") {
-        let param = fileItem.file;
-        let uploadFileForm = new FormData();
-        uploadFileForm.append("file", param);
+      if (this.currentRow != '') {
+        let param = fileItem.file
+        let uploadFileForm = new FormData()
+        uploadFileForm.append('file', param)
 
         await saveData(
           uploadFileForm,
 
           renderSize(param.size),
           this.currentRow.id
-        );
+        )
       } else {
-        this.$alert("Please select one folder to upload data", "Warning", {});
+        this.$alert('Please select one folder to upload data', 'Warning', {})
       }
     },
 
     collapseClass(params) {
-      return params.isFolder === true ? "el-icon-folder" : "el-icon-document";
+      return params.isFolder === true ? 'el-icon-folder' : 'el-icon-document'
     },
     cancleRow() {
-      this.currentRow = "";
+      this.currentRow = ''
     },
     submitDataToEvent() {
-      console.log("this.currentRow", this.currentRow);
-      if (this.currentRow != "") {
-        this.$emit("submitDataToEvent", this.currentRow);
+      console.log('this.currentRow', this.currentRow)
+      if (this.currentRow != '') {
+        $emit(this, 'submitDataToEvent', this.currentRow)
       }
     },
   },
-
   async mounted() {
-    await this.getFolders();
+    await this.getFolders()
   },
-};
+  emits: ['submitDataToEvent'],
+}
 </script>
 
 <style lang="scss" scoped>
@@ -307,7 +313,6 @@ export default {
   padding: 0 10px;
   height: 100%;
   width: 100%;
-
   .row-style {
     padding: 0 10px;
     height: 100%;

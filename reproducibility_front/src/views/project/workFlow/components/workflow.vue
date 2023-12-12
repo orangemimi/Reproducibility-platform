@@ -3,75 +3,75 @@
     <VueBlocksContainer
       ref="container"
       :blocksContent="blocks"
-      :scene.sync="scene"
+      v-model:scene="scene"
       @blockSelect="selectBlock"
       @blockDeselect="deselectBlock"
-      @dblclick.native="seeDetail"
+      @dblclick="seeDetail"
       class="container"
     />
   </div>
 </template>
 
 <script>
-import VueBlocksContainer from "_com/vue-blocks/components/observe/VueBlocksContainer";
+import VueBlocksContainer from '_com/vue-blocks/components/observe/VueBlocksContainer'
 export default {
-  props: ["expectedInstances"],
+  props: ['expectedInstances'],
   components: {
-    VueBlocksContainer
+    VueBlocksContainer,
   },
-  data: function() {
+  data: function () {
     return {
       blocks: [],
       scene: {
-        blocks: []
+        blocks: [],
       },
-      selectedBlock: null
-    };
+      selectedBlock: null,
+    }
   },
 
   watch: {
     expectedInstances() {
-      this.init();
-    }
+      this.init()
+    },
   },
   methods: {
     seeDetail() {
-      let { id, instanceEnum, serviceId } = this.selectedBlock;
-      if (instanceEnum === "PROCESS") {
+      let { id, instanceEnum, serviceId } = this.selectedBlock
+      if (instanceEnum === 'PROCESS') {
         this.$router.push({
-          path: `/resource/${serviceId}/process/invoke?instanceId=${id}`
-        });
+          path: `/resource/${serviceId}/process/invoke?instanceId=${id}`,
+        })
       } else {
         this.$router.push({
-          path: `/resource/${serviceId}/model/invoke?instanceId=${id}`
-        });
+          path: `/resource/${serviceId}/model/invoke?instanceId=${id}`,
+        })
       }
     },
     async init() {
-      let getExpectedInstances = this.expectedInstances;
-      this.blocks = [];
-      let realBlocks = [];
-      let realLinks = [];
+      let getExpectedInstances = this.expectedInstances
+      this.blocks = []
+      let realBlocks = []
+      let realLinks = []
       getExpectedInstances.forEach(({ instanceEnum, service, id, name }) => {
         let block = {
           instanceEnum,
-          name: name
-        };
-        let fields = [];
-        service.behavior.inputs.forEach(input => {
+          name: name,
+        }
+        let fields = []
+        service.behavior.inputs.forEach((input) => {
           fields.push({
             name: input.name,
-            attr: "input"
-          });
-        });
-        service.behavior.outputs.forEach(output => {
+            attr: 'input',
+          })
+        })
+        service.behavior.outputs.forEach((output) => {
           fields.push({
             name: output.name,
-            attr: "output"
-          });
-        });
-        block.fields = fields;
-        this.blocks.push(block);
+            attr: 'output',
+          })
+        })
+        block.fields = fields
+        this.blocks.push(block)
 
         realBlocks.push({
           id: id,
@@ -79,54 +79,54 @@ export default {
           y: 43,
           name: name,
           instanceEnum,
-          serviceId: service.id
-        });
-      });
+          serviceId: service.id,
+        })
+      })
 
       //遍历每个实例的输出与非自身实例的输入是否存在数据引用关系，存在则生成Link
-      getExpectedInstances.forEach(instanceSource => {
-        let originID = instanceSource.id;
+      getExpectedInstances.forEach((instanceSource) => {
+        let originID = instanceSource.id
         instanceSource.service.behavior.outputs.forEach(
           (output, indexOrigin) => {
-            let originSlot = indexOrigin;
-            let withOutSelf = getExpectedInstances.filter(instanceTarget => {
-              return originID != instanceTarget.id;
-            });
+            let originSlot = indexOrigin
+            let withOutSelf = getExpectedInstances.filter((instanceTarget) => {
+              return originID != instanceTarget.id
+            })
 
-            withOutSelf.forEach(instanceTarget => {
-              let targetID = instanceTarget.id;
+            withOutSelf.forEach((instanceTarget) => {
+              let targetID = instanceTarget.id
               instanceTarget.service.behavior.inputs.forEach(
                 (input, indexTarget) => {
                   if (input.dataServiceId == output.dataServiceId) {
-                    let targetSlot = indexTarget;
+                    let targetSlot = indexTarget
                     realLinks.push({
                       originID,
                       originSlot,
                       targetID,
-                      targetSlot
-                    });
+                      targetSlot,
+                    })
                   }
                 }
-              );
-            });
+              )
+            })
           }
-        );
-      });
+        )
+      })
 
       this.scene = {
         blocks: realBlocks,
         links: realLinks,
-        container: { centerX: 1042, centerY: 140, scale: 1 }
-      };
+        container: { centerX: 1042, centerY: 140, scale: 1 },
+      }
     },
     selectBlock(block) {
-      this.selectedBlock = block;
+      this.selectedBlock = block
     },
     deselectBlock() {
-      this.selectedBlock = null;
-    }
+      this.selectedBlock = null
+    },
   },
-};
+}
 </script>
 
 <style lang="scss">
@@ -135,7 +135,6 @@ export default {
   height: 500px;
   padding: 20px 0 0 20px;
 }
-
 .container {
   width: 100%;
   height: calc(100% - 50px);

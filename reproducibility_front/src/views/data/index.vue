@@ -13,10 +13,10 @@
           <el-row class="top-desc">Collected by generous community. 🎁</el-row>
           <el-row class="input-container">
             <el-input
-              @keyup.enter.native="searchData"
+              @keyup.enter="searchData"
               v-model="value"
               placeholder=""
-              prefix-icon="el-icon-search"
+              :prefix-icon="ElIconSearch"
             ></el-input>
           </el-row>
           <el-row class="search-note"
@@ -52,7 +52,7 @@
     <!-- add model -->
     <el-dialog
       title="Add model in Reproducibilty"
-      :visible.sync="addModelDialogShow"
+      v-model="addModelDialogShow"
       width="40%"
       :close-on-click-modal="false"
     >
@@ -75,95 +75,98 @@
             :file-list="fileList"
             :auto-upload="false"
           >
-            <el-button slot="trigger" size="small" type="primary"
-              >Select File</el-button
-            >
+            <template v-slot:trigger>
+              <el-button size="small" type="primary">Select File</el-button>
+            </template>
           </el-upload>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm()">确 定</el-button>
-      </div>
+      <template v-slot:footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitForm()">确 定</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getDataServices } from "@/api/request";
-import dataServiceCard from "./components/DataServiceCard.vue";
-import DataTable from "./components/ResourceContent.vue";
+import { Search as ElIconSearch } from '@element-plus/icons'
+import { getDataServices } from '@/api/request'
+import dataServiceCard from './components/DataServiceCard.vue'
+import DataTable from './components/ResourceContent.vue'
 
 export default {
-  components: { DataTable, dataServiceCard },
   data() {
     return {
       data: [],
       is_extending: false,
-      value: "",
+      value: '',
       pageFilter: {
         pageSize: 8,
         page: 0,
       },
-
       form: {
-        name: "",
-        description: "",
+        name: '',
+        description: '',
         // resourceUrl: "",
       },
       fileList: [],
       addModelDialogShow: false,
-    };
+      ElIconSearch,
+    }
   },
+  components: { DataTable, dataServiceCard },
   computed: {
     noMore() {
-      return this.count >= 20;
+      return this.count >= 20
     },
     disabled() {
-      return this.loading || this.noMore;
+      return this.loading || this.noMore
     },
   },
   methods: {
     upFile() {
-      this.dialogFormVisible = false;
-      this.searchData();
+      this.dialogFormVisible = false
+      this.searchData()
     },
 
     searchData() {
-      this.pageFilter.page = 0;
-      this.getData();
+      this.pageFilter.page = 0
+      this.getData()
     },
 
     async getData() {
       let { content } = await getDataServices(
         this.pageFilter.page,
         this.pageFilter.pageSize
-      );
+      )
       // let { content } = await get(
       //   `/modelItems/${this.pageFilter.page}/${this.pageFilter.pageSize}`
       // );
       //   console.log(content);
       if (content.length == 0) {
-        this.is_extending = false;
-        return;
+        this.is_extending = false
+        return
       } else {
-        this.data = content;
-        this.is_extending = true;
+        this.data = content
+        this.is_extending = true
       }
     },
 
     extendData() {
-      this.pageFilter.page++;
-      this.getData();
+      this.pageFilter.page++
+      this.getData()
     },
 
     addModelItem() {},
   },
   mounted() {
-    this.getData();
+    this.getData()
     // window.addEventListener('scroll', this.scrollDown);
   },
-};
+}
 </script>
 
 <style lang="scss">
@@ -194,7 +197,7 @@ export default {
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;
-      font-family: Arial, Georgia, Times, "Times New Roman", serif;
+      font-family: Arial, Georgia, Times, 'Times New Roman', serif;
       .el-row {
         margin: 0.5rem 0;
       }

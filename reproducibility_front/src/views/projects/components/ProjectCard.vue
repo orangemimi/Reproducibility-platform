@@ -1,9 +1,8 @@
-<!--  -->
 <template>
   <div class="card">
     <!-- <div class="card-image">{{ project.privacy }}</div>
-    <div class="card-title">{{ project.name }}</div>
-    <div class="card-content"></div> -->
+        <div class="card-title">{{ project.name }}</div>
+        <div class="card-content"></div> -->
 
     <el-card class="box-card">
       <div @click="judgeRole(project)">
@@ -24,26 +23,26 @@
         >
 
         <!-- <el-dropdown @command="joinProjectCommand">
-          <span class="el-dropdown-link">
-            Join this project
-            <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="rebuilder_explorer">as explorer</el-dropdown-item>
-              <el-dropdown-item command="rebuilder_operator">as operator</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown> -->
+              <span class="el-dropdown-link">
+                Join this project
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="rebuilder_explorer">as explorer</el-dropdown-item>
+                  <el-dropdown-item command="rebuilder_operator">as operator</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown> -->
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
-import { imgBase64 } from "@/lib/utils";
-import { mapState } from "vuex";
-import { saveNotice } from "@/api/request";
+import { imgBase64 } from '@/lib/utils'
+import { mapState } from 'vuex'
+// import { saveNotice } from '@/api/request'
 export default {
   props: {
     project: {
@@ -63,54 +62,52 @@ export default {
   },
 
   data() {
-    return {};
+    return {}
   },
 
   methods: {
     imgPath(picture, name) {
-      if (picture != undefined && picture != "") {
-        return picture;
+      if (picture != undefined && picture != '') {
+        return picture
       }
-      return imgBase64(name);
+      return imgBase64(name)
     },
     view(id) {
       this.$router.push({
         path: `/project/${id}/info`,
-      });
+      })
     },
-    async joinProjectCommand() {
-      let notice = {
-        recipientId: this.project.creator,
-        type: "apply",
-        content: {
-          type: "joinProject",
-          role: "rebuilder_operator",
-          projectId: this.project.id,
-          projectName: this.project.name,
-        },
-      };
-      await saveNotice(notice);
-    },
+    // async joinProjectCommand() {
+    //   let notice = {
+    //     recipientId: this.project.creator,
+    //     type: 'apply',
+    //     content: {
+    //       type: 'joinProject',
+    //       role: 'rebuilder_operator',
+    //       projectId: this.project.id,
+    //       projectName: this.project.name,
+    //     },
+    //   }
+    //   await saveNotice(notice)
+    // },
 
     async judgeRole(project) {
-      await this.$store.dispatch("permission/getRole", {
+      await this.$store.dispatch('permission/getRole', {
         project: project,
         userId: this.userId,
-      });
-      this.view(project.id);
+      })
+      this.view(project.id)
     },
   },
 
   mounted() {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .card {
   width: 100%;
-  height: 200px;
-  // background-color: white;
-  // box-shadow: $normalBoxShadow;
-
+  height: 200px; /*// background-color: white;*/ /*// box-shadow: $normalBoxShadow;*/
   .box-card {
     margin: 10px 2%;
     // width: 300px;

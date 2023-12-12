@@ -1,7 +1,6 @@
-<!--  -->
 <template>
   <div>
-    <el-row style="float:left;margin:5px 10px  10px 0;">
+    <el-row style="float: left; margin: 5px 10px 10px 0">
       <el-tooltip
         :content="'Select ' + activeNames + 'to execute'"
         placement="top"
@@ -12,11 +11,11 @@
           inactive-color="#ff4949"
           active-value="Models"
           inactive-value="Data"
-          style="float:left;margin-right:10px"
+          style="float: left; margin-right: 10px"
         >
         </el-switch>
       </el-tooltip>
-      <div style="float:left;margin-right:10px">{{ activeNames }}</div>
+      <div style="float: left; margin-right: 10px">{{ activeNames }}</div>
     </el-row>
     <el-input
       placeholder="Search model/tool"
@@ -24,7 +23,9 @@
       class="search_input"
       v-show="modelList.length > 20"
     >
-      <el-button slot="append" icon="el-icon-search"></el-button>
+      <template v-slot:append>
+        <el-button :icon="ElIconSearch"></el-button>
+      </template>
     </el-input>
     <div v-if="modelList != null">
       <div v-for="(item, index) in modelList" :key="index">
@@ -37,25 +38,12 @@
 </template>
 
 <script>
-import ModelCard from "_com/Cards/ModelCard";
+import { Search as ElIconSearch } from '@element-plus/icons-vue'
+import { $on, $off, $once, $emit } from '../../../../utils/gogocodeTransfer'
+import ModelCard from '_com/Cards/ModelCard'
 export default {
-  props: {
-    modelList: {
-      type: Array,
-    },
-  },
-  components: {
-    ModelCard,
-    // modelToolbar
-  },
-
-  watch: {},
-
-  computed: {},
-
   data() {
     return {
-      activeNames: "Models",
       //mxgraph scrollbar
       // ops: {
       //   bar: {
@@ -70,18 +58,29 @@ export default {
       //     disable: false,
       //   },
       // },
-    };
+      activeNames: 'Models',
+      ElIconSearch,
+    }
   },
-
-  methods: {
-    clickModel(val) {
-      val.isCurrent = true;
-      console.log(val);
-      this.$emit("selectModel", val);
+  props: {
+    modelList: {
+      type: Array,
     },
   },
-
+  components: {
+    ModelCard,
+    // modelToolbar
+  },
+  watch: {},
+  computed: {},
+  methods: {
+    clickModel(val) {
+      val.isCurrent = true
+      console.log(val)
+      $emit(this, 'selectModel', val)
+    },
+  },
   mounted() {},
-};
+  emits: ['selectModel'],
+}
 </script>
-<style lang="scss" scoped></style>

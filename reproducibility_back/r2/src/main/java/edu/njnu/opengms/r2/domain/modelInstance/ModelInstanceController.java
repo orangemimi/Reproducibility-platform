@@ -51,7 +51,14 @@ public class ModelInstanceController {
     //新加，用来读取绑定的实例
     @RequestMapping(value = "/getBoundInstances", method = RequestMethod.POST)
     public JsonResult getModelInstancesByIds(@RequestBody List<String> modelInstanceIds) {
-        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllById(modelInstanceIds);
+        System.out.println(modelInstanceIds);
+        List<ModelInstance> modelInstanceList = new ArrayList<>();
+        for (String id : modelInstanceIds) {
+            ModelInstance modelInstance = modelInstanceRepository.findAllById(id);
+            if (modelInstance != null) {
+                modelInstanceList.add(modelInstance);
+            }
+        }
         return ResultUtils.success(modelInstanceList);
     }
 

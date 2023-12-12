@@ -1,73 +1,82 @@
 <template>
   <div class="main">
     <!-- <div class="leftBar" v-if="role == 'builder'">
-      <left-toolbar ref="leftToolbar"></left-toolbar>
-    </div> -->
+          <left-toolbar ref="leftToolbar"></left-toolbar>
+        </div> -->
 
     <div class="mainContainer">
       <div class="modelbarTop">
         <el-divider direction="vertical"></el-divider>
 
         <el-dropdown trigger="click" @command="zoom">
-          <el-button type="text" size="mini">
+          <el-button type="text" size="default">
             {{ size }}%
-            <i class="el-icon-arrow-down el-icon--right"></i>
+            <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
           </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item :command="50">50%</el-dropdown-item>
-            <el-dropdown-item :command="75">75%</el-dropdown-item>
-            <el-dropdown-item :command="100">100%</el-dropdown-item>
-            <el-dropdown-item :command="125">125%</el-dropdown-item>
-            <el-dropdown-item :command="150">150%</el-dropdown-item>
-          </el-dropdown-menu>
+          <template v-slot:dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item :command="50">50%</el-dropdown-item>
+              <el-dropdown-item :command="75">75%</el-dropdown-item>
+              <el-dropdown-item :command="100">100%</el-dropdown-item>
+              <el-dropdown-item :command="125">125%</el-dropdown-item>
+              <el-dropdown-item :command="150">150%</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
         </el-dropdown>
-        <el-button @click="importGraphDialog = true" type="text" size="mini"
+        <el-button @click="importGraphDialog = true" type="text" size="default"
           >Import</el-button
         >
 
-        <el-button @click="saveMx" type="text" size="mini">Save</el-button>
+        <el-button @click="saveMx" type="text" size="default">Save</el-button>
         <el-button
           @click="graphLayout(true, 'hierarchicalLayout')"
           type="text"
-          size="mini"
+          size="default"
           >Suit</el-button
         >
-        <el-button @click="savePic" type="text" size="mini"
+        <el-button @click="savePic" type="text" size="default"
           >save as pic</el-button
         >
       </div>
 
       <!-- {{ expectedInstances }} -->
       <div>
-        <vue-scroll style="height:2800px; " :ops="ops" ref="scroll">
+        <div style="min-height: 2800px" :ops="ops" ref="scroll">
           <div
             id="fullScreenComponent"
             class="graphContainer"
             ref="container"
             @contextmenu.prevent
           ></div>
-        </vue-scroll>
+        </div>
       </div>
     </div>
     <div class="dialogs">
-      <el-dialog :visible.sync="importGraphDialog" width="30%">
+      <el-dialog v-model="importGraphDialog" width="60%">
         <el-input
           type="textarea"
-          :rows="2"
+          :rows="24"
           placeholder="请输入内容"
           v-model="importGraphText"
         >
         </el-input>
-        <el-button @click="importGraph">Save</el-button>
+        <div style="display: flex; justify-content: flex-end">
+          <el-button type="primary" @click="importGraph" style="margin: 20px"
+          >Save</el-button
+        >
+        </div>
       </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
+import { ArrowDown as ElIconArrowDown } from "@element-plus/icons-vue";
+import { $on, $emit } from "../../../../utils/gogocodeTransfer";
 import bus from "./bus";
 import mxgraph from "_com/MxGraph/index";
-import { genGraph } from "_com/MxGraph/initMx";
+import { genGraph } from "_com/MxGraph/initMx.js";
+// import VueScroll from 'vue-scroll';
 
 const {
   // mxGraph,
@@ -93,8 +102,11 @@ const {
 } = mxgraph;
 
 export default {
+  components: {
+    ElIconArrowDown,
+    // VueScroll
+  },
   props: ["expectedInstances"],
-
   watch: {
     expectedInstances() {
       this.graph.removeCells(
@@ -104,11 +116,10 @@ export default {
       this.mxContent += `</root></mxGraphModel>`;
       console.log(this.mxContent);
       this.graph.importGraph(this.mxContent);
-      this.graphLayout(true, "hierarchicalLayout"); 
+      this.graphLayout(true, "hierarchicalLayout");
       this.getDocument();
     },
   },
-
   data() {
     return {
       graph: null,
@@ -155,7 +166,6 @@ export default {
       procedureContent: "",
     };
   },
-
   methods: {
     zoom(val) {
       this.size = val;
@@ -170,6 +180,7 @@ export default {
       this.graph.zoomTo(this.size / 100);
     },
     importGraph() {
+      this.importGraphDialog=false;
       this.graph.importGraph(this.importGraphText);
     },
 
@@ -180,7 +191,7 @@ export default {
       // console.log(xml);
     },
     getSelectionCells() {
-      bus.$on("go", (data) => {
+      $on(bus, "go", (data) => {
         this.selectionCells = data;
       });
     },
@@ -205,10 +216,13 @@ export default {
           mxHierarchicalLayout.prototype.fineTuning = false;
           mxHierarchicalLayout.prototype.traverseAncestors = true;
           mxHierarchicalLayout.prototype.resizeParent = true;
+          console.log('1201');
+
           // 无关系实体之间的间距
           mxHierarchicalLayout.prototype.interHierarchySpacing = 50;
           // 层级之间的距离
           mxHierarchicalLayout.prototype.interRankCellSpacing = 50;
+          console.log(mxHierarchicalLayout.prototype,'101');
 
           // eslint-disable-next-line new-cap
           var hierarchicallayout = new mxHierarchicalLayout(
@@ -380,7 +394,7 @@ export default {
 
       let dataItems = this.dataItemList;
       // console.log(this.dataItemList,'this.dataItemList');
-      
+
       //遍历每个实例的输出与非自身实例的输入是否存在数据引用关系，存在则s生成Link
       let inputs = this.dataItemList.filter((data) => data.type == "input");
       let outputs = this.dataItemList.filter((data) => data.type == "output");
@@ -468,19 +482,31 @@ export default {
         if (isCell) {
           let cell = evt.properties.cell;
           this.graph.addSelectionCell(cell);
-          bus.$emit("go", this.graph.getSelectionCells());
+          $emit(bus, "go", this.graph.getSelectionCells());
           const clickModelType = cell.type;
 
           if (clickModelType == "modelService") {
             // 使用 mxGraph 事件中心，触发自定义事件
             // this.currentCell = cell;
             this.modelClick = true;
-            this.modelDoubleClick = this.dataClick = this.dataDoubleClick = this.codeClick = false;
+            this.modelDoubleClick =
+              this.dataClick =
+              this.dataDoubleClick =
+              this.codeClick =
+                false;
           } else if (clickModelType == "code") {
             this.codeClick = true;
-            this.modelDoubleClick = this.dataClick = this.dataDoubleClick = this.modelClick = false;
+            this.modelDoubleClick =
+              this.dataClick =
+              this.dataDoubleClick =
+              this.modelClick =
+                false;
           } else {
-            this.modelDoubleClick = this.modelClick = this.dataDoubleClick = this.codeClick = false;
+            this.modelDoubleClick =
+              this.modelClick =
+              this.dataDoubleClick =
+              this.codeClick =
+                false;
 
             // console.log(cell);
             this.dataNode = cell;
@@ -490,16 +516,16 @@ export default {
           //单击空白处
           this.currentCell = {};
           // console.log(this.graph.getSelectionCells())
-          bus.$emit("go", []);
+          $emit(bus, "go", []);
         }
       });
     },
     getDocument() {
       let getExpectedInstances = this.expectedInstances;
       this.procedureContent = `<AgentInfo>
-    <Add name="xxx" title="Mr." type="Creator" email="xxx@xxx" insititution="xxxx"/>
-   </AgentInfo>
-   <Configuration>`;
+<Add name="xxx" title="Mr." type="Creator" email="xxx@xxx" insititution="xxxx"/>
+</AgentInfo>
+<Configuration>`;
       getExpectedInstances.forEach((model) => {
         let service = model.service;
         this.procedureContent += `<TaskInstance id="${model.id}" name="${model.name}" description="" modelServiceId="${service.id}"><Behavior><Inputs>`;
@@ -530,17 +556,17 @@ export default {
       let dataItemList = this.dataItemList;
       let modelItemList = this.modelListInGraph;
       let linkList = this.linkEdgeList;
-
+      console.log(dataItemList,dataItemList,linkList,'104');
       // let content = this.mxContent;
       modelItemList.forEach((data) => {
         this.mxContent += ` <mxCell id= "${data.id}" style="${data.style}" parent="1" vertex="1" name="${data.name}" value="${data.name}" type="model">
-          <mxGeometry x= "${data.mxGeometry.x}" y="${data.mxGeometry.y}" width="200" height="50" as="geometry" />
-          </mxCell>`;
+<mxGeometry x= "${data.mxGeometry.x}" y="${data.mxGeometry.y}" width="200" height="50" as="geometry" />
+</mxCell>`;
       });
       dataItemList.forEach((data) => {
         this.mxContent += ` <mxCell id= "${data.id}" style="${data.style}" parent="1" vertex="1" name="${data.name}" value="${data.name}" type="data">
-          <mxGeometry x= "${data.mxGeometry.x}" y="${data.mxGeometry.y}" width="200" height="50" as="geometry" />
-          </mxCell>`;
+<mxGeometry x= "${data.mxGeometry.x}" y="${data.mxGeometry.y}" width="200" height="50" as="geometry" />
+</mxCell>`;
       });
       linkList.forEach((data) => {
         this.mxContent += ` <mxCell id= "${data.id}" parent="1" source="${data.source}" target="${data.target}" edge="1" ><mxGeometry relative="1" as="geometry"/></mxCell>`;
@@ -570,22 +596,18 @@ export default {
       this.graph = genGraph(this.container);
     },
   },
-
   mounted() {
     this.init();
     this.listenGraphEvent();
   },
+  emits: ["go"],
 };
 </script>
 
 <style lang="scss" scoped>
 .main {
-  // width: 100%;
-  // height: 100%;
-
-  // display: flex;
-  // position: relative;
-
+  /*// width: 100%;*/ /*// height: 100%;*/ /*// display: flex;*/ /*// position: relative;*/
+  width: 100%;
   .mainContainer {
     float: left;
     // position: relative;
@@ -625,9 +647,10 @@ export default {
       overflow: hidden;
       height: 100%;
       width: 100%;
-      // min-width: calc(100%);
-      min-width: 2000px;
-      min-height: 2905px;
+      min-width: calc(100%);
+      // min-width: 2000px;
+      // min-height: 2905px;
+      min-height: 80vh;
       // background: rgb(251, 251, 251) url("./mxgraph/point.gif") 0 0 repeat;
       border-radius: 4px;
     }

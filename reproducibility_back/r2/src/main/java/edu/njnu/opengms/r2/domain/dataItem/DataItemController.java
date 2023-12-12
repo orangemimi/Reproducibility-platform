@@ -111,13 +111,13 @@ public class DataItemController {
         //add to dataItem in mongodb
 
         if(storedFolderId.equals("intermediate")){
-            return ResultUtils.success("http://175.27.137.60:8083/data/" +url);
+            return ResultUtils.success("http://112.4.132.6:8083/data/" +url);
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://175.27.137.60:8083/data/" + url)
+                    .value("http://112.4.132.6:8083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)

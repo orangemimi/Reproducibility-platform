@@ -1,12 +1,13 @@
-<!-- info -->
 <template>
   <div class="information">
     <el-col
       :xs="24"
       :sm="24"
       :md="{ span: 22, offset: 1 }"
-      :lg="{ span: 22, offset: 1 }"
+      :lg="{ span: 22, offset: 1 }" 
     >
+    <!-- tmd好神奇，vue2转vue3后这个布局就有问题了，左半边空白，右半边对半分，加了这个br才好，真是玄学,盲猜跟el-row或者flex布局有关，升级后很多el-row的布局跟原先都不太一样 -->
+    <br>
       <el-row :gutter="10">
         <el-col :span="12">
           <div class="info-card">
@@ -20,7 +21,7 @@
                   <div
                     v-if="
                       projectInfo.forkingProjectId != '' &&
-                        projectInfo.forkingProjectId != undefined
+                      projectInfo.forkingProjectId != undefined
                     "
                     class="prompt"
                   >
@@ -60,7 +61,7 @@
                     </div>
                     <div v-else>
                       <el-tag type="success" style="float: left"
-                        ><i class="el-icon-edit"></i
+                        ><el-icon><el-icon-edit /></el-icon
                       ></el-tag>
                     </div>
                   </div>
@@ -80,7 +81,6 @@
 
               <div class="info-img">
                 <div style="float: right">
-                  <!-- <el-button-group> -->
                   <el-button
                     type="primary"
                     plain
@@ -88,29 +88,28 @@
                     @click="editProjectInfoDialog"
                     >Edit</el-button
                   >
-                  <!-- </el-button-group> -->
                   <el-button-group>
                     <el-button type="primary" plain size="small">
-                      <i class="el-icon-share"></i>
+                      <el-icon><el-icon-share /></el-icon>
                     </el-button>
                     <el-button type="primary" plain size="small">
-                      <i class="el-icon-more"></i>
+                      <el-icon><el-icon-more /></el-icon>
                     </el-button>
                   </el-button-group>
                 </div>
                 <div>
-                  <avatar
-                    username="projectInfo.name"
+                  <img
+                    v-if="projectInfo.picture"
                     :src="projectInfo.picture"
-                    :size="200"
-                    style="margin-top: 10px"
-                    :rounded="false"
+                    :alt="projectInfo.name"
                     class="avatar-img"
-                  ></avatar>
+                    style="width: 200px; height: 200px; margin-top: 10px;"
+                  />
+
                 </div>
               </div>
             </div>
-            <div class="info-card-bottom">
+           <div class="info-card-bottom">
               <div class="des">
                 <div class="head">
                   <div class="mark"></div>
@@ -121,16 +120,13 @@
                   class="content"
                   v-if="
                     projectInfo.description != null &&
-                      projectInfo.description != ''
+                    projectInfo.description != ''
                   "
                 >
-                  <!-- {{ projectInfo.description }} -->
                   <div
                     class="item-box w-e-text"
                     v-html="projectInfo.description"
                   ></div>
-
-                  <!-- <div class="w-e-text-container" v-html="projectInfo.description"></div> -->
                 </div>
                 <div v-else class="content">
                   <p class="nocontent">No description</p>
@@ -151,7 +147,7 @@
                     @click="addParticipantDialogShow = true"
                   >
                     Add participant
-                    <i class="el-icon-user-solid"></i>
+                    <el-icon><el-icon-user-solid /></el-icon>
                   </el-button>
                 </div>
               </div>
@@ -179,7 +175,7 @@
                         ></el-col>
                       </div>
                       <el-col :span="3">
-                        <el-avatar :size="50" icon="el-icon-more"></el-avatar>
+                        <el-avatar :size="50" :icon="ElIconMore"></el-avatar>
                       </el-col>
                     </div>
                     <div v-else>
@@ -208,7 +204,7 @@
                 class="content"
                 v-if="
                   projectInfo.citation != undefined &&
-                    projectInfo.citation != null
+                  projectInfo.citation != null
                 "
               >
                 <el-descriptions direction="vertical" :column="4" border>
@@ -252,88 +248,57 @@
         </el-col>
       </el-row>
     </el-col>
-
-    <!-- edit the project dialog -->
-    <!-- <el-dialog
-      title="Edit Project Info"
-      :visible.sync="editProjectInfoDialogShow"
-      width="40%"
-      :close-on-click-modal="false"
-    >
-      <edit-info-form
-        :projectInfo="projectInfo"
-        @editProjectInfoResponse="editProjectInfoResponse"
-      ></edit-info-form>
-    </el-dialog> -->
-
-    <!-- share the project with email  -->
-    <!-- <el-dialog
-      :title="'Invite a collaborator to ' + projectInfo.name"
-      :visible.sync="addParticipantDialogShow"
-      width="40%"
-      :close-on-click-modal="false"
-    >
-      <share-project></share-project>
-    </el-dialog> -->
-
-    <!-- <el-dialog
-      title="Edit citation"
-      :visible.sync="editCitation"
-      width="900px"
-      :close-on-click-modal="false"
-    >
-      <citation-form
-        @citation="getCitation"
-        :citationData="projectInfo.citation"
-        v-if="editCitation"
-      ></citation-form>
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
-import { getProjectAndUsers } from "@/api/request";
-import { dateFormat } from "@/utils/utils";
-import { mapState } from "vuex";
-import Avatar from "vue-avatar";
-import userCard from "_com/Cards/UserCard.vue";
-// import editInfoForm from "./components/EditProjectInfo";
-// import shareProject from "_com/ShareProject";
-// import citationForm from "./components/CitationForm.vue";
-// import reBuilderCard from '_com/UserCard/ReBuilderCard';
+import {
+  Edit as ElIconEdit,
+  Share as ElIconShare,
+  More as ElIconMore,
+  UserFilled as ElIconUserSolid,
+} from '@element-plus/icons-vue'
+import { getProjectAndUsers } from '@/api/request'
+import { dateFormat } from '@/utils/utils'
+import { mapState } from 'vuex'
+import Avatar from 'vue-avatar'
+import userCard from '_com/Cards/UserCard.vue'
 export default {
-  components: {
-    Avatar,
-    userCard,
-    // editInfoForm,
-    // shareProject,
-    // citationForm,
-    // reBuilderCard
-  },
-
-  async beforeRouteUpdate(to, from, next) {
-    this.projectId = to.params.id;
-    await this.init();
-    next();
-  },
-
   data() {
     return {
+      temporaryIcon: null,
       projectId: this.$route.params.id,
       projectInfo: {},
       creator: {},
       memberList: [],
       ops: {
         bar: {
-          background: "#808695",
+          background: '#808695',
         },
       },
       editProjectInfoDialogShow: false,
       addParticipantDialogShow: false,
       editCitation: false,
-    };
+      ElIconMore,
+    }
   },
-
+  components: {
+    Avatar,
+    // editInfoForm,
+    // shareProject,
+    // citationForm,
+    // reBuilderCard
+    userCard,
+    ElIconEdit,
+    ElIconShare,
+    ElIconMore,
+    ElIconUserSolid,
+  },
+  async beforeRouteUpdate(to, from, next) {
+    this.projectId = to.params.id
+    await this.init()
+    next()
+  },
   computed: {
     ...mapState({
       // userId: state => state.user.userId,
@@ -341,106 +306,113 @@ export default {
       // token: state => state.user.token
     }),
     getAuthorLabel() {
-      return function(type) {
-        if (type == "Almanac") {
-          return "Almanac name";
-        } else if (type == "Standard") {
-          return "Standard number";
-        } else if (type == "Achievement") {
-          return "Finisher";
+      return function (type) {
+        if (type == 'Almanac') {
+          return 'Almanac name'
+        } else if (type == 'Standard') {
+          return 'Standard number'
+        } else if (type == 'Achievement') {
+          return 'Finisher'
         } else {
-          return "Author";
+          return 'Author'
         }
-      };
+      }
     },
     getSourceLable() {
-      return function(type) {
-        if (type == "Thesis") {
-          return "Periodical";
-        } else if (type == "Dissertation") {
-          return "Degree-granting unit";
-        } else if (type == "Meeting") {
-          return "Meeting name";
-        } else if (type == "Newspaper") {
-          return "Newspaper name";
-        } else if (type == "Almanac") {
-          return "Column";
-        } else if (type == "Book") {
-          return "Publishing house";
-        } else if (type == "Patent") {
-          return "applicant";
-        } else if (type == "Standard") {
-          return "Source";
-        } else if (type == "Achievement") {
-          return "First completion unit";
+      return function (type) {
+        if (type == 'Thesis') {
+          return 'Periodical'
+        } else if (type == 'Dissertation') {
+          return 'Degree-granting unit'
+        } else if (type == 'Meeting') {
+          return 'Meeting name'
+        } else if (type == 'Newspaper') {
+          return 'Newspaper name'
+        } else if (type == 'Almanac') {
+          return 'Column'
+        } else if (type == 'Book') {
+          return 'Publishing house'
+        } else if (type == 'Patent') {
+          return 'applicant'
+        } else if (type == 'Standard') {
+          return 'Source'
+        } else if (type == 'Achievement') {
+          return 'First completion unit'
         }
-      };
+      }
     },
   },
-
   methods: {
+    //project/info的头像，目前用本地资源代替
+    async loadTemporaryIcon() {
+      this.temporaryIcon = (await import('../../../assets/images/map.jpg'));
+      console.log('ok');
+      console.log(this.temporaryIcon);
+    },
+
     async init() {
-      await this.getProjectInfo();
+      await this.getProjectInfo()
       // await this.judgeRole(this.projectInfo);
     },
 
     async getProjectInfo() {
-      let data = await getProjectAndUsers(this.projectId);
-
-      this.projectInfo = data.project;
-      this.creator = data.creator;
+      let data = await getProjectAndUsers(this.projectId)
+      this.projectInfo = data.project
+      this.creator = data.creator
       if (data.memberList != null) {
         //防止出现数组修改不响应的情况
-        this.$set(this, "memberList", data.memberList);
+        this['memberList'] = data.memberList
       } else {
-        this.$set(this, "memberList", []);
+        this['memberList'] = []
       }
     },
 
     editProjectInfoDialog() {
-      this.editProjectInfoDialogShow = true;
+      this.editProjectInfoDialogShow = true
     },
 
     async getAllUsers() {},
 
     async editProjectInfoResponse(val) {
       if (val.flag) {
-        this.editProjectInfoDialogShow = false;
-        await this.getProjectInfo();
+        this.editProjectInfoDialogShow = false
+        await this.getProjectInfo()
 
         this.$notify({
-          title: "Success",
-          message: "You have update the project successfully!",
-          type: "success",
-        });
+          title: 'Success',
+          message: 'You have update the project successfully!',
+          type: 'success',
+        })
       }
     },
 
     getDate(date, dateType) {
-      if (dateType == "year") {
-        return this.dateFormat(date, "yyyy");
-      } else if (dateType == "month") {
-        return this.dateFormat(date, "yyyy-MM");
+      if (dateType == 'year') {
+        return this.dateFormat(date, 'yyyy')
+      } else if (dateType == 'month') {
+        return this.dateFormat(date, 'yyyy-MM')
       } else {
-        return this.dateFormat(date, "yyyy-MM-dd");
+        return this.dateFormat(date, 'yyyy-MM-dd')
       }
     },
 
     getCitation(val) {
-      this.projectInfo.citation = val;
-      this.editCitation = false;
+      this.projectInfo.citation = val
+      this.editCitation = false
     },
 
-    dateFormat(time, format = "yyyy-MM-dd hh:mm:ss") {
-      return dateFormat(time, format);
+    dateFormat(time, format = 'yyyy-MM-dd hh:mm:ss') {
+      return dateFormat(time, format)
     },
   },
-
   mounted() {
-    this.init();
+    this.init()
+    //加载project/info里面的图片
+    this.loadTemporaryIcon()
   },
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .nocontent {
   opacity: 0.3;
@@ -449,11 +421,12 @@ export default {
 }
 .information {
   width: 100%;
-  min-height: calc(100vh - 240px);
+  min-height: calc(100vh - 242px);
   .info-card {
     background-color: white;
     min-height: calc(100vh - 242px);
     padding: 20px 32px;
+    // border: 1px solid black;
     .info-card-top {
       width: 100%;
       height: 280px;
@@ -570,6 +543,7 @@ export default {
     background-color: white;
     min-height: calc(100vh - 242px);
     padding: 20px 32px;
+    // border: 1px solid black;
     .info {
       height: 32px;
       line-height: 32px;

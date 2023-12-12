@@ -1,5 +1,5 @@
 <template>
-  <el-card style="height:150px;margin:8px -15px">
+  <el-card style="height: 200px; margin: 8px -15px">
     <div>
       <el-row>
         <el-col :span="16">
@@ -8,17 +8,17 @@
           </div>
         </el-col>
         <el-col :span="8">
-          <div v-if="cardData.type === 'model'" style="float:right">
+          <div v-if="cardData.type === 'model'" style="float: right">
             <i class="iconfont icon-model" color="#daa520" />
-            <span style="font-size:18px;color:#daa520">Model</span>
+            <span style="font-size: 18px; color: #daa520">Model</span>
           </div>
-          <div v-if="cardData.type === 'process'" style="float:right">
+          <div v-if="cardData.type === 'process'" style="float: right">
             <i class="iconfont icon-process" color="#d2691e" />
-            <span style="font-size:10px;color:#d2691e">Data Process</span>
+            <span style="font-size: 10px; color: #d2691e">Data Process</span>
           </div>
-          <div v-if="cardData.type === 'evaluation'" style="float:right">
+          <div v-if="cardData.type === 'evaluation'" style="float: right">
             <i class="iconfont icon-dataanalysis" color="#d2691e" />
-            <span style="font-size:10px;color:#d2691e">Evaluation</span>
+            <span style="font-size: 10px; color: #d2691e">Evaluation</span>
           </div>
         </el-col>
       </el-row>
@@ -28,31 +28,35 @@
         </div>
         <div v-else class="noDes">No Description !</div>
       </el-row>
-      <el-row>
-        <el-col>
-          <div class="info">
-            <el-col :span="11">
-              <i class="el-icon-user" :size="12" />
-              <span style="color:#2b85e4">{{
-                cardData.creator ? cardData.creator : "sunlingzhi"
-              }}</span>
-            </el-col>
-            <el-col :span="13">
-              <div style="float:right">
-                <i class="el-icon-alarm-clock" :size="12" />
-                <span>{{ cardData.createTime }}</span>
-              </div>
-            </el-col>
-          </div>
-        </el-col>
-      </el-row>
+      <div style="display: flex; flex-direction: column-reverse">
+        <el-row>
+          <el-col :span="10">
+            <el-icon><el-icon-user /></el-icon>
+            <span style="color: #2b85e4">{{
+              cardData.creator ? cardData.creator : "sunlingzhi"
+            }}</span>
+          </el-col>
+          <el-col :span="14" style="text-align: right">
+            <el-icon><el-icon-alarm-clock /></el-icon>
+            <span>{{ cardData.createTime }}</span>
+          </el-col>
+        </el-row>
+      </div>
     </div>
   </el-card>
 </template>
 
 <script>
+import {
+  User as ElIconUser,
+  AlarmClock as ElIconAlarmClock,
+} from "@element-plus/icons-vue";
 import config from "@/config";
 export default {
+  components: {
+    ElIconUser,
+    ElIconAlarmClock,
+  },
   props: {
     cardData: {
       type: Object,
@@ -79,10 +83,11 @@ export default {
 </script>
 
 <style>
+:deep(.el-card__body) {
+  width: 200px;
+}
 .title {
-  /* height: 3em; */
   overflow: hidden;
-  /* text-overflow: ellipsis; */
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -95,17 +100,16 @@ export default {
   line-height: 1em;
 }
 #bottom-info {
-  /* display: flex; */
   margin-top: 5px;
   justify-content: space-between;
 }
-
 .info {
+  float: right;
   margin-right: 10px;
   font-size: 16px;
 }
 .cmpItemDesc {
-  height: 80px;
+  height: 115px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4;

@@ -1,41 +1,53 @@
 <template>
   <div class="vue-container">
     <VueLink :lines="lines" />
-    <VueBlock
+    <div v-for="(block,index) in blocks" :key="index">     
+      <VueBlock
+        v-model="blocks[index]"
+        :key="block.id"
+        :options="optionsForChild"
+        @update="updateScene"
+        @select="blockSelect(block)"
+      />
+    </div>
+    
+    <!-- 以下是转换为vue3前的写法 -->
+    <!-- <VueBlock
       v-for="block in blocks"
+      v-model="block"
       :key="block.id"
-      v-bind.sync="block"
       :options="optionsForChild"
       @update="updateScene"
       @select="blockSelect(block)"
-    />
+    /> -->
   </div>
 </template>
 
 <script>
-import merge from "deepmerge";
-import mouseHelper from "../../helpers/mouse";
-import VueBlock from "./VueBlock";
-import VueLink from "../VueLink";
+import { $on, $off, $once, $emit } from '../../../../utils/gogocodeTransfer'
+import merge from 'deepmerge'
+import mouseHelper from '../../helpers/mouse'
+import VueBlock from './VueBlock'
+import VueLink from '../VueLink'
 
 export default {
-  name: "VueBlockContainer",
+  name: 'VueBlockContainer',
   props: {
     blocksContent: {
       type: Array,
       default() {
-        return [];
-      }
+        return []
+      },
     },
     scene: {
       type: Object,
       default() {
-        return { blocks: [], links: [], container: {} };
-      }
+        return { blocks: [], links: [], container: {} }
+      },
     },
     options: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
     return {
@@ -51,16 +63,16 @@ export default {
       //
       tempLink: null,
       selectedBlock: null,
-      hasDragged: false
-    };
+      hasDragged: false,
+    }
   },
   watch: {
     blocksContent() {
-      this.importBlocksContent();
+      this.importBlocksContent()
     },
     scene() {
-      this.importScene();
-    }
+      this.importScene()
+    },
   },
   computed: {
     optionsForChild() {
@@ -71,64 +83,64 @@ export default {
         inputSlotClassName: this.inputSlotClassName,
         center: {
           x: this.centerX,
-          y: this.centerY
-        }
-      };
+          y: this.centerY,
+        },
+      }
     },
     container() {
       return {
         centerX: this.centerX,
         centerY: this.centerY,
-        scale: this.scale
-      };
+        scale: this.scale,
+      }
     },
     // Links calculate
     lines() {
-      let lines = [];
+      let lines = []
 
       for (let link of this.links) {
-        let originBlock = this.blocks.find(block => {
-          return block.id === link.originID;
-        });
+        let originBlock = this.blocks.find((block) => {
+          return block.id === link.originID
+        })
 
-        let targetBlock = this.blocks.find(block => {
-          return block.id === link.targetID;
-        });
+        let targetBlock = this.blocks.find((block) => {
+          return block.id === link.targetID
+        })
 
         if (!originBlock || !targetBlock) {
-          console.log("Remove invalid link", link);
-          this.removeLink(link.id);
-          continue;
+          console.log('Remove invalid link', link)
+          this.removeLink(link.id)
+          continue
         }
 
         if (originBlock.id === targetBlock.id) {
-          console.log("Loop detected, remove link", link);
-          this.removeLink(link.id);
-          continue;
+          console.log('Loop detected, remove link', link)
+          this.removeLink(link.id)
+          continue
         }
 
         let originLinkPos = this.getConnectionPos(
           originBlock,
           link.originSlot,
           false
-        );
+        )
         let targetLinkPos = this.getConnectionPos(
           targetBlock,
           link.targetSlot,
           true
-        );
+        )
 
         if (!originLinkPos || !targetLinkPos) {
-          console.log("Remove invalid link (slot not exist)", link);
-          this.removeLink(link.id);
-          continue;
+          console.log('Remove invalid link (slot not exist)', link)
+          this.removeLink(link.id)
+          continue
         }
 
-        let x1 = originLinkPos.x;
-        let y1 = originLinkPos.y;
+        let x1 = originLinkPos.x
+        let y1 = originLinkPos.y
 
-        let x2 = targetLinkPos.x;
-        let y2 = targetLinkPos.y;
+        let x2 = targetLinkPos.x
+        let y2 = targetLinkPos.y
 
         lines.push({
           x1: x1,
@@ -136,17 +148,17 @@ export default {
           x2: x2,
           y2: y2,
           style: {
-            stroke: "#F85",
+            stroke: '#F85',
             strokeWidth: 4 * this.scale,
-            fill: "none"
+            fill: 'none',
           },
           outlineStyle: {
-            stroke: "#666",
+            stroke: '#666',
             strokeWidth: 6 * this.scale,
             strokeOpacity: 0.6,
-            fill: "none"
-          }
-        });
+            fill: 'none',
+          },
+        })
       }
 
       if (this.tempLink) {
@@ -156,31 +168,31 @@ export default {
         //   fill: "none"
         // };
 
-        lines.push(this.tempLink);
+        lines.push(this.tempLink)
       }
 
-      return lines;
-    }
+      return lines
+    },
   },
   methods: {
     // Events
     /** @param e {MouseEvent} */
     handleMove(e) {
-      let mouse = mouseHelper.getMousePosition(this.$el, e);
-      this.mouseX = mouse.x;
-      this.mouseY = mouse.y;
+      let mouse = mouseHelper.getMousePosition(this.$el, e)
+      this.mouseX = mouse.x
+      this.mouseY = mouse.y
 
       if (this.dragging) {
-        let diffX = this.mouseX - this.lastMouseX;
-        let diffY = this.mouseY - this.lastMouseY;
+        let diffX = this.mouseX - this.lastMouseX
+        let diffY = this.mouseY - this.lastMouseY
 
-        this.lastMouseX = this.mouseX;
-        this.lastMouseY = this.mouseY;
+        this.lastMouseX = this.mouseX
+        this.lastMouseY = this.mouseY
 
-        this.centerX += diffX;
-        this.centerY += diffY;
+        this.centerX += diffX
+        this.centerY += diffY
 
-        this.hasDragged = true;
+        this.hasDragged = true
       }
 
       if (this.linking && this.linkStartData) {
@@ -188,189 +200,190 @@ export default {
           this.linkStartData.block,
           this.linkStartData.slotNumber,
           false
-        );
+        )
         this.tempLink = {
           x1: linkStartPos.x,
           y1: linkStartPos.y,
           x2: this.mouseX,
-          y2: this.mouseY
-        };
+          y2: this.mouseY,
+        }
       }
     },
     handleDown(e) {
-      const target = e.target || e.srcElement;
+      console.log('in');
+      const target = e.target || e.srcElement
+      console.log(this.el.$el,this.$el,this.$el.$el,'11112');
       if (
-        (target === this.$el || target.matches("svg, svg *")) &&
+        (target === this.$el || target.matches('svg, svg *')) &&
         e.which === 1
       ) {
-        this.dragging = true;
+        this.dragging = true
+        let mouse = mouseHelper.getMousePosition(this.$el, e)
+        this.mouseX = mouse.x
+        this.mouseY = mouse.y
 
-        let mouse = mouseHelper.getMousePosition(this.$el, e);
-        this.mouseX = mouse.x;
-        this.mouseY = mouse.y;
+        this.lastMouseX = this.mouseX
+        this.lastMouseY = this.mouseY
 
-        this.lastMouseX = this.mouseX;
-        this.lastMouseY = this.mouseY;
-
-        this.deselectAll();
-        if (e.preventDefault) e.preventDefault();
+        this.deselectAll()
+        if (e.preventDefault) e.preventDefault()
       }
     },
     handleUp(e) {
-      const target = e.target || e.srcElement;
+      const target = e.target || e.srcElement
 
       if (this.dragging) {
-        this.dragging = false;
+        this.dragging = false
 
         if (this.hasDragged) {
-          this.updateScene();
-          this.hasDragged = false;
+          this.updateScene()
+          this.hasDragged = false
         }
       }
 
       if (
         this.$el.contains(target) &&
-        (typeof target.className !== "string" ||
+        (typeof target.className !== 'string' ||
           target.className.indexOf(this.inputSlotClassName) === -1)
       ) {
-        this.linking = false;
-        this.tempLink = null;
-        this.linkStartData = null;
+        this.linking = false
+        this.tempLink = null
+        this.linkStartData = null
       }
     },
     handleWheel(e) {
-      const target = e.target || e.srcElement;
+      const target = e.target || e.srcElement
       if (this.$el.contains(target)) {
-        if (e.preventDefault) e.preventDefault();
+        if (e.preventDefault) e.preventDefault()
 
-        let deltaScale = Math.pow(1.1, e.deltaY * -0.01);
-        this.scale *= deltaScale;
+        let deltaScale = Math.pow(1.1, e.deltaY * -0.01)
+        this.scale *= deltaScale
 
         if (this.scale < this.minScale) {
-          this.scale = this.minScale;
-          return;
+          this.scale = this.minScale
+          return
         } else if (this.scale > this.maxScale) {
-          this.scale = this.maxScale;
-          return;
+          this.scale = this.maxScale
+          return
         }
 
         let zoomingCenter = {
           x: this.mouseX,
-          y: this.mouseY
-        };
+          y: this.mouseY,
+        }
 
-        let deltaOffsetX = (zoomingCenter.x - this.centerX) * (deltaScale - 1);
-        let deltaOffsetY = (zoomingCenter.y - this.centerY) * (deltaScale - 1);
+        let deltaOffsetX = (zoomingCenter.x - this.centerX) * (deltaScale - 1)
+        let deltaOffsetY = (zoomingCenter.y - this.centerY) * (deltaScale - 1)
 
-        this.centerX -= deltaOffsetX;
-        this.centerY -= deltaOffsetY;
+        this.centerX -= deltaOffsetX
+        this.centerY -= deltaOffsetY
 
-        this.updateScene();
+        this.updateScene()
       }
     },
     // Processing
     getConnectionPos(block, slotNumber, isInput) {
       if (!block || slotNumber === -1) {
-        return undefined;
+        return undefined
       }
 
-      let x = 0;
-      let y = 0;
+      let x = 0
+      let y = 0
 
-      x += block.x;
-      y += block.y;
+      x += block.x
+      y += block.y
 
-      y += this.optionsForChild.titleHeight;
+      y += this.optionsForChild.titleHeight
 
       if (isInput && block.inputs.length > slotNumber) {
-        console.log("输入输出卡槽与block不一致");
+        console.log('输入输出卡槽与block不一致')
       } else if (!isInput && block.outputs.length > slotNumber) {
-        x += this.optionsForChild.width;
+        x += this.optionsForChild.width
       } else {
         console.error(
-          "slot " + slotNumber + " not found, is input: " + isInput,
+          'slot ' + slotNumber + ' not found, is input: ' + isInput,
           block
-        );
-        return undefined;
+        )
+        return undefined
       }
 
       // (height / 2 + blockBorder + padding)
-      y += 16 / 2 + 1 + 2;
+      y += 16 / 2 + 1 + 2
       //  + (height * slotNumber)
-      y += 16 * slotNumber;
+      y += 16 * slotNumber
 
-      x *= this.scale;
-      y *= this.scale;
+      x *= this.scale
+      y *= this.scale
 
-      x += this.centerX;
-      y += this.centerY;
+      x += this.centerX
+      y += this.centerY
 
-      return { x: x, y: y };
+      return { x: x, y: y }
     },
 
     // Blocks
     addNewBlock(nodeName, x, y) {
       let maxID = Math.max(
         0,
-        ...this.blocks.map(function(o) {
-          return o.id;
+        ...this.blocks.map(function (o) {
+          return o.id
         })
-      );
+      )
 
-      let node = this.nodes.find(n => {
-        return n.name === nodeName;
-      });
+      let node = this.nodes.find((n) => {
+        return n.name === nodeName
+      })
 
       if (!node) {
-        return;
+        return
       }
-      let block = this.createBlock(node, maxID + 1);
+      let block = this.createBlock(node, maxID + 1)
 
       // if x or y not set, place block to center
       if (x === undefined || y === undefined) {
-        x = (this.$el.clientWidth / 2 - this.centerX) / this.scale;
-        y = (this.$el.clientHeight / 2 - this.centerY) / this.scale;
+        x = (this.$el.clientWidth / 2 - this.centerX) / this.scale
+        y = (this.$el.clientHeight / 2 - this.centerY) / this.scale
       } else {
-        x = (x - this.centerX) / this.scale;
-        y = (y - this.centerY) / this.scale;
+        x = (x - this.centerX) / this.scale
+        y = (y - this.centerY) / this.scale
       }
 
-      block.x = x;
-      block.y = y;
-      this.blocks.push(block);
+      block.x = x
+      block.y = y
+      this.blocks.push(block)
 
-      this.updateScene();
+      this.updateScene()
     },
     createBlock(node, id) {
-      let inputs = [];
-      let outputs = [];
-      let values = {};
+      let inputs = []
+      let outputs = []
+      let values = {}
 
-      node.fields.forEach(field => {
-        if (field.attr === "input") {
+      node.fields.forEach((field) => {
+        if (field.attr === 'input') {
           inputs.push({
-            name: field.name
-          });
-        } else if (field.attr === "output") {
+            name: field.name,
+          })
+        } else if (field.attr === 'output') {
           outputs.push({
-            name: field.name
-          });
+            name: field.name,
+          })
         } else {
           if (!values[field.attr]) {
-            values[field.attr] = {};
+            values[field.attr] = {}
           }
 
-          let newField = merge({}, field);
-          delete newField["name"];
-          delete newField["attr"];
+          let newField = merge({}, field)
+          delete newField['name']
+          delete newField['attr']
 
           if (!values[field.attr][field.name]) {
-            values[field.attr][field.name] = {};
+            values[field.attr][field.name] = {}
           }
 
-          values[field.attr][field.name] = newField;
+          values[field.attr][field.name] = newField
         }
-      });
+      })
 
       return {
         id: id,
@@ -380,212 +393,211 @@ export default {
         name: node.name,
         inputs: inputs,
         outputs: outputs,
-        values: values
-      };
+        values: values,
+      }
     },
     deselectAll(withoutID = null) {
-      this.blocks.forEach(value => {
+      this.blocks.forEach((value) => {
         if (value.id !== withoutID && value.selected) {
-          this.blockDeselect(value);
+          this.blockDeselect(value)
         }
-      });
+      })
     },
     // Events
     blockSelect(block) {
-      block.selected = true;
-      this.selectedBlock = block;
-      this.deselectAll(block.id);
-      this.$emit("blockSelect", block);
+      block.selected = true
+      this.selectedBlock = block
+      this.deselectAll(block.id)
+      $emit(this, 'blockSelect', block)
     },
     blockDeselect(block) {
-      block.selected = false;
+      block.selected = false
 
       if (block && this.selectedBlock && this.selectedBlock.id === block.id) {
-        this.selectedBlock = null;
+        this.selectedBlock = null
       }
 
-      this.$emit("blockDeselect", block);
+      $emit(this, 'blockDeselect', block)
     },
     //
     prepareBlocks(blocks) {
       return blocks
-        .map(block => {
-          let node = this.nodes.find(n => {
-            return n.name === block.name;
-          });
+        .map((block) => {
+          let node = this.nodes.find((n) => {
+            return n.name === block.name
+          })
 
           if (!node) {
-            return null;
+            return null
           }
 
-          let newBlock = this.createBlock(node, block.id);
+          let newBlock = this.createBlock(node, block.id)
 
           newBlock = merge(newBlock, block, {
             arrayMerge: (d, s) => {
-              return s.length === 0 ? d : s;
-            }
-          });
+              return s.length === 0 ? d : s
+            },
+          })
 
-          return newBlock;
+          return newBlock
         })
-        .filter(b => {
-          return !!b;
-        });
+        .filter((b) => {
+          return !!b
+        })
     },
     prepareBlocksLinking(blocks, links) {
       if (!blocks) {
-        return [];
+        return []
       }
 
-      let newBlocks = [];
+      let newBlocks = []
 
-      blocks.forEach(block => {
-        let inputs = links.filter(link => {
-          return link.targetID === block.id;
-        });
+      blocks.forEach((block) => {
+        let inputs = links.filter((link) => {
+          return link.targetID === block.id
+        })
 
-        let outputs = links.filter(link => {
-          return link.originID === block.id;
-        });
+        let outputs = links.filter((link) => {
+          return link.originID === block.id
+        })
 
         block.inputs.forEach((s, index) => {
           // is linked
-          block.inputs[index].active = inputs.some(i => i.targetSlot === index);
-        });
+          block.inputs[index].active = inputs.some(
+            (i) => i.targetSlot === index
+          )
+        })
 
         block.outputs.forEach((s, index) => {
           // is linked
           block.outputs[index].active = outputs.some(
-            i => i.originSlot === index
-          );
-        });
+            (i) => i.originSlot === index
+          )
+        })
 
-        newBlocks.push(block);
-      });
+        newBlocks.push(block)
+      })
 
-      return newBlocks;
+      return newBlocks
     },
     importBlocksContent() {
       if (this.blocksContent) {
-        this.nodes = merge([], this.blocksContent);
+        this.nodes = merge([], this.blocksContent)
       }
     },
     importScene() {
-      let scene = merge(this.defaultScene, this.scene);
+      let scene = merge(this.defaultScene, this.scene)
 
-      let blocks = this.prepareBlocks(scene.blocks);
-      blocks = this.prepareBlocksLinking(blocks, scene.links);
+      let blocks = this.prepareBlocks(scene.blocks)
+      blocks = this.prepareBlocksLinking(blocks, scene.links)
 
       // set last selected after update blocks from props
       if (this.selectedBlock) {
-        let block = blocks.find(b => this.selectedBlock.id === b.id);
+        let block = blocks.find((b) => this.selectedBlock.id === b.id)
         if (block) {
-          block.selected = true;
+          block.selected = true
         }
       }
 
-      this.blocks = blocks;
-      this.links = merge([], scene.links);
+      this.blocks = blocks
+      this.links = merge([], scene.links)
 
-      let container = scene.container;
+      let container = scene.container
       if (container.centerX) {
-        this.centerX = container.centerX;
+        this.centerX = container.centerX
       }
       if (container.centerY) {
-        this.centerY = container.centerY;
+        this.centerY = container.centerY
       }
       if (container.scale) {
-        this.scale = container.scale;
+        this.scale = container.scale
       }
     },
     exportScene() {
-      let clonedBlocks = merge([], this.blocks);
-      let blocks = clonedBlocks.map(value => {
-        delete value["inputs"];
-        delete value["outputs"];
-        delete value["selected"];
+      let clonedBlocks = merge([], this.blocks)
+      let blocks = clonedBlocks.map((value) => {
+        delete value['inputs']
+        delete value['outputs']
+        delete value['selected']
 
-        return value;
-      });
+        return value
+      })
 
       return {
         blocks: blocks,
         links: this.links,
-        container: this.container
-      };
+        container: this.container,
+      }
     },
     updateScene() {
-      this.$emit("update:scene", this.exportScene());
-    }
+      $emit(this, 'update:scene', this.exportScene())
+    },
   },
   created() {
-    this.mouseX = 0;
-    this.mouseY = 0;
+    this.mouseX = 0
+    this.mouseY = 0
 
-    this.lastMouseX = 0;
-    this.lastMouseY = 0;
+    this.lastMouseX = 0
+    this.lastMouseY = 0
 
-    this.minScale = 0.2;
-    this.maxScale = 5;
+    this.minScale = 0.2
+    this.maxScale = 5
 
-    this.linking = false;
-    this.linkStartData = null;
+    this.linking = false
+    this.linkStartData = null
 
-    this.inputSlotClassName = "inputSlot";
+    this.inputSlotClassName = 'inputSlot'
 
     this.defaultScene = {
       blocks: [],
       links: [],
-      container: {}
-    };
+      container: {},
+    }
   },
   mounted() {
     document.documentElement.addEventListener(
-      "mousemove",
+      'mousemove',
       this.handleMove,
       true
-    );
+    )
     document.documentElement.addEventListener(
-      "mousedown",
+      'mousedown',
       this.handleDown,
       true
-    );
-    document.documentElement.addEventListener("mouseup", this.handleUp, true);
-    document.documentElement.addEventListener("wheel", this.handleWheel, true);
+    )
+    document.documentElement.addEventListener('mouseup', this.handleUp, true)
+    document.documentElement.addEventListener('wheel', this.handleWheel, true)
 
-    this.centerX = this.$el.clientWidth / 2;
-    this.centerY = this.$el.clientHeight / 2;
+    this.centerX = this.$el.clientWidth / 2
+    this.centerY = this.$el.clientHeight / 2
 
-    this.importBlocksContent();
-    this.importScene();
+    this.importBlocksContent()
+    this.importScene()
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.documentElement.removeEventListener(
-      "mousemove",
+      'mousemove',
       this.handleMove,
       true
-    );
+    )
     document.documentElement.removeEventListener(
-      "mousedown",
+      'mousedown',
       this.handleDown,
       true
-    );
+    )
+    document.documentElement.removeEventListener('mouseup', this.handleUp, true)
     document.documentElement.removeEventListener(
-      "mouseup",
-      this.handleUp,
-      true
-    );
-    document.documentElement.removeEventListener(
-      "wheel",
+      'wheel',
       this.handleWheel,
       true
-    );
+    )
   },
   components: {
     VueBlock,
-    VueLink
-  }
-};
+    VueLink,
+  },
+  emits: ['blockSelect', 'blockDeselect', 'update:scene'],
+}
 </script>
 
 <style lang="scss" scoped>

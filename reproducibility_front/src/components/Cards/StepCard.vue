@@ -4,9 +4,9 @@
       <el-col :span="24">
         <div>
           <!-- <div class="top">
-            <div class="title">{{ info.btnType }}</div>
-            <div class="top-icon"><i class="el-icon-top-right"></i></div>
-          </div> -->
+                <div class="title">{{ info.btnType }}</div>
+                <div class="top-icon"><i class="el-icon-top-right"></i></div>
+              </div> -->
           <div class="content">
             <div class="content-comp">
               <component :is="typeMapping(info.btnType)"></component>
@@ -19,16 +19,16 @@
 </template>
 
 <script>
-import ContextContent from '_com/Context/Context';
-import ScenarioContent from '_com/Scenario/Scenario';
+import ContextContent from '_com/Context/Context'
+import ScenarioContent from '_com/Scenario/Scenario'
 // import ReScenarioContent from '_com/Scenario/reScenario';
-import ResourceContent from '_com/Resource/Resource';
-import ResultContent from '_com/Result/Result';
+import ResourceContent from '_com/Resource/Resource'
+import ResultContent from '_com/Result/Result'
 // import contentResource from '_com/Context/components/Resource/ContentResource.vue';
-import ResourceDefinition from '_com/Resource/components/ResourceDefinition.vue';
-import contentScenario from '_com/Context/components/Scenario/ContentScenario.vue';
-import contentContext from '_com/Context/components/Context/ContentContext.vue';
-import forkScenario from '_com/Scenario/ForkScenario.vue';
+import ResourceDefinition from '_com/Resource/components/ResourceDefinition.vue'
+import contentScenario from '_com/Context/components/Scenario/ContentScenario.vue'
+import contentContext from '_com/Context/components/Context/ContentContext.vue'
+import forkScenario from '_com/Scenario/ForkScenario.vue'
 
 // import AnalysisContent from "./AnalysisContent";
 export default {
@@ -41,92 +41,86 @@ export default {
     ResourceDefinition,
     contentScenario,
     contentContext,
-    forkScenario
+    forkScenario,
   },
   props: {
     cardInfo: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   watch: {
     cardInfo: {
       handler(val) {
-        this.info = val;
+        this.info = val
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   data() {
     return {
-      info: this.cardInfo
-    };
+      info: this.cardInfo,
+    }
   },
   methods: {
     typeMapping(type) {
-      let vueType;
+      let vueType
       switch (type) {
         case 'Content Definition':
           {
-            vueType = 'ContextContent';
+            vueType = 'ContextContent'
           }
-          break;
+          break
         case 'Simulation Scenario':
           {
-            vueType = 'ScenarioContent';
+            vueType = 'ScenarioContent'
           }
-          break;
+          break
         case 'Reproducible Simulation Scenario':
           {
-            vueType = 'ReScenarioContent';
+            vueType = 'ReScenarioContent'
           }
-          break;
+          break
         case 'Resource Collection':
           {
-            vueType = 'ResourceContent';
+            vueType = 'ResourceContent'
           }
-          break;
+          break
         case 'Expected Result':
           {
-            vueType = 'ResultContent';
+            vueType = 'ResultContent'
           }
-          break;
+          break
         case 'Resource Definition':
           {
-            vueType = 'ResourceDefinition';
+            vueType = 'ResourceDefinition'
           }
-          break;
+          break
         case 'Scenario Definition':
           {
-            vueType = 'contentScenario';
+            vueType = 'contentScenario'
           }
-          break;
+          break
         case 'Context Definition':
           {
-            vueType = 'contentContext';
+            vueType = 'contentContext'
           }
-          break;
+          break
         case 'forkScenario': {
-          vueType = 'forkScenario';
+          vueType = 'forkScenario'
         }
       }
-      return vueType;
-    }
-  }
-};
+      return vueType
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
 .card {
-  background: #ffffff;
-  // box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-  // opacity: 1;
+  background: #ffffff; /*// box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);*/ /*// opacity: 1;*/
   height: 100%;
-  width: 100%;
-  // margin: 10px;
-  // border-bottom-left-radius: 4px;
-  // border-bottom-right-radius: 4px;
-
-  // .top {
+  width: 100%; /*// margin: 10px;*/ /*// border-bottom-left-radius: 4px;*/ /*// border-bottom-right-radius: 4px;*/ /*// .top {
+*/
   //   // background: $headerBackground;
   //   color: rgb(255, 255, 255);
   //   font-size: 16px;

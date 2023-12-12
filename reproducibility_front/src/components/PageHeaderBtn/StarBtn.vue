@@ -1,13 +1,12 @@
-<!--  -->
 <template>
   <div class="btn">
     <div class="btn-left">
       <div @click="star" v-show="isStar == false">
-        <i class="el-icon-star-off"></i>
+        <el-icon><el-icon-star-off /></el-icon>
         Star
       </div>
       <div @click="unStar" v-show="isStar">
-        <i class="el-icon-star-on"></i>
+        <el-icon><el-icon-star-on /></el-icon>
         UnStar
       </div>
     </div>
@@ -21,59 +20,62 @@
 
 <script>
 import {
+  StarOff as ElIconStarOff,
+  StarOn as ElIconStarOn,
+} from '@element-plus/icons'
+import {
   starProject,
   isStarProject,
   getStarredCount,
   unStarProject,
-} from "@/api/request";
+} from '@/api/request'
 export default {
-  components: {},
-
+  components: {
+    ElIconStarOff,
+    ElIconStarOn,
+  },
   watch: {},
-
   computed: {},
-
   data() {
     return {
       projectId: this.$route.params.id,
       isStar: false,
       starNumber: 0,
-    };
+    }
   },
-
   methods: {
     async init() {
-      let data = await isStarProject(this.projectId);
-      console.log(data);
+      let data = await isStarProject(this.projectId)
+      console.log(data)
       if (data == 1) {
-        this.isStar = true;
+        this.isStar = true
       } else {
-        this.isStar = false;
+        this.isStar = false
       }
-      this.starNumber = await getStarredCount(this.projectId);
+      this.starNumber = await getStarredCount(this.projectId)
     },
 
     async star() {
-      let data = await starProject(this.projectId);
-      console.log(data);
-      this.isStar = true;
-      this.starNumber = data.starCount;
+      let data = await starProject(this.projectId)
+      console.log(data)
+      this.isStar = true
+      this.starNumber = data.starCount
     },
 
     async unStar() {
-      let data = await unStarProject(this.projectId);
-      console.log(data);
-      this.isStar = false;
-      this.starNumber = data.starCount;
+      let data = await unStarProject(this.projectId)
+      console.log(data)
+      this.isStar = false
+      this.starNumber = data.starCount
     },
   },
-
   mounted() {
-    console.log(this.$store.state.user.userId);
-    this.init();
+    console.log(this.$store.state.user.userId)
+    this.init()
   },
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .btn {
   width: 120px;
@@ -81,10 +83,8 @@ export default {
   font-weight: 550;
   text-align: center;
   vertical-align: middle;
-
   box-shadow: $btnShadow;
   transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
-
   .btn-left {
     width: 80px;
     float: left;

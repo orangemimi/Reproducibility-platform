@@ -13,6 +13,8 @@ public enum ResultEnum {
     USER_PASSWORD_NOT_MATCH(-6, "账户名和密码不匹配"),
     QUERY_TYPE_ERROR(-7, "查询类型不支持"),
     REMOTE_SERVICE_ERROR(-8, "远程服务调用出错"),
+    CODE_WRONG(-9,"docker错误"),
+
     ;
 
     private Integer code;

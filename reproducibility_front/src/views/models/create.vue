@@ -1,4 +1,3 @@
-<!-- create model resource -->
 <template>
   <div class="main-contain">
     <el-row>
@@ -37,7 +36,7 @@
 </template>
 
 <script>
-import { addModelByMD5Local } from "@/api/request";
+import { addModelByMD5Local } from '@/api/request'
 export default {
   watch: {},
 
@@ -46,53 +45,54 @@ export default {
   data() {
     return {
       form: {
-        name: "",
-        description: "",
-        md5: "",
-        privacy: "",
+        name: '',
+        description: '',
+        md5: '',
+        privacy: '',
         tags: [],
-        thumbnail: "",
-        source: "",
-        type: "service",
+        thumbnail: '',
+        source: '',
+        type: 'service',
       },
-      inputTagValue: "",
-    };
+      inputTagValue: '',
+    }
   },
 
   methods: {
     async addModel() {
-      let data = await addModelByMD5Local(this.form);
-      console.log(data);
+      let data = await addModelByMD5Local(this.form)
+      console.log(data)
       this.$notify({
-        title: "Success",
-        message: "You have add the model service successfully!",
-        type: "success",
-      });
+        title: 'Success',
+        message: 'You have add the model service successfully!',
+        type: 'success',
+      })
     },
 
     uploadImgResponse(val) {
-      this.form.thumbnail = val;
+      this.form.thumbnail = val
     },
 
     handleClose(val) {
-      this.form.tags.splice(this.form.tags.indexOf(val), 1);
+      this.form.tags.splice(this.form.tags.indexOf(val), 1)
     },
 
     handleInputConfirm() {
-      let inputTagValue = this.inputTagValue;
+      let inputTagValue = this.inputTagValue
       if (inputTagValue) {
-        this.form.tags.push(inputTagValue);
+        this.form.tags.push(inputTagValue)
       }
-      this.inputTagValue = "";
+      this.inputTagValue = ''
     },
   },
 
   mounted() {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .main-contain {
-  //   width: 100%;
+  /*//   width: 100%;*/
   .title {
     text-align: center;
     // width: 100%;

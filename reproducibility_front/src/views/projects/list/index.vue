@@ -1,4 +1,3 @@
-<!--  -->
 <template>
   <div class="project">
     <el-row>
@@ -8,7 +7,7 @@
             projects
             <el-button
               type="success"
-              icon="el-icon-document-add"
+              :icon="ElIconDocumentAdd"
               size="mini"
               class="btn"
               @click="dialogNewProject = true"
@@ -17,11 +16,11 @@
           <el-input
             placeholder="Please enter the content"
             size="small"
-            prefix-icon="el-icon-search"
+            :prefix-icon="ElIconSearch"
           ></el-input>
 
           <div v-if="myProjects.length > 0">
-            <div
+            <!-- <div
               v-for="(item, index) in myProjects"
               :key="index"
               style="display: flex; margin-bottom: 5px"
@@ -31,6 +30,19 @@
                 :to="{ path: `/project/${item.projectId}/info` }"
               >
                 <div style="height: 30px; line-height: 30px" class="router">
+                  {{ user.name }}
+                  <span>/</span>
+                  {{ item.name }}
+                </div>
+              </router-link>
+            </div> -->
+            <div
+              v-for="(item, index) in myProjects"
+              :key="index"
+              style="display: flex; margin-bottom: 5px"
+            >
+              <router-link :to="{ path: `/project/${item.projectId}/info` }" v-slot="{  navigate }">
+                <div @click="navigate" style="height: 30px; line-height: 30px" class="router">
                   {{ user.name }}
                   <span>/</span>
                   {{ item.name }}
@@ -65,27 +77,23 @@
       ></el-pagination>
     </div>
 
-    <el-dialog title="New Project" :visible.sync="dialogNewProject" width="60%">
+    <el-dialog title="New Project" v-model="dialogNewProject" width="60%">
       <create @dialogShow="dialogShow" />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getMyProjects, getAllProjects } from "@/api/request";
-import create from "../create";
-import { imgBase64 } from "@/lib/utils";
-import projectCard from "../components/ProjectCard";
-import { mapState } from "vuex";
+import {
+  DocumentAdd as ElIconDocumentAdd,
+  Search as ElIconSearch,
+} from '@element-plus/icons-vue'
+import { getMyProjects, getAllProjects } from '@/api/request'
+import create from '../create/index.vue'
+import { imgBase64 } from '@/lib/utils'
+import projectCard from '../components/ProjectCard.vue'
+import { mapState } from 'vuex'
 export default {
-  components: { projectCard, create },
-
-  watch: {},
-
-  computed: {
-    ...mapState(["user"]),
-  },
-
   data() {
     return {
       projectList: [],
@@ -93,38 +101,45 @@ export default {
       total: 0,
       dialogNewProject: false,
       myProjects: [],
-    };
+      ElIconDocumentAdd,
+      ElIconSearch,
+    }
   },
-
+  components: { projectCard, create },
+  watch: {},
+  computed: {
+    ...mapState(['user']),
+  },
   methods: {
     async init() {
-      this.myProjects = await getMyProjects();
-      let data = await getAllProjects(0, 16);
-      this.projectList = data.content;
-      this.total = data.totalElements;
+      this.myProjects = await getMyProjects()
+      let data = await getAllProjects(0, 16)
+      this.projectList = data.content
+      this.total = data.totalElements
     },
 
     imgBase64(projectName) {
-      return imgBase64(projectName);
+      return imgBase64(projectName)
     },
 
     async change(val) {
-      let data = await getAllProjects(val - 1, 16);
-      this.projectList = data.content;
+      let data = await getAllProjects(val - 1, 16)
+      this.projectList = data.content
     },
 
     async dialogShow(val) {
-      this.dialogNewProject = val;
-      await this.init();
+      console.log(val,'out1');
+      this.dialogNewProject = val
+      await this.init()
     },
   },
-
   mounted() {
-    console.log(this.user);
-    this.init();
+    console.log(this.user)
+    this.init()
   },
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .left {
   margin-top: 10px;
@@ -159,7 +174,8 @@ export default {
   width: 20%;
 }
 .project {
-  padding: 0 10px; // for col
+  padding: 0 10px; /*// for col
+*/
   .project-card:hover {
     cursor: pointer;
   }

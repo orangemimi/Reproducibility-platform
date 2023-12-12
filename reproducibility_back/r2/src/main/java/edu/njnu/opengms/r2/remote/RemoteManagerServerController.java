@@ -48,7 +48,7 @@ public class RemoteManagerServerController {
 //    String wzpIpAndPort;
 
     @RequestMapping(value = "/getServiceTask/{pid}", method = RequestMethod.GET)
-    JsonResult getServiceTask(@PathVariable String pid){
+        JsonResult getServiceTask(@PathVariable String pid){
         System.out.println("-------------");
         return ResultUtils.success(managerServerFeign.getServiceTask(pid));
     }
@@ -63,6 +63,7 @@ public class RemoteManagerServerController {
     JsonResult getServiceTask(@RequestBody JSONObject obj){
         return ResultUtils.success(managerServerFeign.invoke(obj));
     }
+
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     JsonResult refresh(@RequestBody JSONObject obj){
 

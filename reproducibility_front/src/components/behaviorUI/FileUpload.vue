@@ -4,7 +4,7 @@
       v-show="disabled && input.dataServiceId != undefined"
       plain
       type="warning"
-      icon="el-icon-download"
+      :icon="ElIconDownload"
       @click="download()"
     ></el-button>
     <el-upload
@@ -13,36 +13,38 @@
       :limit="1"
       :on-success="onSuccess"
     >
-      <el-button
-        size="small"
-        type="primary"
-      >点击上传</el-button>
+      <el-button size="small" type="primary">点击上传</el-button>
     </el-upload>
   </div>
 </template>
+
 <script>
-import config from "@/config";
+import { Download as ElIconDownload } from '@element-plus/icons-vue'
+import config from '@/config'
 export default {
+  data() {
+    return {
+      ElIconDownload,
+    }
+  },
   props: {
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     input: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   methods: {
     onSuccess({ data }) {
-      this.input.dataServiceId = data.id;
+      this.input.dataServiceId = data.id
     },
     download() {
       window.open(
         `${config.containerURL}/data_service/fetch/${this.input.dataServiceId}`
-      );
-    }
-  }
-};
+      )
+    },
+  },
+}
 </script>
-
-<style></style>

@@ -1,4 +1,3 @@
-<!-- project info -->
 <template>
   <div>
     <div class="page-header">
@@ -30,11 +29,11 @@
 </template>
 
 <script>
-import { getProjectAndUsers, forkProject } from "@/api/request";
-import builderMenu from "./components/BuilderMenu";
-import reBuilderMenu from "./components/ReBuilderMenu";
+import { getProjectAndUsers } from '@/api/request'
+import builderMenu from './components/BuilderMenu.vue'
+import reBuilderMenu from './components/ReBuilderMenu.vue'
 // import workFlow from
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -44,13 +43,13 @@ export default {
   },
 
   async beforeRouteUpdate(to, from, next) {
-    this.projectId = to.params.id;
-    await this.getProjectInfo();
-    next();
+    this.projectId = to.params.id
+    await this.getProjectInfo()
+    next()
   },
 
   computed: {
-    ...mapState(["user", "permission"]),
+    ...mapState(['user', 'permission']),
   },
 
   data() {
@@ -59,27 +58,27 @@ export default {
       projectInfo: {},
       creator: {},
       memberList: [],
-    };
+    }
   },
 
   methods: {
     async init() {
-      await this.getProjectInfo();
-      await this.judgeRole(this.projectInfo, this.user.userId);
+      await this.getProjectInfo()
+      await this.judgeRole(this.projectInfo, this.user.userId)
     },
     async judgeRole(project, userId) {
-      await this.$store.dispatch("permission/getRole", {
+      await this.$store.dispatch('permission/getRole', {
         project: project,
         userId: userId,
-      });
+      })
     },
 
     async getProjectInfo() {
-      let data = await getProjectAndUsers(this.projectId);
+      let data = await getProjectAndUsers(this.projectId)
 
-      this.projectInfo = data.project;
-      this.creator = data.creator;
-      this.memberList = data.memberList;
+      this.projectInfo = data.project
+      this.creator = data.creator
+      this.memberList = data.memberList
     },
 
     toRouterType(val) {
@@ -90,31 +89,32 @@ export default {
             forkingProjectId: this.projectInfo.forkingProjectId,
             //   forkingProjectId: this.projectInfo.id,
           },
-        });
+        })
       }
     },
 
-    async createProject() {
-      let form = {
-        name: this.projectInfo.name,
-        description: this.projectInfo.description,
-        purpose: this.projectInfo.purpose,
-        privacy: this.projectInfo.privacy,
-        picture: this.projectInfo.picture,
-        forkingProjectId: this.projectInfo.id,
-      };
-      let data = await forkProject(form);
+    // async createProject() {
+    //   let form = {
+    //     name: this.projectInfo.name,
+    //     description: this.projectInfo.description,
+    //     purpose: this.projectInfo.purpose,
+    //     privacy: this.projectInfo.privacy,
+    //     picture: this.projectInfo.picture,
+    //     forkingProjectId: this.projectInfo.id,
+    //   }
+    //   let data = await forkProject(form)
 
-      this.userInfo.folkedProjects.push(data.id);
-      // await updateUserByJwtUserId({ createdProjects: this.userInfo.createdProjects });
-    },
+    //   this.userInfo.folkedProjects.push(data.id)
+    //   // await updateUserByJwtUserId({ createdProjects: this.userInfo.createdProjects });
+    // },
   },
 
   mounted() {
-    this.init();
+    this.init()
   },
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .page-header {
   height: 120px;
@@ -122,11 +122,10 @@ export default {
   background-color: $contain2Background;
   box-shadow: $underLineNavBoxShadow;
   padding: 16px 32px 0 32px;
-
   .nav {
     .breadcrumb {
       padding: 5px 0;
-      /deep/ .el-breadcrumb__inner {
+      :deep(.el-breadcrumb__inner) {
         font-size: 18px;
         font-weight: 550;
         line-height: 22px;
@@ -164,9 +163,5 @@ export default {
     // height: 32px;
     line-height: 72px;
   }
-}
-
-// .page-content {
-//   width: 100%;
-// }
+} /*// .page-content*/
 </style>

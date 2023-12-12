@@ -41,24 +41,24 @@
 </template>
 
 <script>
-import { dateFormat } from '@/utils/utils';
+import { dateFormat } from '@/utils/utils'
 export default {
   props: {
     record: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
-    return {};
+    return {}
   },
   computed: {
     getDate() {
-      return dateFormat(new Date(parseInt(this.record.createTime)));
-    }
+      return dateFormat(new Date(parseInt(this.record.createTime)))
+    },
   },
   methods: {},
-  mounted() {}
-};
+  mounted() {},
+}
 </script>
 
 <style lang="scss" scoped>

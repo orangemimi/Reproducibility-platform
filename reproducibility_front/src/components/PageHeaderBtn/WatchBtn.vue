@@ -1,9 +1,8 @@
-<!--  -->
 <template>
   <div class="btn">
     <div class="btn-left">
       <div>
-        <i class="el-icon-view"></i>
+        <el-icon><el-icon-view /></el-icon>
         Watch
         <!-- <i class="el-icon-arrow-down el-icon--right"></i> -->
       </div>
@@ -17,27 +16,26 @@
 </template>
 
 <script>
+import { View as ElIconView } from '@element-plus/icons-vue'
 export default {
+  components: {
+    ElIconView,
+  },
   props: {
     count: {
       type: Number,
     },
   },
-  components: {},
-
   watch: {},
-
   computed: {},
-
   data() {
-    return {};
+    return {}
   },
-
   methods: {},
-
   mounted() {},
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .btn {
   width: 120px;
@@ -45,10 +43,8 @@ export default {
   font-weight: 550;
   text-align: center;
   vertical-align: middle;
-
   box-shadow: $btnShadow;
   transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
-
   .btn-left {
     width: 80px;
     float: left;

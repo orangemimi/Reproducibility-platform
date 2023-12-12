@@ -15,40 +15,45 @@
 export default {
   props: {
     visible: {
-      type: Boolean
+      type: Boolean,
     },
     currentGraph: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   watch: {
     visible: {
+      deep: true,
+
       handler(val) {
-        this.dialogVisible = val;
-        console.log(val);
-      }
+        this.dialogVisible = val
+        console.log(val)
+      },
     },
     currentGraph: {
+      deep: true,
+
       handler(val) {
-        this.graph = val;
-        console.log(val);
-      }
-    }
+        this.graph = val
+        console.log(val)
+      },
+    },
   },
   components: {},
   data() {
-    return { dialogVisible: this.visible, graph: this.currentGraph };
+    return { dialogVisible: this.visible, graph: this.currentGraph }
   },
   methods: {
     closeDialog() {
-      this.dialogVisible = false;
+      this.dialogVisible = false
     },
-    editCellValue() {}
+    editCellValue() {},
   },
   created() {},
-  mounted() {}
-};
+  mounted() {},
+}
 </script>
+
 <style lang="scss" scoped>
 .editNodeContainer {
   position: relative;

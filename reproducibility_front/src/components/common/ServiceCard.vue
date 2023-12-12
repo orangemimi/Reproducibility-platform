@@ -14,30 +14,30 @@
 </template>
 
 <script>
-import { imgBase64 } from "@/lib/utils";
+import { imgBase64 } from '@/lib/utils'
 export default {
-  props: ["item", "type"],
+  props: ['item', 'type'],
   methods: {
     imgPath(snapshot, name) {
       if (snapshot != undefined) {
-        return snapshot;
+        return snapshot
       } else {
-        return imgBase64(name);
+        return imgBase64(name)
       }
     },
     view(id) {
-      if (this.type == "data") {
+      if (this.type == 'data') {
         this.$router.push({
           path: `/resource/data/${id}`,
-        });
+        })
       } else {
         this.$router.push({
           path: `/resource/${id}/${this.type}`,
-        });
+        })
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

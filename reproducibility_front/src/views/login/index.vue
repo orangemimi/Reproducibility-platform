@@ -28,7 +28,7 @@
         placeholder="请输入密码"
         :type="tab == 'login' ? 'password' : 'text'"
         v-model="formItem.password"
-        style="margin-top: 10px;"
+        style="margin-top: 10px"
       >
       </el-input>
     </div>
@@ -40,50 +40,54 @@
 </template>
 
 <script>
-import { post } from "@/axios";
-import { mapActions } from "vuex";
-import md5 from "js-md5";
+import { post } from '@/axios'
+import { mapActions } from 'vuex'
+import md5 from 'js-md5'
 export default {
   data() {
     return {
-      tab: "login",
+      tab: 'login',
       formItem: {
-        name: "",
-        email: "",
-        password: "",
+        name: '',
+        email: '',
+        password: '',
       },
-    };
+    }
   },
   methods: {
-    ...mapActions(["handleLogOut", "handleLogIn"]),
+    ...mapActions(['handleLogOut', 'handleLogIn']),
     async handleClick() {
       try {
-        await this.handleLogOut();
+        await this.handleLogOut()
 
-        if (this.tab == "register") {
-          let form = new FormData();
-          form.append("email", this.formItem.email);
-          form.append("name", this.formItem.name);
-          form.append("password", md5(this.formItem.password));
-          await post(`/users/${this.tab}`, form);
+        if (this.tab == 'register') {
+          let form = new FormData()
+          form.append('email', this.formItem.email)
+          form.append('name', this.formItem.name)
+          form.append('password', md5(this.formItem.password))
+          await post(`/users/${this.tab}`, form)
         } else {
-          await this.$store.dispatch("user/handleLogIn", this.formItem);
+          await this.$store.dispatch('user/handleLogIn', this.formItem)
         }
 
-        let redirect = decodeURIComponent(this.$route.query.redirect || "/");
+        let redirect = decodeURIComponent(this.$route.query.redirect || '/')
         if (redirect != undefined) {
           this.$router.push({
             path: redirect,
-          });
+          })
         } else {
-          this.$router.push({ name: "home" });
+          this.$router.push({ name: 'home' })
         }
       } catch (error) {
-        this.$throw(error);
+        this.$message({
+          type:'error',
+          message:'Account or password error'
+        })
+        // this.$throw(error)
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -107,7 +111,6 @@ export default {
     }
   }
 }
-
 .btn-wrapper {
   margin-top: 40px;
   text-align: center;

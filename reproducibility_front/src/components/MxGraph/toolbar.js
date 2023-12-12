@@ -1,9 +1,9 @@
-import mxgraph from './index';
+import mxgraph from './index'
 
-const { mxConstants } = mxgraph;
+const { mxConstants } = mxgraph
 
-const outputIcon = './images/1.jpg';
-const inputIcon = './images/2.jpg';
+const outputIcon = './images/1.jpg'
+const inputIcon = './images/2.jpg'
 
 export const toolbarItems = [
   {
@@ -20,9 +20,9 @@ export const toolbarItems = [
       align: mxConstants.ALIGN_CENTER,
       // verticalAlign: mxConstants.ALIGN_,
       imageAlign: mxConstants.ALIGN_CENTER,
-      imageVerticalAlign: mxConstants.ALIGN_TOP
+      imageVerticalAlign: mxConstants.ALIGN_TOP,
       // image: outputIcon,
-    }
+    },
   },
   {
     icon: inputIcon,
@@ -37,10 +37,10 @@ export const toolbarItems = [
       align: mxConstants.ALIGN_CENTER, // 水平方向对齐方式
       // verticalAlign: mxConstants.ALIGN_CENTER, // 垂直方向对齐方式
       imageAlign: mxConstants.ALIGN_CENTER, // 图形水平方向对齐方式
-      imageVerticalAlign: mxConstants.ALIGN_TOP // 图形垂直方向对齐方式
+      imageVerticalAlign: mxConstants.ALIGN_TOP, // 图形垂直方向对齐方式
       // image: inputIcon, // 图形
       // rounded:true,// 圆角
       // arcSize:'6'// 设置圆角程度
-    }
-  }
-];
+    },
+  },
+]

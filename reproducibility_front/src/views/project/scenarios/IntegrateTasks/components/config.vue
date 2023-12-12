@@ -2,7 +2,7 @@
   <div class="main">
     <el-row class="title">
       <el-col :span="12">
-        <i class="el-icon-setting"></i>
+        <el-icon><el-icon-setting /></el-icon>
         {{ service.name }}
       </el-col>
       <el-col :span="7" :offset="5">
@@ -38,7 +38,7 @@
             <el-row>
               <el-col :span="10">
                 <span class="event-name">
-                  <span v-show="!input.isOptional" style="color:red">*</span
+                  <span v-show="!input.isOptional" style="color: red">*</span
                   >{{ input.name }}</span
                 >
               </el-col>
@@ -126,9 +126,7 @@
                 <span class="event-name"> {{ output.name }}</span>
               </el-col>
               <el-col :span="8" :offset="2">
-                <div>
-                  null
-                </div>
+                <div>null</div>
               </el-col>
             </el-row>
             <el-row>{{ output.description }}</el-row>
@@ -137,28 +135,26 @@
       </div>
     </el-row>
 
-    <el-dialog title="Start the task" :visible.sync="dialogInvokeVisible">
+    <el-dialog title="Start the task" v-model="dialogInvokeVisible">
       <el-input v-model="instanceName" autocomplete="off">
-        <template slot="prepend">Name:</template></el-input
+        <template v-slot:prepend>Name:</template></el-input
       >
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogInvokeVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="invoke()">Invoke</el-button>
-      </span>
+      <template v-slot:footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogInvokeVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="invoke()">Invoke</el-button>
+        </span>
+      </template>
     </el-dialog>
 
-    <el-dialog
-      title="Instances"
-      :visible.sync="dialogInstancesVisible"
-      width="80%"
-    >
+    <el-dialog title="Instances" v-model="dialogInstancesVisible" width="80%">
       <el-table
         :data="instancesData"
         stripe
-        style="width: 100%; font-size: 18px;"
+        style="width: 100%; font-size: 18px"
       >
         <el-table-column type="expand">
-          <template slot-scope="props">
+          <template v-slot="props">
             <h1>Model Configuration</h1>
             <el-divider></el-divider>
             <innerTable :behavior="props.row.service.behavior"></innerTable>
@@ -182,7 +178,7 @@
           :filter-method="filterTag"
           filter-placement="bottom-end"
         >
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-tag
               :type="statusEnumTag(scope.row.statusEnum)"
               disable-transitions
@@ -191,7 +187,7 @@
           </template>
         </el-table-column>
         <el-table-column label="Operation">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button size="small" round @click="handleBind(scope.row)"
               >Bind</el-button
             >
@@ -203,76 +199,85 @@
 </template>
 
 <script>
-import InputParameter from "_com/behaviorUI/InputParameter";
-import RangeParameter from "_com/behaviorUI/RangeParameter";
-import SelectParameter from "_com/behaviorUI/SelectParameter";
-import SliderParameter from "_com/behaviorUI/SliderParameter";
-import TableParameter from "_com/behaviorUI/TableParameter";
-import { dateFormat } from "@/lib/utils";
-import { get, post } from "@/axios";
-import innerTable from "_com/innerTable";
-import { mapState } from "vuex";
+import { Setting as ElIconSetting } from '@element-plus/icons-vue'
+import InputParameter from '_com/behaviorUI/InputParameter'
+import RangeParameter from '_com/behaviorUI/RangeParameter'
+import SelectParameter from '_com/behaviorUI/SelectParameter'
+import SliderParameter from '_com/behaviorUI/SliderParameter'
+import TableParameter from '_com/behaviorUI/TableParameter'
+import { dateFormat } from '@/lib/utils'
+import { get, post } from '@/axios'
+import innerTable from '_com/innerTable'
+import { mapState } from 'vuex'
 
 export default {
-  props: ["service", "type", "dataServices"],
-  computed: {
-    ...mapState(["user"]),
+  components: {
+    InputParameter,
+    RangeParameter,
+    SelectParameter,
+    SliderParameter,
+    TableParameter,
+    innerTable,
+    ElIconSetting,
   },
-
+  props: ['service', 'type', 'dataServices'],
+  computed: {
+    ...mapState(['user']),
+  },
   data() {
     return {
       id: this.$route.params.id,
       dialogInvokeVisible: false,
       dialogInstancesVisible: false,
       instancesData: [],
-      instanceName: "",
-    };
+      instanceName: '',
+    }
   },
   methods: {
     async handleBind(row) {
       await post(
-        "/g2s/{id}/bind/{instanceId}?instanceEnum=" + row.instanceEnum,
+        '/g2s/{id}/bind/{instanceId}?instanceEnum=' + row.instanceEnum,
         null,
         {
           id: this.id,
           instanceId: row.id,
         }
-      );
+      )
 
       this.$message({
-        message: "绑定成功",
-        type: "success",
-      });
-      this.dialogInstancesVisible = false;
+        message: '绑定成功',
+        type: 'success',
+      })
+      this.dialogInstancesVisible = false
     },
     statusEnumTag(status) {
-      if (status === "FINISH") {
-        return "success";
-      } else if (status === "ERROR") {
-        return "danger";
+      if (status === 'FINISH') {
+        return 'success'
+      } else if (status === 'ERROR') {
+        return 'danger'
       } else {
-        return "info";
+        return 'info'
       }
     },
     filterTag(value, row) {
-      return row.statusEnum === value;
+      return row.statusEnum === value
     },
     showDialogInvoke() {
-      this.dialogInvokeVisible = true;
+      this.dialogInvokeVisible = true
       this.instanceName =
         this.service.name +
-        "_InitialOut_" +
+        '_InitialOut_' +
         this.user.name +
-        dateFormat(new Date());
+        dateFormat(new Date())
     },
     showDialogInstances() {
-      this.dialogInstancesVisible = true;
-      this.refreshInstances();
+      this.dialogInstancesVisible = true
+      this.refreshInstances()
     },
 
     async refreshInstances() {
       this.instancesData = await get(
-        "/g2s/{id}/getInstances/{type}/{serviceId}",
+        '/g2s/{id}/getInstances/{type}/{serviceId}',
         null,
         {
           id: this.id,
@@ -280,15 +285,15 @@ export default {
           serviceId: this.service.id,
         },
         false
-      );
+      )
     },
     async invoke() {
-      this.service.details = null;
+      this.service.details = null
       await post(
-        "/g2s/{id}/invoke",
+        '/g2s/{id}/invoke',
         {
           name: this.instanceName,
-          statusEnum: "READY",
+          statusEnum: 'READY',
           instanceEnum: this.type,
           service: this.service,
           creator: this.$store.state.user.name,
@@ -297,50 +302,42 @@ export default {
         {
           id: this.id,
         }
-      );
-      this.dialogInvokeVisible = false;
+      )
+      this.dialogInvokeVisible = false
     },
     typeMapping(type) {
-      let vueType;
+      let vueType
       switch (type) {
-        case "input_parameter":
+        case 'input_parameter':
           {
-            vueType = "InputParameter";
+            vueType = 'InputParameter'
           }
-          break;
-        case "range_parameter":
+          break
+        case 'range_parameter':
           {
-            vueType = "RangeParameter";
+            vueType = 'RangeParameter'
           }
-          break;
-        case "slider_parameter":
+          break
+        case 'slider_parameter':
           {
-            vueType = "SliderParameter";
+            vueType = 'SliderParameter'
           }
-          break;
-        case "select_parameter":
+          break
+        case 'select_parameter':
           {
-            vueType = "SelectParameter";
+            vueType = 'SelectParameter'
           }
-          break;
-        case "table_parameter":
+          break
+        case 'table_parameter':
           {
-            vueType = "TableParameter";
+            vueType = 'TableParameter'
           }
-          break;
+          break
       }
-      return vueType;
+      return vueType
     },
   },
-  components: {
-    InputParameter,
-    RangeParameter,
-    SelectParameter,
-    SliderParameter,
-    TableParameter,
-    innerTable,
-  },
-};
+}
 </script>
 
 <style>
@@ -364,7 +361,6 @@ export default {
 .btn {
   margin-top: 20px;
 }
-
 .title {
   position: relative;
   font-size: 20px;
@@ -376,11 +372,9 @@ export default {
 .group {
   position: relative;
   padding-bottom: 30px;
-  /* font-size: 18px; */
 }
 .group > .title {
   font-style: italic;
-  /* font-size: 18px; */
   padding-bottom: 10px;
   border-bottom: solid 2px #999;
 }

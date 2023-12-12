@@ -1,4 +1,3 @@
-<!-- data upload information -->
 <template>
   <div class="main">
     <!-- {{ formType }} -->
@@ -35,48 +34,49 @@
     </el-form>
 
     <!-- 
-    <el-dialog
-      :visible.sync="addSpatialInfodialogVisible"
-      width="40%"
-      title="Add Spatial Info"
-      class="spatialDialog"
-      :append-to-body="true"
-    >
-      <spatial-info-dialog :spatialInfo="spatialInfoForm"></spatial-info-dialog>
+        <el-dialog
+          :visible.sync="addSpatialInfodialogVisible"
+          width="40%"
+          title="Add Spatial Info"
+          class="spatialDialog"
+          :append-to-body="true"
+        >
+          <spatial-info-dialog :spatialInfo="spatialInfoForm"></spatial-info-dialog>
 
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="handleSpatialInfoClose" size="mini">Confirm</el-button>
-        </span>
-      </template>
-    </el-dialog>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button type="primary" @click="handleSpatialInfoClose" size="mini">Confirm</el-button>
+            </span>
+          </template>
+        </el-dialog>
 
-    <el-dialog
-      :visible.sync="addTemporalInfodialogVisible"
-      width="40%"
-      class="temporalDialog"
-      title="Add Temporal Info"
-      :append-to-body="true"
-    >
-      <temporal-info-dialog
-        :temporalInfo="temporalInfoForm"
-      ></temporal-info-dialog>
-    </el-dialog> -->
+        <el-dialog
+          :visible.sync="addTemporalInfodialogVisible"
+          width="40%"
+          class="temporalDialog"
+          title="Add Temporal Info"
+          :append-to-body="true"
+        >
+          <temporal-info-dialog
+            :temporalInfo="temporalInfoForm"
+          ></temporal-info-dialog>
+        </el-dialog> -->
   </div>
 </template>
 
 <script>
+import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
 // import { post } from '@/axios';
-import { saveDataItem, postDataContainer } from "@/api/request";
+import { saveDataItem, postDataContainer } from '@/api/request'
 // import addImage from '_com/AddImage';
-import { getSuffix, renderSize } from "@/utils/utils";
+import { getSuffix, renderSize } from '@/utils/utils'
 
 // import temporalInfoTable from '_com/ContextTable/TemporalInfoTable';
 // import temporalInfoDialog from "_com/ContextTable/TemporalInfoDialog";
 // import spatialInfoTable from '_com/ContextTable/SpatialInfoTable';
 // import spatialInfoDialog from "_com/ContextTable/SpatialInfoDialog";
 // import unitDrawer from "_com/UnitDrawer/UnitDrawer";
-import fileUpload from "./FileUpload";
+import fileUpload from './FileUpload'
 
 export default {
   props: {
@@ -87,12 +87,11 @@ export default {
       type: Object,
     },
   },
-
   watch: {
     initFormData: {
       handler(val) {
-        if (val != "") {
-          this.form = val;
+        if (val != '') {
+          this.form = val
         }
       },
       deep: true,
@@ -109,43 +108,42 @@ export default {
     fileUpload,
     // addChildValue
   },
-
   data() {
     return {
       projectId: this.$route.params.id,
-      value1: "",
+      value1: '',
       form: {
-        name: "",
-        type: "Input",
-        value: "",
-        token: "",
-        description: "",
+        name: '',
+        type: 'Input',
+        value: '',
+        token: '',
+        description: '',
         keywords: [],
         agentAttribute: {
           organization: {},
-          reference: "",
+          reference: '',
         },
         activityAttribute: {
           relatedActivity: {
-            name: "",
-            description: "",
+            name: '',
+            description: '',
           },
           relatedResource: {
-            name: "",
-            description: "",
+            name: '',
+            description: '',
           },
           relationshipLink: {
-            description: "",
+            description: '',
           },
         },
-        state: "Public",
-        version: "1.0",
+        state: 'Public',
+        version: '1.0',
         format: this.formType,
         restriction: {
-          type: "String",
-          decimal: "",
-          content: "",
-          unit: { value: "" },
+          type: 'String',
+          decimal: '',
+          content: '',
+          unit: { value: '' },
           spatialInfo: {},
           temporalInfo: {},
         },
@@ -153,31 +151,31 @@ export default {
 
       Rules: {
         name: [
-          { required: true, message: "Name cannot be empty", trigg: "blur" },
+          { required: true, message: 'Name cannot be empty', trigg: 'blur' },
         ],
-        value: [{ required: true, message: "Data cannot be empty" }],
+        value: [{ required: true, message: 'Data cannot be empty' }],
         version: [
-          { required: true, message: "Version cannot be empty", trigg: "blur" },
+          { required: true, message: 'Version cannot be empty', trigg: 'blur' },
         ],
         token: [
-          { required: true, message: "Token cannot be empty", trigg: "blur" },
+          { required: true, message: 'Token cannot be empty', trigg: 'blur' },
         ],
       },
 
       fileForm: {
-        alia: "",
-        name: "",
-        type: "",
-        description: "",
-        privacy: "discoverable",
+        alia: '',
+        name: '',
+        type: '',
+        description: '',
+        privacy: 'discoverable',
         folder: false,
-        source: "",
-        thumbnail: "",
-        userUpload: "",
-        address: "",
+        source: '',
+        thumbnail: '',
+        userUpload: '',
+        address: '',
       },
 
-      typeEnums: ["String", "Number", "Date"],
+      typeEnums: ['String', 'Number', 'Date'],
 
       uploadFileForm: new FormData(), //上传文件的form
       fileList: [], //el-upload上传的文件列表,
@@ -185,7 +183,7 @@ export default {
       //   file: {},
       ops: {
         bar: {
-          background: "#808695",
+          background: '#808695',
         },
       },
       nodeInfo: this.nodeInformation,
@@ -195,13 +193,13 @@ export default {
       spatialInfoForm: {
         enable: false,
         spatialReference: {
-          general: "",
-          wkt: "",
+          general: '',
+          wkt: '',
         },
-        spatialDimension: "",
+        spatialDimension: '',
         spatialScale: {
-          type: "",
-          description: "",
+          type: '',
+          description: '',
         },
         spatialExtentList: [],
         resolutionConstraintList: [],
@@ -210,11 +208,11 @@ export default {
       temporalInfoForm: {
         enable: false,
         temporalScale: {
-          type: "",
-          description: "",
+          type: '',
+          description: '',
         },
         temporalReference: {
-          value: "",
+          value: '',
         },
         temporalExtentList: [],
         stepConstraintList: [],
@@ -228,12 +226,11 @@ export default {
 
       //file uolad related
       currentFile: {},
-    };
+    }
   },
-
   methods: {
     uploadImgResponse(val) {
-      this.form.picture = val;
+      this.form.picture = val
     },
 
     remove() {
@@ -249,46 +246,46 @@ export default {
       //   userUpload: '',
       //   address: '',
       // };
-      this.currentFile = {};
+      this.currentFile = {}
     },
 
     //上传文件到服务器
     async submitUpload(param) {
-      console.log(param.file);
+      console.log(param.file)
 
-      this.uploadFileForm = new FormData();
-      this.uploadFileForm.append("file", param.file);
+      this.uploadFileForm = new FormData()
+      this.uploadFileForm.append('file', param.file)
       // console.log(this.uploadFileForm.get('file'));
-      let data = await postDataContainer(this.uploadFileForm);
+      let data = await postDataContainer(this.uploadFileForm)
 
-      this.fileForm.name = data.file_name;
-      this.fileForm.suffix = getSuffix(param.file.name);
-      this.fileForm.fileSize = renderSize(param.file.size);
-      this.fileForm.folder = false;
-      this.fileForm.userUpload = true;
+      this.fileForm.name = data.file_name
+      this.fileForm.suffix = getSuffix(param.file.name)
+      this.fileForm.fileSize = renderSize(param.file.size)
+      this.fileForm.folder = false
+      this.fileForm.userUpload = true
 
-      this.fileForm.address = `http://175.27.137.60:8083/data/${data.id}`;
+      this.fileForm.address = `http://112.4.132.6:8083/data/${data.id}`
 
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
 
     handleSuccess(response, file, fileList) {
-      console.log(response, file, fileList);
-      if (file.status == "success") {
-        this.currentFile = this.fileForm;
+      console.log(response, file, fileList)
+      if (file.status == 'success') {
+        this.currentFile = this.fileForm
       }
     },
 
     //data item保存到数据库
     //上传数据直接保存到fileItems,即用户的资源可全部显示，之后选择所需的数据，之后保存选择的数据之后 保存到resource数据表里面去
     submit() {
-      this.$refs["form"].validate(async (valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (!valid) {
           this.$notify.error({
-            title: "Error",
-            message: "Validation failed",
-          });
-          return;
+            title: 'Error',
+            message: 'Validation failed',
+          })
+          return
         }
 
         // console.log('getFile', this.uploadFileForm.get('file'));
@@ -296,18 +293,18 @@ export default {
         //   this.fileForm.description = this.form.description;
         //   await saveFileItem(this.fileForm);
         // }
-        this.form.restriction.spatialInfo = this.spatialInfoForm;
-        this.form.restriction.temporalInfo = this.temporalInfoForm;
-        this.form.projectId = this.projectId;
-        console.log(this.form);
-        let data = await saveDataItem(this.form);
-        console.log(data);
+        this.form.restriction.spatialInfo = this.spatialInfoForm
+        this.form.restriction.temporalInfo = this.temporalInfoForm
+        this.form.projectId = this.projectId
+        console.log(this.form)
+        let data = await saveDataItem(this.form)
+        console.log(data)
         let result = {
           data: data,
           flag: true,
-        };
-        this.$emit("uploadSuccess", result);
-      });
+        }
+        $emit(this, 'uploadSuccess', result)
+      })
       // if (formType == 'file') {
 
       // } else if (formType == 'parameter') {
@@ -326,49 +323,48 @@ export default {
     },
 
     returnFileUrl(val) {
-      console.log(val);
-      this.form.value = val.address;
+      console.log(val)
+      this.form.value = val.address
     },
 
     //tree
 
     onDel(node) {
-      node.remove();
+      node.remove()
     },
     onClick(params) {
       // eslint-disable-next-line no-console
-      console.log(params);
+      console.log(params)
     },
 
     closeDrawer() {
-      this.drawer = false;
+      this.drawer = false
     },
     selectUnit(val) {
-      console.log(val);
-      this.form.restriction.unit = val.name;
+      console.log(val)
+      this.form.restriction.unit = val.name
     },
   },
-
   mounted() {
     // console.log(this.formType)
     // console.log(this.initFormData)
   },
-};
+  emits: ['uploadSuccess'],
+}
 </script>
+
 <style lang="scss" scoped>
 .main {
   height: 100%;
-  width: 100%;
-
-  // position: relative;
+  width: 100%; /*// position: relative;*/
   .file {
     .drag {
       margin-bottom: 20px;
-      /deep/ .el-icon-upload {
+      :deep(.el-icon-upload){
         margin: 0;
       }
 
-      /deep/ .el-upload-dragger {
+      :deep(.el-upload-dragger) {
         width: calc(50vw);
         height: 100px;
       }
@@ -416,7 +412,7 @@ export default {
 
   .resource {
     .source {
-      /deep/ .el-form-item__content {
+      :deep(.el-form-item__content){
         line-height: 20px;
       }
       .tree {

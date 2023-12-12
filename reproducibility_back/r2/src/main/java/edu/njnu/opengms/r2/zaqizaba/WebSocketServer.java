@@ -91,4 +91,16 @@ public class WebSocketServer {
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
+
+    public void sendMessageByProject(String projectId, String message) {
+        for (WebSocketServer item : webSocketSet) {
+            try {
+                if (item.sid.equals(projectId)) {
+                    item.sendMessage(message);
+                }
+            } catch (IOException e) {
+                // 处理异常
+            }
+        }
+    }
 }

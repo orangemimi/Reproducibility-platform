@@ -31,14 +31,14 @@
             <span class="flow-item">
               <span class="flow-item-icon blue">
                 <span class="flow-item-bg"></span>
-                <i class="el-icon-position" />
+                <el-icon><el-icon-position /></el-icon>
               </span>
               <span class="flow-item-text">Register as a builder</span>
             </span>
             <span class="flow-item">
               <span class="flow-item-icon yellow">
                 <span class="flow-item-bg"></span>
-                <i class="el-icon-edit-outline" />
+                <el-icon><el-icon-edit-outline /></el-icon>
               </span>
               <span class="flow-item-text">Create a project</span>
             </span>
@@ -46,7 +46,7 @@
             <span class="flow-item">
               <span class="flow-item-icon green">
                 <span class="flow-item-bg"></span>
-                <i class="el-icon-share" />
+                <el-icon><el-icon-share /></el-icon>
               </span>
               <span class="flow-item-text">Operation with the projects</span>
             </span>
@@ -135,14 +135,25 @@
     </div>
   </div>
 </template>
+
 <script>
+import {
+  Position as ElIconPosition,
+  Edit as ElIconEditOutline,
+  Share as ElIconShare,
+} from '@element-plus/icons-vue'
 export default {
+  components: {
+    ElIconPosition,
+    ElIconEditOutline,
+    ElIconShare,
+  },
   methods: {
     start() {
-      this.$router.push({ name: "g2s_list" });
+      this.$router.push({ name: 'g2s_list' })
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -156,7 +167,7 @@ $firstHeight: 700px;
     min-height: 100%;
   }
   .bg {
-    background-image: url("../../assets/images/bg.jpg");
+    background-image: url('../../assets/images/bg.jpg');
     background-size: cover;
     position: absolute;
     width: 100%;
@@ -176,7 +187,6 @@ $firstHeight: 700px;
     top: 0;
   }
 }
-
 .content,
 .flow,
 .cases,
@@ -185,7 +195,6 @@ $firstHeight: 700px;
   text-align: center;
   margin-bottom: 3rem;
 }
-
 .content {
   min-height: $firstHeight;
   display: flex;
@@ -216,7 +225,6 @@ $firstHeight: 700px;
     border-radius: 6px;
   }
 }
-
 .main-container {
   .blue {
     border-color: #5cadff;
@@ -258,25 +266,25 @@ $firstHeight: 700px;
         }
 
         .img-map {
-          background-image: url("../../assets/images/map.jpg");
+          background-image: url('../../assets/images/map.jpg');
         }
         .img-chart {
-          background-image: url("../../assets/images/chart.jpg");
+          background-image: url('../../assets/images/chart.jpg');
         }
         .img-video {
-          background-image: url("../../assets/images/video.jpg");
+          background-image: url('../../assets/images/video.jpg');
         }
         .img-edit {
-          background-image: url("../../assets/images/edit.jpg");
+          background-image: url('../../assets/images/edit.jpg');
         }
         .img-todo {
-          background-image: url("../../assets/images/notes.jpg");
+          background-image: url('../../assets/images/notes.jpg');
         }
 
         .card-title {
           display: block;
-          font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-            "Lucida Sans", Arial, sans-serif;
+          font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+            'Lucida Sans', Arial, sans-serif;
           padding: 1rem 1rem;
           font-size: 1.4rem;
         }
@@ -311,15 +319,15 @@ $firstHeight: 700px;
         }
 
         .img1 {
-          background-image: url("../../assets/images/planet.jpg");
+          background-image: url('../../assets/images/planet.jpg');
         }
 
         .img2 {
-          background-image: url("../../assets/images/fire.jpg");
+          background-image: url('../../assets/images/fire.jpg');
         }
 
         .img3 {
-          background-image: url("../../assets/images/leaft1.jpg");
+          background-image: url('../../assets/images/leaft1.jpg');
         }
 
         .mask {
@@ -342,8 +350,8 @@ $firstHeight: 700px;
             }
           }
           .case-text {
-            font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-              "Lucida Sans", Arial, sans-serif;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+              'Lucida Sans', Arial, sans-serif;
             transition: all 0.6s 0s cubic-bezier(0.02, 0.67, 0.45, 0.93);
             pointer-events: none;
             position: absolute;
@@ -423,7 +431,7 @@ $firstHeight: 700px;
             padding: 1rem 0;
             font-size: 1.2rem;
             display: block;
-            font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
               sans-serif;
           }
         }
