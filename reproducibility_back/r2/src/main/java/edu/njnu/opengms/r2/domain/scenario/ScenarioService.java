@@ -137,6 +137,8 @@ public class ScenarioService {
                 .build();
 
         Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
+
+
 //        Folder childFolder = folderRepository.insert(folder);
         List<String> parentFolderChildren = new ArrayList<String>();
         String id = newScenarioFolder.getId();
@@ -149,6 +151,7 @@ public class ScenarioService {
 
         folderService.updateFolderChildren(parentFolder.getId(),updateProjectFolderChildrenDTO,userId);
 
+        //todo
 
 
         return newScenario;

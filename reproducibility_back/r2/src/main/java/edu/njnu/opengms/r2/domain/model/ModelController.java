@@ -10,6 +10,7 @@ import edu.njnu.opengms.r2.domain.model.support.State;
 import edu.njnu.opengms.r2.domain.user.User;
 import edu.njnu.opengms.r2.domain.user.UserRepository;
 import edu.njnu.opengms.r2.remote.RemotePortalService;
+import org.apache.xpath.operations.String;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
@@ -158,18 +159,18 @@ public class ModelController {
         if (model.isPresent()) {
             return ResultUtils.success(model.get());
         } else {
+
+    @RequestMapping(value = "/invoke", method = RequestMethod.POST)
             return ResultUtils.error(404, "Model not found");
-        }
+}
     }
 
-    @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
+@RequestMapping(value = "/my", method = RequestMethod.GET)
+public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         List<Model> modelList=  modelRepository.findAllByIdInOrContributorId(user.getModelList(),userId);
         return ResultUtils.success(modelList);
-    }
-
-    @RequestMapping(value = "/invoke", method = RequestMethod.POST)
+        }
     JsonResult invoke(@RequestBody JSONObject obj) {
         return ResultUtils.success();
     }
