@@ -161,7 +161,6 @@ export default {
 
       // 记录并删除保存数据的标识符
       while ((match2 = regex2.exec(line)) !== null) {
-        console.log('in2')
         var data = match2[1]
         var relativePath2 = match2[2]
         var fileContent2 = ''
@@ -174,7 +173,7 @@ export default {
       }
       return updatedLine
     },
-    // 根据路径找到对应的数据文件，获取数据的url
+    // 执行GetData逻辑，根据路径找到对应的数据文件，获取数据的url
     changeData(path) {
       var segments = path.split('/').filter((segment) => segment.trim() !== '')
       //空路径
@@ -182,7 +181,6 @@ export default {
         this.pathError = true
         return '路径为空'
       }
-      console.log(this.Folders, 'root folder')
       var currentFolder
       var projectName = this.project?.name + ' --folder'
       this.Folders[0]?.children.forEach((child) => {
@@ -200,6 +198,9 @@ export default {
       })
       // 处理前面的部分，每个部分都是文件夹
       for (let i = 0; i < segments.length - 1; i++) {
+        if(segments[i]=='.'||segments[i]=='..'){
+          continue;
+        }
         var folderName = segments[i]
         console.log(i, folderName, currentFolder, currentFolder.children)
         if (currentFolder.children) {
@@ -248,7 +249,12 @@ export default {
         return fileName + '不是一个数据文件，请检查该数据文件是否存在' // 数据文件不存在
       }
     },
+    //捕获路径之后进行数据存储
     async SaveDataInFolder(data, path, currentCodeLines) {
+      //需要针对path做进一步处理
+      // if(segments[i]=='.'||segments[i]=='..'){
+      //     continue;
+      //   }
       var currentCodeBlock = currentCodeLines.join('\n')
       // console.log(data,path,'11');
       currentCodeBlock += '\nprint(' + data + ');'

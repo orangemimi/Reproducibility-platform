@@ -187,6 +187,9 @@ export async function saveData(form, fileSize, storedFolderId) {
   return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form)
 }
 
+export async function postFile(form) {
+  return await axios.post('http://112.4.132.6:8083/data', form)
+}
 //-----------------------------------------------dataContainer---------------------------------------------
 
 export async function postDataContainer(form) {
@@ -249,9 +252,7 @@ export async function updateInstance(id, formData) {
 }
 
 //===============================extra=================================================
-export async function postFile(form) {
-  return await axios.post('http://112.4.132.6:8083/data', form)
-}
+
 
 //docker
 export async function codingPython(code) {
