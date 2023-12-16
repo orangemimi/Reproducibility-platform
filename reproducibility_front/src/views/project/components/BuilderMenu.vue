@@ -11,7 +11,11 @@
         @click="handleClick('Information')"
         :class="{ isActive: isInfoActive }"
       >
+<<<<<<< Updated upstream
         <i class="el-icon-info"></i>
+=======
+        <el-icon><InfoFilled /></el-icon>
+>>>>>>> Stashed changes
         Information
       </div>
       <!-- <div class="construction menu-item" @click="handleClick('Construction')" :class="{ isActive: isConstructionActive }">
@@ -23,15 +27,34 @@
         @click="handleClick('Construction')"
         :class="{ isActive: isConstruction1Active }"
       >
+<<<<<<< Updated upstream
         <i class="el-icon-info"></i>
         Construction
       </div>
       <div
+=======
+        <el-icon><InfoFilled /></el-icon>
+        Construction
+      </div>
+      <div
+        class="WorkFlow menu-item"
+        @click="handleClick('WorkFlow')"
+        :class="{ isActive: isWorkFlowActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+        WorkFlow
+      </div>
+      <div
+>>>>>>> Stashed changes
         class="contributor menu-item"
         @click="handleClick('Contributor')"
         :class="{ isActive: isContributorActive }"
       >
+<<<<<<< Updated upstream
         <i class="el-icon-info"></i>
+=======
+        <el-icon><InfoFilled /></el-icon>
+>>>>>>> Stashed changes
         Contributor
       </div>
       <div
@@ -39,7 +62,11 @@
         @click="handleClick('Community')"
         :class="{ isActive: isCommunityActive }"
       >
+<<<<<<< Updated upstream
         <i class="el-icon-info"></i>
+=======
+        <el-icon><InfoFilled /></el-icon>
+>>>>>>> Stashed changes
         Community
       </div>
       <div
@@ -47,7 +74,11 @@
         @click="handleClick('Settings')"
         :class="{ isActive: isSettingsActive }"
       >
+<<<<<<< Updated upstream
         <i class="el-icon-info"></i>
+=======
+        <el-icon><InfoFilled /></el-icon>
+>>>>>>> Stashed changes
         Settings
       </div>
     </div>
@@ -55,9 +86,14 @@
 </template>
 
 <script>
+<<<<<<< Updated upstream
 export default {
   components: {},
 
+=======
+// import { $emit } from '../../../utils/gogocodeTransfer'
+export default {
+>>>>>>> Stashed changes
   watch: {},
 
   computed: {},
@@ -70,6 +106,10 @@ export default {
       isSettingsActive: false,
       isCommunityActive: false,
       isConstruction1Active: false,
+<<<<<<< Updated upstream
+=======
+      isWorkFlowActive: false,
+>>>>>>> Stashed changes
     };
   },
 
@@ -77,6 +117,7 @@ export default {
     handleClick(type) {
       if (type == "Information") {
         this.isInfoActive = true;
+<<<<<<< Updated upstream
         this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = this.isConstruction1Active = false;
       } else if (type == "Contributor") {
         this.isContributorActive = true;
@@ -90,6 +131,60 @@ export default {
       } else if (type == "Construction") {
         this.isConstruction1Active = true;
         this.isInfoActive = this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
+=======
+        this.isConstructionActive =
+          this.isContributorActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+          this.isConstruction1Active =
+          this.isWorkFlowActive =
+            false;
+      } else if (type == "Contributor") {
+        this.isContributorActive = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+          this.isConstruction1Active =
+          this.isWorkFlowActive =
+            false;
+      } else if (type == "Community") {
+        this.isCommunityActive = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isSettingsActive =
+          this.isContributorActive =
+          this.isConstruction1Active =
+          this.isWorkFlowActive =
+            false;
+      } else if (type == "Settings") {
+        this.isSettingsActive = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isContributorActive =
+          this.isCommunityActive =
+          this.isConstruction1Active =
+          this.isWorkFlowActive =
+            false;
+      } else if (type == "Construction") {
+        this.isConstruction1Active = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isContributorActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+          this.isWorkFlowActive =
+            false;
+      } else if (type == "WorkFlow") {
+        this.isWorkFlowActive = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isContributorActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+          this.isConstruction1Active =
+            false;
+>>>>>>> Stashed changes
       }
       this.$emit("toRouterType", type);
     },
@@ -98,11 +193,21 @@ export default {
       switch (this.$router.currentRoute.name) {
         case "Information": {
           this.isInfoActive = true;
+<<<<<<< Updated upstream
           this.isConstructionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
+=======
+          this.isConstructionActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+            this.isCommunityActive =
+            this.isWorkFlowActive =
+              false;
+>>>>>>> Stashed changes
           break;
         }
         case "Construction": {
           this.isConstructionActive = true;
+<<<<<<< Updated upstream
           this.isInfoActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
           break;
         }
@@ -119,10 +224,67 @@ export default {
         case "Community": {
           this.isCommunityActive = true;
           this.isInfoActive = this.isReproductionActive = this.isSettingsActive = this.isContributorActive = false;
+=======
+          this.isInfoActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+            this.isCommunityActive =
+            this.isWorkFlowActive =
+              false;
+          break;
+        }
+        case "WorkFlow": {
+          this.isWorkFlowActive = true;
+          this.isInfoActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+            this.isCommunityActive =
+            this.isWorkFlowActive =
+              false;
+          break;
+        }
+        case "Contributor": {
+          this.isContributorActive = true;
+          this.isInfoActive =
+            this.isConstructionActive =
+            this.isSettingsActive =
+            this.isCommunityActive =
+            this.isConstruction1Active =
+              false;
+          break;
+        }
+        case "Settings": {
+          this.isSettingsActive = true;
+          this.isInfoActive =
+            this.isConstructionActive =
+            this.isContributorActive =
+            this.isCommunityActive =
+            this.isWorkFlowActive =
+              false;
+          break;
+        }
+        case "Community": {
+          this.isCommunityActive = true;
+          this.isInfoActive =
+            this.isReproductionActive =
+            this.isSettingsActive =
+            this.isContributorActive =
+            this.isWorkFlowActive =
+              false;
+>>>>>>> Stashed changes
         }
       }
     },
   },
+<<<<<<< Updated upstream
+=======
+  mounted() {
+    this.init();
+  },
+  emits: ["toRouterType"],
+};
+</script>
+>>>>>>> Stashed changes
 
   mounted() {
     this.init();

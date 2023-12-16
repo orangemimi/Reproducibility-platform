@@ -12,7 +12,6 @@ import edu.njnu.opengms.r2.domain.project.ProjectRepository;
 import edu.njnu.opengms.r2.remote.UserServiceServie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,8 +84,8 @@ public class UserService {
     public JSONObject login(String email, String password) {
 
         User userFromDB = userRepository.findByEmail(email).orElseThrow(MyException::noObject);
-        if(userFromDB.getPassword().equals(password)){
-            String jwtToken = JwtUtils.generateToken(userFromDB.getId(),userFromDB.getName(), email, password);
+        if (userFromDB.getPassword().equals(password)) {
+            String jwtToken = JwtUtils.generateToken(userFromDB.getId(), userFromDB.getName(), email, password);
             JSONObject json = new JSONObject();
             json.put("name", userFromDB.getName());
             json.put("userId", userFromDB.getId());
@@ -99,71 +98,12 @@ public class UserService {
             json.put("token", "Bearer" + " " + jwtToken);
 
             return json;
-        }else{
+        } else {
             throw new MyException(ResultEnum.USER_PASSWORD_NOT_MATCH);
         }
-
-
-//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-//        String IP = Utils.getIpAddr(request);
-//        password = DigestUtils.md5DigestAsHex(password.getBytes());
-//        JSONObject userJson= userServiceServie.login(email, password, IP);
-//        if(!userRepository.findByEmail(email).isPresent() && userJson != null){
-//            // 本地没有记录，远程数据库有记录
-//            // 字段插入数据库
-//            User addUserDTO = new User();
-//            addUserDTO.setEmail(email);
-//            addUserDTO.setPassword(password);
-//            addUserDTO.setUserServerId(((JSONObject)userJson.get("data")).getStr("userId"));
-//            addUserDTO.setName(((JSONObject)userJson.get("data")).getStr("name"));
-//            addUserDTO.setJoinedProjects(new ArrayList<String>());
-//            addUserDTO.setCreatedProjects(new ArrayList<String>());
-//            addUserDTO.setForkedProjects(new ArrayList<String>());
-//            System.out.println(addUserDTO.toString());
-//            userRepository.insert(addUserDTO);
-//        }else if (!userRepository.findByEmail(email).isPresent() && userJson == null) {
-//            //本地没有记录，远程没有记录
-//            throw new MyException(ResultEnum.NO_OBJECT);
-//        }else if (userRepository.findByEmail(email).isPresent() && userJson != null) {
-//            // 本地有记录，远程数据库有记录
-//            User user = userRepository.findByEmail(email).orElseThrow(MyException::noObject);
-//            if(!user.getUserServerId().equals(((JSONObject)userJson.get("data")).getStr("userId"))) {user.setUserServerId(((JSONObject)userJson.get("data")).getStr("userId"));}
-//            if(!user.getName().equals(((JSONObject)userJson.get("data")).getStr("name"))) {user.setName(((JSONObject)userJson.get("data")).getStr("name"));}
-//            if(!user.getPassword().equals(password)) {user.setPassword(password);}
-//            userRepository.save(user);
-//        }
-//        //验证成功，将数据交给前端
-//        User userFromDB = userRepository.findByEmail(email).orElseThrow(MyException::noObject);
-//        JSONObject temp = (JSONObject) userJson.get("data");
-//        int unreadApply = noticeService.getNumForApply(temp.getStr("userId"));
-//        int unreadReply = noticeService.getNumForReply(temp.getStr("userId"));
-//        String avatar = temp.getStr("avatar");
-//        if(avatar == null) { avatar = ""; };
-//        String jwtToken = JwtUtils.generateToken(temp.getStr("userServerId"), temp.getStr("name"), password);
-//        JSONObject json = new JSONObject();
-//        json.put("name", temp.getStr("name"));
-//        json.put("userId", temp.getStr("userId"));
-//        json.put("avatar", avatar);
-//        json.put("email", email);
-//        json.put("unreadApply", unreadApply);
-//        json.put("unreadReply", unreadReply);
-//        json.put("joinedProjects", userFromDB.getJoinedProjects());
-//        json.put("createdProjects", userFromDB.getCreatedProjects());
-//        json.put("token", "Bearer" + " " + jwtToken);
-//        return json;
     }
 
 
-
-
-
-
-//    public JSONObject updateByUserId(String userId, UpdateUserDTO update, String email, String password) throws IllegalAccessException {
-//        User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
-//        update.updateTo(userFromDB);
-//        userRepository.save(userFromDB);
-//        return userServiceServie.updateUserinfo(email, password, update);
-//    }
 
     public User updateJoinedProjects(String userId, String update) {
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
@@ -186,56 +126,6 @@ public class UserService {
         return userRepository.save(userFromDB);
     }
 
-
-
-    /*
-    * 目的：检验登录，登录成功时将数据传送给前端
-    * 1.检验本地和用户服务器有无注册
-    * 2.没有注册抛出throw new MyException(ResultEnum.NO_OBJECT);
-    * 3.注册了将数据传送给前端
-    * */
-
-
-    //发送邮箱验证码
-    public JSONObject sendCodeEmail(String email) {
-        JSONObject jsonObj = userServiceServie.getIdentifyinCode(email);
-        if((int) jsonObj.get("code") == 0) {
-            return jsonObj;
-        }else {
-            throw new MyException(ResultEnum.NO_OBJECT);
-        }
-    }
-
-    /*
-    * 忘记密码，通过邮箱修改密码
-    * 1.修改用户服务器的密码
-    * 2.修改本地数据库的密码
-    * 3.本地有记录用户服务器一定有记录，用户服务器有记录本地不一定有记录，注意做判断处理
-    * */
-    public User forgetPassword(String email, String password, String code) {
-        password = DigestUtils.md5DigestAsHex(password.getBytes());
-        JSONObject jsonObj = userServiceServie.changePWDbyEmail(email, code, password);
-        if((int) jsonObj.get("code") == 0) {
-            //用户服务器修改成功时
-            if(userRepository.findByEmail(email).isPresent()) {
-                //本地有记录，同时修改本地记录
-                User userFromDB = userRepository.findByEmail(email).orElseThrow(MyException::noObject);
-                userFromDB.setPassword(password);
-                return userRepository.save(userFromDB);
-            }else {
-                //本地无记录，插入本地记录
-                User user = ((JSONObject) jsonObj.get("data")).toBean(User.class);
-                user.setPassword(password);
-                user.setUserServerId(((JSONObject) jsonObj.get("data")).getStr("userId"));
-                user.setJoinedProjects(new ArrayList<String>());
-                user.setForkedProjects(new ArrayList<String>());
-                user.setCreatedProjects(new ArrayList<String>());
-                return userRepository.insert(user);
-            }
-        }else {
-            throw new MyException(ResultEnum.NO_OBJECT);
-        }
-    }
 
     //修改密码
     public User updatePassword(String oldPWD, String newPWD, String email) {
@@ -263,7 +153,35 @@ public class UserService {
     public User getUserInfoById(String userId) {
 
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
+<<<<<<< Updated upstream
         return userFromDB;
+=======
+        JSONObject obj = new JSONObject();
+        JSONObject userNew = new JSONObject();
+        if(userFromDB.getModelList()!=null) {
+            JSONObject models = Optional.ofNullable(userFromDB)
+                    .map(x -> x.getModelList())
+                    .map(x -> {
+
+                        List<String> modelIdList = x;
+                        if (modelIdList != null) {
+                            obj.put("modelList", modelRepository.findAllById(modelIdList));
+                        } else {
+                            obj.put("modelList", null);
+
+                        }
+
+                        return obj;
+                    })
+                    .orElseGet(null);
+//            userNew.put("modelItemList",obj);
+        }
+        userNew.put("name",userFromDB.getName());
+        userNew.put("modelList",userFromDB.getModelList());
+        userNew.put("createdProjects",userFromDB.getCreatedProjects());
+
+        return userNew;
+>>>>>>> Stashed changes
     }
 
     public User update(User user){

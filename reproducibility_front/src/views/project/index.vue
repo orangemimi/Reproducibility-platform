@@ -30,9 +30,16 @@
 </template>
 
 <script>
+<<<<<<< Updated upstream
 import { getProjectAndUsers, forkProject } from "@/api/request";
 import builderMenu from "./components/BuilderMenu";
 import reBuilderMenu from "./components/ReBuilderMenu";
+=======
+import { getProjectAndUsers } from "@/api/request";
+import builderMenu from "./components/BuilderMenu.vue";
+import reBuilderMenu from "./components/ReBuilderMenu.vue";
+import { ref } from "vue";
+>>>>>>> Stashed changes
 import { mapState } from "vuex";
 
 export default {
@@ -65,6 +72,16 @@ export default {
     async init() {
       await this.getProjectInfo();
       await this.judgeRole(this.projectInfo, this.user.userId);
+<<<<<<< Updated upstream
+=======
+      // debugger;
+      if (this.permission.role == "builder") {
+      } else {
+        this.$router.push({
+          name: "R_Info",
+        });
+      }
+>>>>>>> Stashed changes
     },
     async judgeRole(project, userId) {
       await this.$store.dispatch("permission/getRole", {
@@ -82,12 +99,20 @@ export default {
     },
 
     toRouterType(val) {
-      if (val != this.$router.currentRoute.name) {
+      console.log(this.$router.currentRoute.value.name, val, "emit");
+      if (val != this.$router.currentRoute.value.name) {
         this.$router.push({
+          // path: `/project/${this.$route.params.id}/val`,
           name: val,
+<<<<<<< Updated upstream
           query: {
             forkingProjectId: this.projectInfo.forkingProjectId,
           },
+=======
+          // query: {
+          //   forkingProjectId: this.projectInfo.forkingProjectId,
+          // },
+>>>>>>> Stashed changes
         });
       }
     },

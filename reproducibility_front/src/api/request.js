@@ -22,6 +22,17 @@ export async function saveUser(form) {
 
 export async function getUserInfoByUserId(userId) {
   return await get(`/users/getUserInfoByUserId/${userId}`);
+<<<<<<< Updated upstream
+=======
+}
+
+export async function getUser() {
+  return await get(`/users`);
+}
+
+export async function updateUsersModel(json) {
+  return await patch(`/users/model`, json);
+>>>>>>> Stashed changes
 }
 
 export async function getUserProjects() {
@@ -50,6 +61,14 @@ export async function getProjectById(projectId) {
 
 export async function getMyProjects() {
   return await get(`/projects/getmyprojects`);
+<<<<<<< Updated upstream
+=======
+}
+
+//将传输的pdf文件送到后端处理
+export async function pdfConvert(fileContent) {
+  return await post(`/projects/pdf`, fileContent);
+>>>>>>> Stashed changes
 }
 
 //---------------
@@ -69,9 +88,15 @@ export async function updateProjectMembers(projectId, form) {
 
 export async function saveProject(form) {
   let data = await post(`/projects`, form);
+<<<<<<< Updated upstream
   if (data != null) {
     successNotification("create", "project");
   }
+=======
+  // if (data != null) {
+  //   successNotification('create', 'project')
+  // }
+>>>>>>> Stashed changes
   return data;
 }
 
@@ -86,6 +111,7 @@ export async function checkTaskStatus(tid) {
 
 //-------------------------------------------modelitems--------------------------------------------------
 
+<<<<<<< Updated upstream
 export async function getModelsByPrivacy(privacy, currentPage, pagesize) {
   return await get(
     `/models/getPublicModels/${privacy}/${currentPage}/${pagesize}`
@@ -98,6 +124,34 @@ export async function getAllPublicModels() {
 
 export async function getPublicModelListByIgnoreName(text) {
   return await get(`/models/getPublicModelListByIgnoreName/${text}`);
+=======
+// export async function getModelsByPrivacy(privacy, currentPage, pagesize, key) {
+//   return await post(
+//     `/models/getPublicModels/${privacy}/${currentPage}/${pagesize}`,
+//     key
+//   );
+// }
+export async function getModelsByPrivacy(form) {
+  return await post(`/models/getPublicModels`, form);
+}
+export async function getMyModels() {
+  return await get(`/models/my`);
+}
+
+// export async function getAllPublicModels() {
+//   return await get(`/models/allPublic`);
+// }
+
+// export async function getPublicModelListByIgnoreName(text) {
+//   return await get(`/models/getPublicModelListByIgnoreName/${text}`);
+// }
+
+export async function getModelById(id) {
+  return await get(`/models/getModelById/${id}`);
+}
+export async function addModelByMD5Local(form) {
+  return await get(`/models/local`, form);
+>>>>>>> Stashed changes
 }
 
 //---
@@ -119,8 +173,19 @@ export async function getScenariosByProjectId(projectId) {
   return await get(`/scenario/project/${projectId}`);
 }
 
+// export async function getScenarioAllInfoById(scenarioId) {
+//   return await get(`/scenario/${scenarioId}`);
+// }
+
 export async function saveScenario(postJson) {
   return await post(`/scenario`, postJson);
+<<<<<<< Updated upstream
+=======
+}
+
+export async function bindScenario(id, postJson) {
+  return await patch(`/scenario/instance/${id}`, postJson);
+>>>>>>> Stashed changes
 }
 
 export async function updateScenarioByProjectId(projectId, postJson) {
@@ -131,9 +196,14 @@ export async function updateScenarioByProjectId(projectId, postJson) {
   return data;
 }
 
+<<<<<<< Updated upstream
 export async function updateresourceCollection(id, type, form) {
   let data = await patch(`/scenario/resources/${id}/${type}`, form);
 
+=======
+export async function updateresourceCollection(id, form) {
+  let data = await patch(`/scenario/resources/${id}`, form);
+>>>>>>> Stashed changes
   return data;
 }
 
@@ -149,10 +219,20 @@ export async function getFolders() {
 
 //-----------------------------------------------data---------------------------------------------
 
+<<<<<<< Updated upstream
 export async function saveData(form, storedFolderId, fileSize) {
   return await post(`/data/uploadFileForm/${storedFolderId}/${fileSize}`, form);
 }
 
+=======
+export async function saveData(form, fileSize, storedFolderId) {
+  return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form);
+}
+
+export async function postFile(form) {
+  return await axios.post("http://112.4.132.6:8083/data", form);
+}
+>>>>>>> Stashed changes
 //-----------------------------------------------dataContainer---------------------------------------------
 
 export async function postDataContainer(form) {
@@ -199,6 +279,14 @@ export async function getInstanceById(id) {
 
 export async function getInstancesInScenario(scenarioId, modelId) {
   return await get(`/model_instances/inscenario/${scenarioId}/${modelId}`);
+<<<<<<< Updated upstream
+=======
+}
+
+//这是一个另类，读取数据但是用的POST，注意
+export async function getInstancesByIds(instances) {
+  return await post(`/model_instances/getBoundInstances`, instances);
+>>>>>>> Stashed changes
 }
 
 export async function saveInstance(formData) {
@@ -210,6 +298,13 @@ export async function updateInstance(id, formData) {
 }
 
 //===============================extra=================================================
+<<<<<<< Updated upstream
 export async function postFile(form) {
   return await axios.post("http://221.226.60.2:8082/data", form);
+=======
+
+//docker
+export async function codingPython(code) {
+  return await post(`/execute-python`, code);
+>>>>>>> Stashed changes
 }

@@ -6,6 +6,7 @@
       <el-menu-item index="3">消息中心</el-menu-item>
     </el-menu> -->
     <div class="menu">
+<<<<<<< Updated upstream
       <div class="info menu-item" @click="handleClick('Information')" :class="{ isActive: isInfoActive }">
         <i class="el-icon-info"></i>
         Information
@@ -20,32 +21,77 @@
       </div>
       <div class="community menu-item" @click="handleClick('Community')" :class="{ isActive: isCommunityActive }">
         <i class="el-icon-info"></i>
+=======
+      <div
+        class="info menu-item"
+        @click="handleClick('R_Info')"
+        :class="{ isActive: isInfoActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+        Information
+      </div>
+
+      <div
+        class="scenario menu-item"
+        @click="handleClick('R_Reproduction')"
+        :class="{ isActive: isReproductionActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+        Reproduction
+      </div>
+
+      <div
+        class="contributor menu-item"
+        @click="handleClick('Contributor')"
+        :class="{ isActive: isContributorActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+        Contributor
+      </div>
+      <div
+        class="community menu-item"
+        @click="handleClick('Community')"
+        :class="{ isActive: isCommunityActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+>>>>>>> Stashed changes
         Community
       </div>
     </div>
   </div>
 </template>
 
+<!-- <script setup>
+
+</script> -->
 <script>
 export default {
+<<<<<<< Updated upstream
   components: {},
 
   watch: {},
 
   computed: {},
 
+=======
+>>>>>>> Stashed changes
   data() {
     return {
       isInfoActive: true,
       isReproductionActive: false,
       isContributorActive: false,
       isSettingsActive: false,
+<<<<<<< Updated upstream
       isCommunityActive: false
+=======
+      isCommunityActive: false,
+>>>>>>> Stashed changes
     };
   },
 
   methods: {
     handleClick(type) {
+<<<<<<< Updated upstream
       if (type == 'Information') {
         this.isInfoActive = true;
         this.isReproductionActive = this.isContributorActive = this.isSettingsActive = this.isCommunityActive = false;
@@ -82,10 +128,91 @@ export default {
         case 'Community': {
           this.isCommunityActive = true;
           this.isInfoActive = this.isReproductionActive = this.isSettingsActive = this.isContributorActive = false;
+=======
+      if (type == "R_Info") {
+        // type = "R_Reproduction";
+        this.isInfoActive = true;
+        this.isReproductionActive =
+          this.isContributorActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+            false;
+      } else if (type == "R_Reproduction") {
+        this.isReproductionActive = true;
+        this.isInfoActive =
+          this.isContributorActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+            false;
+      } else if (type == "Contributor") {
+        this.isContributorActive = true;
+        this.isInfoActive =
+          this.isReproductionActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+            false;
+      } else if (type == "Community") {
+        this.isCommunityActive = true;
+        this.isInfoActive =
+          this.isReproductionActive =
+          this.isSettingsActive =
+          this.isContributorActive =
+            false;
+      }
+      this.$emit("toRouterType", type);
+    },
+
+    init() {
+      // console.log(this.$router.currentRoute.value, "value");
+      // // debugger;
+      switch (this.$router.currentRoute.value.name) {
+        case "R_Info": {
+          // debugger;
+          this.isInfoActive = true;
+          this.isReproductionActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+              false;
+          break;
+        }
+        case "R_Reproduction": {
+          this.isReproductionActive = true;
+          this.isInfoActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+              false;
+          break;
+        }
+        case "Contributor": {
+          this.isContributorActive = true;
+          this.isInfoActive =
+            this.isReproductionActive =
+            this.isSettingsActive =
+              false;
+          break;
+        }
+        case "Community": {
+          this.isCommunityActive = true;
+          this.isInfoActive =
+            this.isReproductionActive =
+            this.isSettingsActive =
+            this.isContributorActive =
+              false;
+>>>>>>> Stashed changes
         }
       }
     }
   },
+<<<<<<< Updated upstream
+=======
+  mounted() {
+    this.isInfoActive = true;
+    this.init();
+  },
+  emits: ["toRouterType"],
+};
+</script>
+>>>>>>> Stashed changes
 
   mounted() {
     this.init();

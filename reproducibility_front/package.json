@@ -8,10 +8,18 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+<<<<<<< Updated upstream
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "echarts": "^4.7.0",
     "element-ui": "^2.13.1",
+=======
+    "@element-plus/icons-vue": "^2.1.0",
+    "@types/vue": "^2.0.0",
+    "axios": "^1.6.0",
+    "codemirror": "^5.46.0",
+    "element-plus": "^2.4.3",
+>>>>>>> Stashed changes
     "file-saver": "^2.0.5",
     "identicon.js": "^2.3.3",
     "js-md5": "^0.7.3",
@@ -19,6 +27,7 @@
     "mavon-editor": "^2.9.0",
     "mxgraph": "^4.2.2",
     "string-format": "^2.0.0",
+<<<<<<< Updated upstream
     "vue": "^2.6.11",
     "vue-avatar": "^2.2.0",
     "vue-router": "^3.1.6",
@@ -43,5 +52,26 @@
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
+=======
+    "vite-plugin-style-import": "^2.0.0",
+    "vue": "^3.3.11",
+    "vue-avatar": "^2.2.0",
+    "vue-router": "^4.2.5",
+    "vue-seamless-scroll": "^1.1.23",
+    "vue3-perfect-scrollbar": "^1.6.1",
+    "vuex": "^4.1.0",
+    "x2js": "^3.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "less": "^4.2.0",
+    "sass": "^1.55.0",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.1",
+    "vue-tsc": "^1.8.5",
+    "webpack": "^5.0.0"
+>>>>>>> Stashed changes
   }
 }

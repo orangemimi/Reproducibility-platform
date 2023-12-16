@@ -31,12 +31,8 @@ public class ModelController {
     @Autowired
     RemotePortalService remotePortalService;
 
-    //create one project
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public JsonResult create(@RequestBody AddModelServiceDTO add) {
-        Model model;
-        JSONObject data;
 
+<<<<<<< Updated upstream
 //        if(add.getType().equals("service")){
 //            data = remotePortalService.getModelInfo(add.getServiceId());
 //            model = Model.builder()
@@ -54,6 +50,8 @@ public class ModelController {
 //        }
         return ResultUtils.success();
     }
+=======
+>>>>>>> Stashed changes
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void createPortal(@RequestBody List<String> add) {
@@ -107,7 +105,20 @@ public class ModelController {
         return ResultUtils.success(modelRepository.findByNameContainsIgnoreCase(text));
     }
 
+<<<<<<< Updated upstream
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
+=======
+            return ResultUtils.error(404, "Model not found");
+}
+    }
+
+@RequestMapping(value = "/my", method = RequestMethod.GET)
+public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
+        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
+        List<Model> modelList=  modelRepository.findAllByIdInOrContributorId(user.getModelList(),userId);
+        return ResultUtils.success(modelList);
+        }
+>>>>>>> Stashed changes
     JsonResult invoke(@RequestBody JSONObject obj) {
         return ResultUtils.success();
     }

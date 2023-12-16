@@ -63,10 +63,18 @@ import {
   getScenariosByProjectId,
 } from "@/api/request";
 
+<<<<<<< Updated upstream:reproducibility_front/src/views/project/scenarios/index.vue
 import ScenarioCard from "_com/Cards/ScenarioListCard.vue";
 
 import ResourceToolbar from "./Toolbars/ResourceToolbar";
 import ModelContent from "./Toolbars/ModelContent";
+=======
+import scenarioCard from "_com/Cards/ScenarioListCard.vue";
+import createScenario from "./../construction/index.vue";
+
+import resourceToolbar from "./Toolbars/ResourceToolbar";
+import modelContent from "_com/ModelContent/index";
+>>>>>>> Stashed changes:reproducibility_front/src/views/builder/scenarios/index.vue
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
   components: {
@@ -88,6 +96,10 @@ export default {
       allScenarioList: [],
       chosenScenario: {},
       currentModel: {},
+<<<<<<< Updated upstream:reproducibility_front/src/views/project/scenarios/index.vue
+=======
+      createScenarioDialog: false,
+>>>>>>> Stashed changes:reproducibility_front/src/views/builder/scenarios/index.vue
     };
   },
 
@@ -97,6 +109,11 @@ export default {
 
       this.chosenScenario = await getScenarioById(this.project.scenario);
       this.chosenScenario.isBinded = true;
+<<<<<<< Updated upstream:reproducibility_front/src/views/project/scenarios/index.vue
+=======
+      this.currentModel = this.chosenScenario.resourceCollection.modelList[0];
+
+>>>>>>> Stashed changes:reproducibility_front/src/views/builder/scenarios/index.vue
       this.allScenarioList = await getScenariosByProjectId(this.projectId);
       let binded = {};
       this.allScenarioList.forEach((element, index) => {
@@ -113,10 +130,26 @@ export default {
     async chooseScenario(item) {
       this.chosenScenario = await getScenarioById(item.id);
       this.chosenScenario.isBinded = true;
+<<<<<<< Updated upstream:reproducibility_front/src/views/project/scenarios/index.vue
+=======
+    },
+
+    createNewScenario() {
+      this.createScenarioDialog = true;
+>>>>>>> Stashed changes:reproducibility_front/src/views/builder/scenarios/index.vue
     },
 
     selectModel(val) {
       this.currentModel = val;
+<<<<<<< Updated upstream:reproducibility_front/src/views/project/scenarios/index.vue
+=======
+    },
+    createStatus(val) {
+      if (val == "success") {
+        this.createScenarioDialog = false;
+        this.init();
+      }
+>>>>>>> Stashed changes:reproducibility_front/src/views/builder/scenarios/index.vue
     },
   },
 
