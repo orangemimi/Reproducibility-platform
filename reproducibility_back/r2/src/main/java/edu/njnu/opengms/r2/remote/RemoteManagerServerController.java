@@ -90,11 +90,16 @@ public class RemoteManagerServerController {
             JSONObject object = managerServerFeign.refresh((JSONObject) instanceInitial.get("refreshForm"));
             List<JSONObject> statesInit = (List) instanceInitial.get("behavior");
             JSONObject refreshData= (JSONObject) object.get("data");
-            JSONObject assessTypeObj = (JSONObject) statesInit.get(0).getJSONArray("parameters").get(4);
-            JSONObject udx = (JSONObject) assessTypeObj.getJSONObject("datasetItem").getJSONArray("UdxDeclarationNew").get(0);
-            String assType = udx.getStr("parameterValue");
+            String assType = "";
             String value="";
             Double doubleValue=0.00;
+            if(instanceInitial.get("modelName").equals("StatisticsCalculation")){
+                JSONObject assessTypeObj = (JSONObject) statesInit.get(0).getJSONArray("parameters").get(4);
+                JSONObject udx = (JSONObject) assessTypeObj.getJSONObject("datasetItem").getJSONArray("UdxDeclarationNew").get(0);
+                assType = udx.getStr("parameterValue");
+
+            }
+
 
 
             List<JSONObject> outList = (List<JSONObject>) refreshData.get("outputs");
@@ -138,7 +143,7 @@ public class RemoteManagerServerController {
 
                                     //IF assessment, get the content of txt,
                                     String assessment="";
-                                    if(instanceInitial.get("modelId").equals("65a0a40a1e8e312ef974d82b")){
+                                    if(instanceInitial.get("modelName").equals("StatisticsCalculation")){
                                         SecureRandom secureRandom = new SecureRandom();
                                         byte[] seed = secureRandom.generateSeed(16);
 
@@ -155,10 +160,10 @@ public class RemoteManagerServerController {
                                         }
 
                                         String.format("%.2f", doubleValue);
-//
+                                        JSONObject outAssessmentParam  = (JSONObject) outInstance.getJSONObject("datasetItem");
+                                        outAssessmentParam.put("assessmentValue",String.format("%.2f", doubleValue));
                                     }
-                                    JSONObject outAssessmentParam  = (JSONObject) outInstance.getJSONObject("datasetItem");
-                                    outAssessmentParam.put("assessmentValue",String.format("%.2f", doubleValue));
+
 
                                 }
                             }
