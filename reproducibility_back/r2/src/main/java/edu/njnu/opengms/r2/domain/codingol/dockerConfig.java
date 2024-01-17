@@ -1,4 +1,3 @@
-//import org.springframework.context.annotation.Configuration;
 package edu.njnu.opengms.r2.domain.codingol;
 
 import com.github.dockerjava.api.DockerClient;
