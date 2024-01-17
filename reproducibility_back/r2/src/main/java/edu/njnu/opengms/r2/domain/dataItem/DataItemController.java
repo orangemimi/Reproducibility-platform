@@ -108,8 +108,6 @@ public class DataItemController {
         }
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");//获得上传数据的URL
 
-        //add to dataItem in mongodb
-
         if(storedFolderId.equals("intermediate")){
             return ResultUtils.success("http://112.4.132.6:8083/data/" +url);
         } else {
@@ -165,13 +163,8 @@ public class DataItemController {
             updateResourceScenarioDTO.setResourceCollection(resourceCollectionUpdate);
             updateResourceScenarioDTO.updateTo(scenario);
             scenarioRepository.save(scenario);
-
-
-
             return ResultUtils.success(folder);
         }
-
-
 
     }
 

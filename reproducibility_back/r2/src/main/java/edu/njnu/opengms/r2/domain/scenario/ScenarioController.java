@@ -7,7 +7,7 @@ import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceResourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +25,12 @@ public class ScenarioController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public JsonResult getScenarioInfoBId(@PathVariable("id") String id) {
-
         return ResultUtils.success( scenarioService.getScenario(id) );
+    }
+    @RequestMapping(value = "/r/{scenarioId}", method = RequestMethod.GET)
+    public JsonResult getScenarioInfoByInitialScenarioId(@PathVariable("scenarioId") String scenarioId) {
+
+        return ResultUtils.success( scenarioService.getScenarioByInitialScenarioId(scenarioId) );
     }
 
 
@@ -41,16 +45,20 @@ public class ScenarioController {
     public JsonResult updateScenarioInfo(@PathVariable("id") String id, @RequestBody UpdateScenarioDTO update) {
         return ResultUtils.success(scenarioService.updateScenario(id, update));
     }
+//    @RequestMapping(value = "/r/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
+//    public JsonResult updateScenarioInfo(@PathVariable("id") String id, @RequestBody UpdateForkedScenarioDTO update) {
+//        return ResultUtils.success(scenarioService.updateScenario(id, update));
+//    }
 
     @RequestMapping(value = "/instance/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
-    public JsonResult updateScenarioInstance(  @JwtTokenParser(key="userId") String userId,@PathVariable("id") String id, @RequestBody UpdateScenarioInstanceDTO update) {
+    public JsonResult updateScenarioInstance(  @JwtTokenParser(key="userId") String userId,@PathVariable("id") String id, @RequestBody UpdateScenarioInstanceResourceDTO update) {
 
         return ResultUtils.success(scenarioService.updateScenarioInstance(id, update));
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public JsonResult saveScenarioInfo(@RequestBody AddScenarioDTO add, @JwtTokenParser(key="userId") String userId) {
-        return ResultUtils.success(scenarioService.saveScenario(add,userId));
+    @RequestMapping(value = "/{initialScenatioId}", method = RequestMethod.POST)
+    public JsonResult saveScenarioInfo(@RequestBody AddScenarioDTO add, @JwtTokenParser(key="userId") String userId,@PathVariable("initialScenatioId") String initialScenatioId) {
+        return ResultUtils.success(scenarioService.saveScenario(add,userId,initialScenatioId));
     }
 
     @RequestMapping(value = "/resources/{id}", method = RequestMethod.PATCH)

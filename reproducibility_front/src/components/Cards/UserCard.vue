@@ -49,22 +49,22 @@ export default {
   computed: {},
 
   data() {
-    return {}
+    return {};
   },
 
   methods: {
     click() {
-      console.log(1)
+      console.log(1);
       this.$router.push({
         path: `/Homepage/${this.user.id}`,
-      })
+      });
     },
   },
 
   mounted() {
-    console.log(this.user)
+    console.log(this.user);
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -72,7 +72,7 @@ export default {
   .text {
     text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: wrap;
     width: 60px;
   }
 }

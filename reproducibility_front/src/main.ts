@@ -11,6 +11,15 @@ import setupStore from './store';
 import mavonEditor from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
 import './assets/iconfont/iconfont.css';
+import PerfectScrollbar from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+import eventBus from 'vue3-eventbus'
+import rate from 'vue-rate'
+import 'vue-rate/dist/vue-rate.css'
+import ss from "simple-statistics";
+
+
+// import mxgraph from './mxgraph';
 // import './assets/variable.scss';
 // import  VueScrollTo  from 'vuescroll';
 import x2js from 'x2js';
@@ -18,12 +27,17 @@ import x2js from 'x2js';
 const app = createApp(App);
 
 app.use(router);
-// app.use(ElementPlus, { locale });
-app.use(ElementPlus);
+app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 app.use(mavonEditor);
+app.use(PerfectScrollbar);
+app.use(eventBus);
+app.use(rate);
+
+
+
 // app.use(VueScrollTo);
 (async () => {
   // 异步初始化 Vuex store

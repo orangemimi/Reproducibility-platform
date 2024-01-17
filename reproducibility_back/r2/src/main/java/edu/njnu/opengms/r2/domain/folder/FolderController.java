@@ -6,10 +6,7 @@ import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
 import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author ：Zhiyi
@@ -35,6 +32,11 @@ public class FolderController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public JsonResult getByCreatorId(@JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success(folderService.getFolderByCreator(userId));
+    }
+
+    @RequestMapping(value = "/{scenarioId}", method = RequestMethod.GET)
+    public JsonResult getByUserId(@PathVariable("scenarioId") String scenarioId, String userId) {
+        return ResultUtils.success(folderService.getFolderByScenarioId(scenarioId));
     }
 
     @RequestMapping(value = "", method = RequestMethod.PATCH)

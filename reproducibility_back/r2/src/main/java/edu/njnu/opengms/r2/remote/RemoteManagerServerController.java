@@ -1,11 +1,20 @@
 package edu.njnu.opengms.r2.remote;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.enums.ResultEnum;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
+import edu.njnu.opengms.r2.domain.dataItem.AddDataItemDTO;
+import edu.njnu.opengms.r2.domain.dataItem.DataItem;
+import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
+import edu.njnu.opengms.r2.domain.model.support.State;
+import edu.njnu.opengms.r2.domain.modelInstance.ModelInstance;
+import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceService;
+import edu.njnu.opengms.r2.domain.modelInstance.dto.UpdateModelInstanceDTO;
+import edu.njnu.opengms.r2.utils.FunctionUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +31,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.security.SecureRandom;
+import java.util.List;
 
 /**
  * @Author ：Zhiyi
@@ -35,6 +46,8 @@ public class RemoteManagerServerController {
     @Autowired
     ManagerServerFeign managerServerFeign;
 
+    @Autowired
+    FunctionUtils functionUtils;
 //    @Autowired
 //    IntegrateTaskInstanceRepository integrateTaskInstanceRepository;
 //
@@ -43,6 +56,12 @@ public class RemoteManagerServerController {
 
     @Value("${managerServerIpAndPort}")
     private String managerServerIpAndPort;
+
+    @Autowired
+    DataItemRepository dataItemRepository;
+
+    @Autowired
+    ModelInstanceService modelInstanceService;
 
 //    @Value("${wzpIpAndPort}:8084")
 //    String wzpIpAndPort;
@@ -65,9 +84,106 @@ public class RemoteManagerServerController {
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
-    JsonResult refresh(@RequestBody JSONObject obj){
+    ModelInstance refresh(@RequestBody JSONObject instanceInitial,@JwtTokenParser(key = "userId") String userId){
+        ModelInstance modelInstance = new ModelInstance();
+        if(!instanceInitial.get("status").equals(2)){
+            JSONObject object = managerServerFeign.refresh((JSONObject) instanceInitial.get("refreshForm"));
+            List<JSONObject> statesInit = (List) instanceInitial.get("behavior");
+            JSONObject refreshData= (JSONObject) object.get("data");
+            JSONObject assessTypeObj = (JSONObject) statesInit.get(0).getJSONArray("parameters").get(4);
+            JSONObject udx = (JSONObject) assessTypeObj.getJSONObject("datasetItem").getJSONArray("UdxDeclarationNew").get(0);
+            String assType = udx.getStr("parameterValue");
+            String value="";
+            Double doubleValue=0.00;
 
-        return ResultUtils.success(managerServerFeign.refresh(obj));
+
+            List<JSONObject> outList = (List<JSONObject>) refreshData.get("outputs");
+            Boolean isOutEmpty=true;
+            //IF status are different, update the instance
+            if(!instanceInitial.get("status").equals(refreshData.get("status"))){
+                for(JSONObject out: outList){
+
+                    DataItem resultDataItem = new DataItem();
+                    if((!out.get("url").equals(null))&&(!out.get("url").equals(""))){
+
+
+                        isOutEmpty=false;
+                        AddDataItemDTO add = AddDataItemDTO.builder()
+                                .contributorId(userId)
+                                .name((String) out.get("event"))
+                                .suffix((String) out.get("suffix"))
+                                .value((String) out.get("url"))
+                                .isInitial(true)
+                                .isIntermediate(true)
+                                .isParameter(false)
+                                .isReproduced(false)
+                                .privacy("public")
+                                .build();
+                        DataItem dataItem = new DataItem();
+                        add.convertTo(dataItem);
+                        resultDataItem  = dataItemRepository.insert(dataItem);
+                        refreshData.put("dataItem",resultDataItem);
+                    } else{
+                        isOutEmpty = true;
+                    }
+
+                    for (JSONObject state:  statesInit){
+                        //如果output有值，塞入instance，并更新
+                        if(state.get("name").equals(out.get("statename"))){
+                            List<JSONObject> outInstanceList = (List<JSONObject>) state.get("outputs");
+                            for(JSONObject outInstance :outInstanceList){
+                                if(outInstance.get("name").equals(out.get("event"))){
+                                    outInstance.put("value",out.get("url"));
+                                    outInstance.put("dataId",resultDataItem.getId());
+
+                                    //IF assessment, get the content of txt,
+                                    String assessment="";
+                                    if(instanceInitial.get("modelId").equals("65a0a40a1e8e312ef974d82b")){
+                                        SecureRandom secureRandom = new SecureRandom();
+                                        byte[] seed = secureRandom.generateSeed(16);
+
+                                        UUID uuid = UUID.nameUUIDFromBytes(seed);
+
+                                        functionUtils.downloadFileFromUrl((String) out.get("url"),"D:\\Downloads\\Platform\\" + uuid +".txt");
+                                        assessment =  functionUtils.readFile("D:\\Downloads\\Platform\\"+ uuid+".txt");
+                                        if(assType.equals("Pearson")){
+                                            value = assessment.substring(1, assessment.indexOf(","));
+                                            doubleValue = Double.parseDouble(value);
+
+                                        } else {
+                                            doubleValue = Double.parseDouble(assessment);
+                                        }
+
+                                        String.format("%.2f", doubleValue);
+//
+                                    }
+                                    JSONObject outAssessmentParam  = (JSONObject) outInstance.getJSONObject("datasetItem");
+                                    outAssessmentParam.put("assessmentValue",String.format("%.2f", doubleValue));
+
+                                }
+                            }
+                        }
+                    }
+
+                }
+                //update model instance
+                List<State> bmsqList = (List<State>)(List)statesInit;
+                UpdateModelInstanceDTO updataInstance= UpdateModelInstanceDTO.builder()
+                        .behavior(bmsqList)
+                        .status((Integer) refreshData.get("status"))//new status
+                        .build();
+                if(isOutEmpty){
+                    //set the status = -1
+                    updataInstance.setStatus(1);
+                }
+                modelInstance=  modelInstanceService.updateInstance(instanceInitial.getStr("id"),updataInstance);
+
+            }
+        }
+
+
+        //else no update the instance
+        return modelInstance;
     }
 
     @SneakyThrows

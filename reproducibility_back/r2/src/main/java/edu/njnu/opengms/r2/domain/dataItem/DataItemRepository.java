@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @InterfaceName ModelServiceRepository
@@ -16,7 +17,5 @@ import java.util.List;
 @Repository
 public interface DataItemRepository extends MongoRepository<DataItem,String> {
     List<DataItem> findAllByIdIn(List<String> id);
-    List<DataItem> findAllById(List<String> id);
-
-
+    Optional<DataItem> findById(String id);
 }

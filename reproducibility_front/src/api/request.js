@@ -1,40 +1,40 @@
-import { get, post, patch } from '@/axios'
-import { successNotification } from '@/utils/notification'
-import axios from 'axios'
+import { get, post, patch } from "@/axios";
+import { successNotification } from "@/utils/notification";
+import axios from "axios";
 
 //-------------------------------------------------users--------------------------------------
 
 export async function updateUserCreatedProjects(form) {
-  let data = await patch(`/users`, form)
+  let data = await patch(`/users`, form);
   // if (data != null) {
   //   successNotification('update', 'user');
   // }
-  return data
+  return data;
 }
 
 export async function saveUser(form) {
-  let data = await post(`/users/register`, form)
+  let data = await post(`/users/register`, form);
   if (data != null) {
-    successNotification('create', 'user')
+    successNotification("create", "user");
   }
-  return data
+  return data;
 }
 
 //根据project来获取 不要暴露user接口
 export async function getUserInfoByUserId(userId) {
-  return await get(`/users/getUserInfoByUserId/${userId}`)
+  return await get(`/users/getUserInfoByUserId/${userId}`);
 }
 
 export async function getUser() {
-  return await get(`/users`)
+  return await get(`/users`);
 }
 
 export async function updateUsersModel(json) {
-  return await patch(`/users/model`, json)
+  return await patch(`/users/model`, json);
 }
 
 export async function getUserProjects() {
-  return await get(`/users/getUserProjects`)
+  return await get(`/users/getUserProjects`);
 }
 
 //----------------------------------------------------projects-----------------------------------------
@@ -45,57 +45,65 @@ export async function getUserProjects() {
 // }
 
 export async function getProjectAndUsers(projectId) {
-  return await get(`/projects/user/${projectId}`)
+  return await get(`/projects/user/${projectId}`);
 }
 
 export async function getAllProjects(currentPage, pagesize) {
-  let data = await get(`/projects/${currentPage}/${pagesize}`)
-  return data
+  let data = await get(`/projects/${currentPage}/${pagesize}`);
+  return data;
 }
 
 export async function getProjectById(projectId) {
-  return await get(`/projects/info/${projectId}`)
+  return await get(`/projects/info/${projectId}`);
 }
 
 export async function getMyProjects() {
-  return await get(`/projects/getmyprojects`)
+  return await get(`/projects/getmyprojects`);
 }
 
 //将传输的pdf文件送到后端处理
 export async function pdfConvert(fileContent) {
-  return await post(`/projects/pdf`, fileContent)
+  return await post(`/projects/pdf`, fileContent);
 }
 
 //---------------
 
 export async function updateProject(projectId, form) {
-  let data = await patch(`/projects/${projectId}`, form)
-  return data
+  let data = await patch(`/projects/${projectId}`, form);
+  return data;
 }
 
 export async function updateProjectMembers(projectId, form) {
-  let data = await patch(`/projects/memberList/${projectId}`, form)
+  let data = await patch(`/projects/memberList/${projectId}`, form);
   if (data != null) {
-    successNotification('update', 'project')
+    successNotification("update", "project");
   }
-  return data
+  return data;
 }
 
 export async function saveProject(form) {
-  let data = await post(`/projects`, form)
+  let data = await post(`/projects`, form);
   // if (data != null) {
   //   successNotification('create', 'project')
   // }
-  return data
+  return data;
+}
+
+export async function folkProject(projectId) {
+  let data = await post(`/projects/folk/${projectId}`);
+  // if (data != null) {
+  //   successNotification('create', 'project')
+  // }
+  return data;
 }
 
 //------------------------------------------manager server------------------------------------
 export async function runtask(formData) {
-  return await post(`/managerServer/runtask`, formData)
+  return await post(`/managerServer/runtask`, formData);
 }
 
 export async function checkTaskStatus(tid) {
-  return await get(`/managerServer/checkTaskStatus/${tid}`)
+  return await get(`/managerServer/checkTaskStatus/${tid}`);
 }
 
 //-------------------------------------------modelitems--------------------------------------------------
@@ -107,10 +115,10 @@ export async function checkTaskStatus(tid) {
 //   );
 // }
 export async function getModelsByPrivacy(form) {
-  return await post(`/models/getPublicModels`, form)
+  return await post(`/models/getPublicModels`, form);
 }
 export async function getMyModels() {
-  return await get(`/models/my`)
+  return await get(`/models/my`);
 }
 
 // export async function getAllPublicModels() {
@@ -122,10 +130,13 @@ export async function getMyModels() {
 // }
 
 export async function getModelById(id) {
-  return await get(`/models/getModelById/${id}`)
+  return await get(`/models/getModelById/${id}`);
+}
+export async function getAssessmentMethod() {
+  return await get(`/models/getAssessmentMethod`);
 }
 export async function addModelByMD5Local(form) {
-  return await get(`/models/local`, form)
+  return await get(`/models/local`, form);
 }
 // export async function getMyModels(id) {
 //   return await get(`/models/getModelById/${id}`);
@@ -143,118 +154,150 @@ export async function addModelByMD5Local(form) {
 
 //------------------------------------------scenario------------------------------------
 export async function getScenarioById(id) {
-  return await get(`/scenario/${id}`)
+  return await get(`/scenario/${id}`);
 }
 
 export async function getScenariosByProjectId(projectId) {
-  return await get(`/scenario/project/${projectId}`)
+  return await get(`/scenario/project/${projectId}`);
+}
+export async function getScenariosByScenarioId(scenarioId) {
+  return await get(`/scenario/r/${scenarioId}`);
 }
 
-export async function saveScenario(postJson) {
-  return await post(`/scenario`, postJson)
+// export async function getScenarioAllInfoById(scenarioId) {
+//   return await get(`/scenario/${scenarioId}`);
+// }
+
+export async function saveScenario(postJson, initialScenatioId) {
+  return await post(`/scenario/${initialScenatioId}`, postJson);
 }
 
 export async function bindScenario(id, postJson) {
-  return await patch(`/scenario/instance/${id}`, postJson)
+  return await patch(`/scenario/instance/${id}`, postJson);
 }
 
 export async function updateScenarioByProjectId(projectId, postJson) {
-  let data = await patch(`/scenario/${projectId}`, postJson)
+  let data = await patch(`/scenario/${projectId}`, postJson);
   if (data != null) {
-    successNotification('update', 'scenario')
+    successNotification("update", "scenario");
   }
-  return data
+  return data;
 }
 
 export async function updateresourceCollection(id, form) {
-  let data = await patch(`/scenario/resources/${id}`, form)
-  return data
+  let data = await patch(`/scenario/resources/${id}`, form);
+  return data;
 }
 
 //-----------------------------------------------folder---------------------------------------------
 
 export async function addFolder(form) {
-  return await post(`/folders`, form)
+  return await post(`/folders`, form);
 }
 
 export async function getFolders() {
-  return await get(`/folders`)
+  return await get(`/folders`);
+}
+
+export async function getFoldersByTagId(tagId) {
+  return await get(`/folders/${tagId}`);
 }
 
 //-----------------------------------------------data---------------------------------------------
 
 export async function saveData(form, fileSize, storedFolderId) {
-  return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form)
+  return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form);
 }
 
 export async function postFile(form) {
-  return await axios.post('http://112.4.132.6:8083/data', form)
+  return await axios.post("http://112.4.132.6:8083/data", form);
 }
 //-----------------------------------------------dataContainer---------------------------------------------
 
 export async function postDataContainer(form) {
   // debugger;
-  let data = await post(`/dataContainer/uploadSingle`, form)
-  return data
+  let data = await post(`/dataContainer/uploadSingle`, form);
+  return data;
 }
 
 export async function getDataServiceInfo(form) {
-  debugger
+  debugger;
 
-  return await post(`/dataContainer/dataService/getData`, form)
+  return await post(`/dataContainer/dataService/getData`, form);
 }
 
 export async function getDataServiceInfo1(form) {
-  return await post(`/dataContainer/dataService/findData`, form)
+  return await post(`/dataContainer/dataService/findData`, form);
 }
 
 export async function getAllProcessing(list) {
-  return await get(`/dataContainer/dataService/getAllProcessing`, list)
+  return await get(`/dataContainer/dataService/getAllProcessing`, list);
 }
 
 //-----------------------------------------------manager server type 1---------------------------------------------
 export async function initTask(md5) {
-  return await get(`/managerServer/getServiceTask/${md5}`)
+  return await get(`/managerServer/getServiceTask/${md5}`);
 }
 
 export async function createTask(obj) {
-  return await post(`/managerServer/initTask/`, obj)
+  return await post(`/managerServer/initTask/`, obj);
 }
 
 export async function invokeSingleModel(formData) {
-  return await post(`/managerServer/invoke`, formData)
+  return await post(`/managerServer/invoke`, formData);
 }
 
 export async function getRecordofSingleModel(obj) {
-  return await post(`/managerServer/refresh`, obj)
+  return await post(`/managerServer/refresh`, obj);
 }
 
 //-----------------------------------------------model instances---------------------------------------------
 export async function getInstanceById(id) {
-  return await get(`/model_instances/${id}`)
+  return await get(`/model_instances/${id}`);
 }
 
-export async function getInstancesInScenario(scenarioId, modelId) {
-  return await get(`/model_instances/inscenario/${scenarioId}/${modelId}`)
+export async function getInstancesInScenario(
+  scenarioId,
+  modelId,
+  isReproduced
+) {
+  return await get(
+    `/model_instances/inscenario/${scenarioId}/${modelId}/${isReproduced}`
+  );
+}
+export async function getAssessmentInstancesInScenario(scenarioId) {
+  return await get(`/model_instances/inscenario/assessment/${scenarioId}`);
 }
 
 //这是一个另类，读取数据但是用的POST，注意
 export async function getInstancesByIds(instances) {
-  return await post(`/model_instances/getBoundInstances`, instances)
+  return await post(`/model_instances/getBoundInstances`, instances);
 }
 
 export async function saveInstance(formData) {
-  return await post(`/model_instances`, formData)
+  return await post(`/model_instances`, formData);
 }
 
 export async function updateInstance(id, formData) {
-  return await patch(`/model_instances/${id}`, formData)
+  return await patch(`/model_instances/${id}`, formData);
+}
+
+//===============================assessment=================================================
+
+export async function getAssessment(id) {
+  return await patch(`/assessment/${id}`);
+}
+
+export async function startAssessment(formData) {
+  return await patch(`/assessment/start`, formData);
+}
+export async function autoAssessment(reproducedScenarioId) {
+  return await patch(`/assessment/${reproducedScenarioId}`);
 }
 
 //===============================extra=================================================
 
-
 //docker
 export async function codingPython(code) {
-  return await post(`/execute-python`, code)
+  return await post(`/execute-python`, code);
 }

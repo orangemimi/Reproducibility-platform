@@ -3,6 +3,7 @@ package edu.njnu.opengms.r2.domain.modelInstance.dto;
 import edu.njnu.opengms.common.dto.ToDomainConverter;
 import edu.njnu.opengms.r2.domain.model.support.State;
 import edu.njnu.opengms.r2.domain.modelInstance.ModelInstance;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -15,11 +16,12 @@ import java.util.List;
  * @Version 1.0.0
  */
 @Data
+@Builder
 public class UpdateModelInstanceDTO implements ToDomainConverter<ModelInstance> {
 
     List<State> behavior;
 
-    String status;//running 0, fail, success 2
+    Integer status;//running 0, fail, success 2
 
 
 }

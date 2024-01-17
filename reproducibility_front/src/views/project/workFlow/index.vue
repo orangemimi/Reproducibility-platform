@@ -387,7 +387,7 @@ export default {
     modelTable() {
       return this.ExpectedInstances.map((item) => {
         let { modelDescription, modelId, name } = item
-        console.log(name, '101')
+
         let [modelName, invokeTime] = name.split('||')
         return {
           modelId,
@@ -403,14 +403,14 @@ export default {
     async getExpectedInstances() {
       // 先拿到对应的工程 所包含的场景id
       this.project = await getProjectById(this.id)
-      console.log(this.project, 'this.project')
+  
       this.userInfo = await getUserInfoByUserId(this.project.creatorId)
       this.creator = this.userInfo.name
       // 根据场景中instances获取对应的boundInstanceList
       this.scenario = await getScenarioById(this.project.scenario)
-      console.log(this.scenario, 'this.scenario')
+     
       let boundInstanceList = await getInstancesByIds(this.scenario.instances)
-      console.log(boundInstanceList,'111');
+
       let newBoundInstanceList = boundInstanceList.map(async (item) => {
         let modelInfo = await getModelById(item.modelId)
         return {

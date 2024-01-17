@@ -3,23 +3,21 @@ package edu.njnu.opengms.r2.domain.scenario;
 
 import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.exception.MyException;
-import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
 import edu.njnu.opengms.r2.domain.folder.Folder;
 import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.folder.FolderService;
 import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
 import edu.njnu.opengms.r2.domain.folder.dto.UpdateFolderChildrenDTO;
-import edu.njnu.opengms.r2.domain.model.ModelRepository;
-import edu.njnu.opengms.r2.domain.modelInstance.ModelInstanceRepository;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateForkedScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceResourceDTO;
+import edu.njnu.opengms.r2.utils.FunctionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @Author ：Zhiyi
@@ -33,84 +31,116 @@ public class ScenarioService {
     ScenarioRepository scenarioRepository;
 
     @Autowired
-    ModelRepository modelRepository;
-
-    @Autowired
-    DataItemRepository dataItemRepository;
-
-    @Autowired
-    ModelInstanceRepository modelInstanceRepository;
-
-    @Autowired
     FolderRepository folderRepository;
 
     @Autowired
     FolderService folderService;
 
+    @Autowired
+    FunctionUtils functionUtils;
+
 
     public JSONObject getScenario(String id) {
-
-        JSONObject obj = new JSONObject();
-//        JSONObject objInstance = new JSONObject();
-        JSONObject scenarioNew = new JSONObject();
-
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
-        JSONObject modelList =  Optional.ofNullable(scenario)
-                .map(x -> x.getResourceCollection())
-                .map(x -> {
-                    List<String> modelIdList = x.getModelList();
-                    if (modelIdList != null) {
-                        obj.put("modelList", modelRepository.findAllById(modelIdList));
-                    } else {
-                        obj.put("modelList", null);
-                    }
-                    List<String> dataIdList = x.getDataList();
-                    if (modelIdList != null) {
-                        obj.put("dataList", dataItemRepository.findAllById(dataIdList));
-                    } else {
-                        obj.put("dataList", null);
-                    }
-                    return obj;
-                })
-                .orElseGet( () -> {
-//                    JSONObject defaultObject = new JSONObject();
-//                    defaultObject.put("instanceObjectList", null);
-                    return null;
-                });
-
-        JSONObject instanceList =  Optional.ofNullable(scenario)
-                .map(x -> x.getInstances())
-                .map(x -> {
-                    List<String> instanceIdList = x;
-                    if (instanceIdList != null) {
-                        scenarioNew.put("instanceObjectList", modelInstanceRepository.findAllById(instanceIdList));
-                    } else {
-                        scenarioNew.put("instanceObjectList", null);
-                    }
-                    return scenarioNew;
-                })
-                .orElseGet(() -> {
-                    JSONObject defaultObject = new JSONObject();
-                    defaultObject.put("instanceObjectList", null);
-                    return defaultObject;
-                });
-
-
-        scenarioNew.put("name", scenario.name);
-        scenarioNew.put("id", scenario.id);
-        scenarioNew.put("type", scenario.type);
-        scenarioNew.put("instances", scenario.instances);
-        scenarioNew.put("resourceCollection", scenario.resourceCollection);
-        scenarioNew.put("resourceCollectionObjects", obj);
-//        scenarioNew.put("instanceObjects", objInstance);
-
-
-        return scenarioNew;
+        return functionUtils.getScenario(scenario);
     }
 
-    public List<Scenario> getScenariosByProjectId(String projectId) {
+//        JSONObject obj = new JSONObject();
+//        JSONObject scenarioNew = new JSONObject();
+
+//        Optional.ofNullable(scenario)
+//                .map(x -> x.getResourceCollection())
+//                .map(x -> {
+//                    List<String> modelIdList = x.getModelList();
+//
+//                    if (modelIdList != null) {
+//                        obj.put("modelList", modelRepository.findAllById(modelIdList));
+//                    } else {
+//                        obj.put("modelList", null);
+//                    }
+//                    List<String> dataIdList = x.getDataList();
+//                    if (dataIdList != null) {
+//                        List dataListWithObject = new ArrayList();
+//                        for(String dataid : dataIdList){
+//                            DataItem dataItem = dataItemRepository.findById(dataid).orElseThrow(MyException::noObject);
+//                            dataListWithObject.add(dataItem);
+//
+//                        }
+//                        obj.put("dataList", dataListWithObject);
+//
+//                    } else {
+//                        obj.put("dataList", null);
+//                    }
+//                    return obj;
+//                })
+//                .orElseGet( () -> {
+////                    JSONObject defaultObject = new JSONObject();
+////                    defaultObject.put("instanceObjectList", null);
+//                    return null;
+//                });
+//
+//        Optional.ofNullable(scenario)
+//                .map(x -> x.getInstances())
+//                .map(x -> {
+//                    List<String> instanceIdList = x;
+//                    if (instanceIdList != null) {
+////                        scenarioNew.put("instanceObjectList", modelInstanceRepository.findAllById(instanceIdList));
+////                        getAllInstances(modelInstanceIds)
+//                        scenarioNew.put("instanceObjectList", modelInstanceController.getAllInstances(instanceIdList));
+//
+//                    } else {
+//                        scenarioNew.put("instanceObjectList", null);
+//                    }
+//                    return scenarioNew;
+//                })
+//                .orElseGet(() -> {
+//                    JSONObject defaultObject = new JSONObject();
+//                    defaultObject.put("instanceObjectList", null);
+//                    return defaultObject;
+//                });
+//        Optional.ofNullable(scenario)
+//                .map(x -> x.getInitialScenarioId())
+//                .map(x -> {
+//                    String scenarioId = x;
+//                    scenarioNew.put("initialScenarioObject", scenarioRepository.findById(scenarioId));
+//                    return scenarioNew;
+//                })
+//                .orElseGet(() -> {
+//                    JSONObject defaultObject = new JSONObject();
+//                    defaultObject.put("initialScenarioObject", null);
+//                    return defaultObject;
+//                });
+//
+//
+//        scenarioNew.put("name", scenario.name);
+//        scenarioNew.put("id", scenario.id);
+//        scenarioNew.put("type", scenario.type);
+//        scenarioNew.put("instances", scenario.instances);
+//        scenarioNew.put("resourceCollection", scenario.resourceCollection);
+//        scenarioNew.put("resourceCollectionObjects", obj);
+//        scenarioNew.put("initialScenarioId", scenario.initialScenarioId);
+
+//        return scenarioNew;
+//    }
+
+    public JSONObject getScenarioByInitialScenarioId(String scenarioId) {
+        Scenario scenario  = scenarioRepository.findByInitialScenarioId(scenarioId);
+        if(scenario==null){
+            return null;
+        } else{
+          return functionUtils.getScenario(scenario);
+        }
+
+    }
+
+    public List<JSONObject> getScenariosByProjectId(String projectId) {
         List<Scenario> scenarios = scenarioRepository.findAllByProjectId(projectId);
-        return scenarios;
+        List<JSONObject> jsonObjectList = new ArrayList<>();
+        for(Scenario s : scenarios){
+            jsonObjectList.add(getScenario(s.getId()));
+
+        }
+        return jsonObjectList;
     }
 
     public Scenario updateScenario(String id, UpdateScenarioDTO update) {
@@ -118,11 +148,19 @@ public class ScenarioService {
         update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
+    public Scenario updateScenarioForked(String id, UpdateForkedScenarioDTO updateForkedScenarioDTO) {
+        Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
+        updateForkedScenarioDTO.updateTo(scenario);
+        return scenarioRepository.save(scenario);
+    }
 
-    public Scenario saveScenario(AddScenarioDTO add, String userId) {
+    public Scenario saveScenario(AddScenarioDTO add, String userId,String initialScenatioId) {
         Scenario scenario = new Scenario();
-//        scenario.setUserId(userId);
         add.convertTo(scenario);
+        scenario.setCreator(userId);
+        if(!initialScenatioId.equals("initial")){
+            scenario.setInitialScenarioId(initialScenatioId);
+        }
 
         Scenario newScenario =  scenarioRepository.insert(scenario);
 
@@ -137,7 +175,6 @@ public class ScenarioService {
                 .build();
 
         Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
-
 
 //        Folder childFolder = folderRepository.insert(folder);
         List<String> parentFolderChildren = new ArrayList<String>();
@@ -196,7 +233,7 @@ public class ScenarioService {
         return scenarioRepository.save(scenario);
     }
 
-    public Scenario updateScenarioInstance(String id, UpdateScenarioInstanceDTO update) {
+    public Scenario updateScenarioInstance(String id, UpdateScenarioInstanceResourceDTO update) {
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
         update.updateTo(scenario);
         return scenarioRepository.save(scenario);

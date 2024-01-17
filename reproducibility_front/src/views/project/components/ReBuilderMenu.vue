@@ -7,26 +7,28 @@
     <div class="menu">
       <div
         class="info menu-item"
-        @click="handleClick('Information')"
+        @click="handleClick('R_Info')"
         :class="{ isActive: isInfoActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Information
       </div>
+
       <div
         class="scenario menu-item"
-        @click="handleClick('Reproduction')"
+        @click="handleClick('R_Reproduction')"
         :class="{ isActive: isReproductionActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Reproduction
       </div>
+
       <div
         class="contributor menu-item"
         @click="handleClick('Contributor')"
         :class="{ isActive: isContributorActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Contributor
       </div>
       <div
@@ -34,22 +36,27 @@
         @click="handleClick('Community')"
         :class="{ isActive: isCommunityActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Community
+      </div>
+      <div style="float: right">
+        <folk-btn></folk-btn>
       </div>
     </div>
   </div>
 </template>
 
+<!-- <script setup>
+
+</script> -->
 <script>
-import { InfoFilled as ElIconInfo } from '@element-plus/icons-vue'
-import { $emit } from '../../../utils/gogocodeTransfer'
+import folkBtn from "_com/PageHeaderBtn/FolkBtn.vue";
+// import starBtn from "_com/PageHeaderBtn/StarBtn.vue";
 export default {
   components: {
-    ElIconInfo,
+    folkBtn,
+    // starBtn,
   },
-  watch: {},
-  computed: {},
   data() {
     return {
       isInfoActive: true,
@@ -57,84 +64,89 @@ export default {
       isContributorActive: false,
       isSettingsActive: false,
       isCommunityActive: false,
-    }
+    };
   },
   methods: {
     handleClick(type) {
-      if (type == 'Information') {
-        this.isInfoActive = true
+      if (type == "R_Info") {
+        // type = "R_Reproduction";
+        this.isInfoActive = true;
         this.isReproductionActive =
           this.isContributorActive =
           this.isSettingsActive =
           this.isCommunityActive =
-            false
-      } else if (type == 'Reproduction') {
-        this.isReproductionActive = true
+            false;
+      } else if (type == "R_Reproduction") {
+        this.isReproductionActive = true;
         this.isInfoActive =
           this.isContributorActive =
           this.isSettingsActive =
           this.isCommunityActive =
-            false
-      } else if (type == 'Contributor') {
-        this.isContributorActive = true
+            false;
+      } else if (type == "Contributor") {
+        this.isContributorActive = true;
         this.isInfoActive =
           this.isReproductionActive =
           this.isSettingsActive =
           this.isCommunityActive =
-            false
-      } else if (type == 'Community') {
-        this.isCommunityActive = true
+            false;
+      } else if (type == "Community") {
+        this.isCommunityActive = true;
         this.isInfoActive =
           this.isReproductionActive =
           this.isSettingsActive =
           this.isContributorActive =
-            false
+            false;
       }
-      $emit(this, 'toRouterType', type)
+      this.$emit("toRouterType", type);
     },
 
     init() {
-      switch (this.$router.currentRoute.name) {
-        case 'Information': {
-          this.isInfoActive = true
+      // console.log(this.$router.currentRoute.value, "value");
+      // // debugger;
+      switch (this.$router.currentRoute.value.name) {
+        case "R_Info": {
+          // debugger;
+          this.isInfoActive = true;
           this.isReproductionActive =
             this.isContributorActive =
             this.isSettingsActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Reproduction': {
-          this.isReproductionActive = true
+        case "R_Reproduction": {
+          this.isReproductionActive = true;
           this.isInfoActive =
             this.isContributorActive =
             this.isSettingsActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Contributor': {
-          this.isContributorActive = true
+        case "Contributor": {
+          this.isContributorActive = true;
           this.isInfoActive =
             this.isReproductionActive =
             this.isSettingsActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Community': {
-          this.isCommunityActive = true
+        case "Community": {
+          this.isCommunityActive = true;
           this.isInfoActive =
             this.isReproductionActive =
             this.isSettingsActive =
             this.isContributorActive =
-              false
+              false;
         }
       }
     },
   },
   mounted() {
-    this.init()
+    this.isInfoActive = true;
+    this.init();
   },
-  emits: ['toRouterType'],
-}
+  emits: ["toRouterType"],
+};
 </script>
 
 <style lang="scss" scoped>

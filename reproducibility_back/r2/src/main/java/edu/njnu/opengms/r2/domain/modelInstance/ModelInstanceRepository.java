@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface ModelInstanceRepository extends MongoRepository<ModelInstance,String> {
     Optional<ModelInstance> findById(String id);
-    List<ModelInstance> findAllByScenarioIdAndModelId(String scenarioId,String modelId);
+    List<ModelInstance> findAllByScenarioIdAndModelIdAndIsReproducedAndExecutorId(String scenarioId,String modelId,Boolean isReproduced, String executorId);
     List<ModelInstance> findAllByScenarioId(String scenarioId);
 //    List<ModelInstance> findAllById(List<String> instanceIds);
     ModelInstance findAllById(String instanceIds);

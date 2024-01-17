@@ -1,39 +1,39 @@
-import axios from 'axios'
-import sf from 'string-format'
-import { ElLoading as Loading } from 'element-plus'
-import { ResError } from '@/lib/error/ResError'
-import store from '@/store'
-import router from '@/router'
-import config from '@/config'
+import axios from "axios";
+import sf from "string-format";
+import { ElLoading as Loading } from "element-plus";
+import { ResError } from "@/lib/error/ResError";
+import store from "@/store";
+import router from "@/router";
+import config from "@/config";
 
-const baseRequestUrl = config.apiURL
+const baseRequestUrl = config.apiURL;
 
 const axiosInstance = axios.create({
   baseURL: baseRequestUrl,
   timeout: 200000,
   // withCredentials: true
-})
+});
 
 axiosInstance.interceptors.request.use(
   (config) => {
     if (config.loading == true) {
-      Loading.service()
+      Loading.service();
     }
-    config.headers.Authorization = localStorage.getItem('token') || null
-    return config
+    config.headers.Authorization = localStorage.getItem("token") || null;
+    return config;
   },
   (error) => {
     //前台捕获的错误
     if (error.config.loading == true) {
-      Loading.service().close()
+      Loading.service().close();
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 axiosInstance.interceptors.response.use(
   (res) => {
     if (res.config.loading == true) {
-      Loading.service().close()
+      Loading.service().close();
     }
 
     //身份异常
@@ -42,59 +42,59 @@ axiosInstance.interceptors.response.use(
       res.data.code == -5 || //TOKEN_WRONG
       res.data.code == -6 // USER_PASSWORD_NOT_MATCH
     ) {
-      store.dispatch('handleLogOut')
+      store.dispatch("handleLogOut");
       router.push({
-        name: 'login',
-      })
+        name: "login",
+      });
     }
     // 状态码小于0属于异常情况
     if (res.data.code < 0) {
       //由弹窗出来，是为了给用户看
-      throw new ResError(res.data.msg)
+      throw new ResError(res.data.msg);
     }
-    return res.data.data
+    return res.data.data;
   },
   (error) => {
     //后台未捕获的错误
     if (error.config.loading == true) {
-      Loading.service().close()
+      Loading.service().close();
     }
-    throw new ResError('请求服务器失败，请检查服务是否正常！')
+    throw new ResError("请求服务器失败，请检查服务是否正常！");
   }
-)
+);
 
-export const get = (url, params, pathVariable = null, loading = true) => {
+export const get = (url, params, pathVariable = null, loading = false) => {
   return axiosInstance.get(sf(url, pathVariable), {
     params: params,
     loading,
-  })
-}
+  });
+};
 
 export const postFile = (url, data, pathVariable = null, loading = true) =>
   axiosInstance.post(sf(url, pathVariable), data, {
     loading,
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
-  })
+  });
 
 export const post = (url, data, pathVariable = null, loading = true) =>
   axiosInstance.post(sf(url, pathVariable), data, {
     loading,
-  })
+  });
 
 export const put = (url, data, pathVariable = null, loading = true) =>
   axiosInstance.put(sf(url, pathVariable), data, {
     loading,
-  })
+  });
 
 export const patch = (url, data, pathVariable = null, loading = true) =>
   axiosInstance.patch(sf(url, pathVariable), data, {
     loading,
-  })
+  });
 
 export const del = (url, params, pathVariable = null, loading = true) =>
   axiosInstance.delete(sf(url, pathVariable), {
     params: params,
     loading,
-  })
+  });

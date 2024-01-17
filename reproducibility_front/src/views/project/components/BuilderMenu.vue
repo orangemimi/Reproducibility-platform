@@ -4,13 +4,14 @@
             <el-menu-item index="1">处理中心</el-menu-item>
             <el-menu-item index="3">消息中心</el-menu-item>
           </el-menu> -->
+
     <div class="menu">
       <div
         class="info menu-item"
         @click="handleClick('Information')"
         :class="{ isActive: isInfoActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Information
       </div>
       <!-- <div class="construction menu-item" @click="handleClick('Construction')" :class="{ isActive: isConstructionActive }">
@@ -22,7 +23,7 @@
         @click="handleClick('Construction')"
         :class="{ isActive: isConstruction1Active }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Construction
       </div>
       <div
@@ -30,7 +31,7 @@
         @click="handleClick('WorkFlow')"
         :class="{ isActive: isWorkFlowActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         WorkFlow
       </div>
       <div
@@ -38,7 +39,7 @@
         @click="handleClick('Contributor')"
         :class="{ isActive: isContributorActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Contributor
       </div>
       <div
@@ -46,7 +47,7 @@
         @click="handleClick('Community')"
         :class="{ isActive: isCommunityActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Community
       </div>
       <div
@@ -54,7 +55,7 @@
         @click="handleClick('Settings')"
         :class="{ isActive: isSettingsActive }"
       >
-        <el-icon><el-icon-info /></el-icon>
+        <el-icon><InfoFilled /></el-icon>
         Settings
       </div>
     </div>
@@ -62,12 +63,8 @@
 </template>
 
 <script>
-import { InfoFilled as ElIconInfo } from '@element-plus/icons-vue'
-import { $emit } from '../../../utils/gogocodeTransfer'
+// import { $emit } from '../../../utils/gogocodeTransfer'
 export default {
-  components: {
-    ElIconInfo,
-  },
   watch: {},
   computed: {},
   data() {
@@ -79,137 +76,137 @@ export default {
       isCommunityActive: false,
       isConstruction1Active: false,
       isWorkFlowActive: false,
-    }
+    };
   },
   methods: {
     handleClick(type) {
-      if (type == 'Information') {
-        this.isInfoActive = true
+      if (type == "Information") {
+        this.isInfoActive = true;
         this.isConstructionActive =
           this.isContributorActive =
           this.isSettingsActive =
           this.isCommunityActive =
           this.isConstruction1Active =
           this.isWorkFlowActive =
-            false
-      } else if (type == 'Contributor') {
-        this.isContributorActive = true
+            false;
+      } else if (type == "Contributor") {
+        this.isContributorActive = true;
         this.isInfoActive =
           this.isConstructionActive =
           this.isSettingsActive =
           this.isCommunityActive =
           this.isConstruction1Active =
           this.isWorkFlowActive =
-            false
-      } else if (type == 'Community') {
-        this.isCommunityActive = true
+            false;
+      } else if (type == "Community") {
+        this.isCommunityActive = true;
         this.isInfoActive =
           this.isConstructionActive =
           this.isSettingsActive =
           this.isContributorActive =
           this.isConstruction1Active =
           this.isWorkFlowActive =
-            false
-      } else if (type == 'Settings') {
-        this.isSettingsActive = true
+            false;
+      } else if (type == "Settings") {
+        this.isSettingsActive = true;
         this.isInfoActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isCommunityActive =
           this.isConstruction1Active =
           this.isWorkFlowActive =
-            false
-      } else if (type == 'Construction') {
-        this.isConstruction1Active = true
+            false;
+      } else if (type == "Construction") {
+        this.isConstruction1Active = true;
         this.isInfoActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isSettingsActive =
           this.isCommunityActive =
           this.isWorkFlowActive =
-            false
-      } else if (type == 'WorkFlow') {
-        this.isWorkFlowActive = true
+            false;
+      } else if (type == "WorkFlow") {
+        this.isWorkFlowActive = true;
         this.isInfoActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isSettingsActive =
           this.isCommunityActive =
           this.isConstruction1Active =
-            false
+            false;
       }
-      $emit(this, 'toRouterType', type)
+      this.$emit("toRouterType", type);
     },
 
     init() {
       switch (this.$router.currentRoute.name) {
-        case 'Information': {
-          this.isInfoActive = true
+        case "Information": {
+          this.isInfoActive = true;
           this.isConstructionActive =
             this.isContributorActive =
             this.isSettingsActive =
             this.isCommunityActive =
             this.isWorkFlowActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Construction': {
-          this.isConstructionActive = true
+        case "Construction": {
+          this.isConstructionActive = true;
           this.isInfoActive =
             this.isContributorActive =
             this.isSettingsActive =
             this.isCommunityActive =
             this.isWorkFlowActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'WorkFlow': {
-          this.isWorkFlowActive = true
+        case "WorkFlow": {
+          this.isWorkFlowActive = true;
           this.isInfoActive =
             this.isContributorActive =
             this.isSettingsActive =
             this.isCommunityActive =
             this.isWorkFlowActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Contributor': {
-          this.isContributorActive = true
+        case "Contributor": {
+          this.isContributorActive = true;
           this.isInfoActive =
             this.isConstructionActive =
             this.isSettingsActive =
             this.isCommunityActive =
             this.isConstruction1Active =
-              false
-          break
+              false;
+          break;
         }
-        case 'Settings': {
-          this.isSettingsActive = true
+        case "Settings": {
+          this.isSettingsActive = true;
           this.isInfoActive =
             this.isConstructionActive =
             this.isContributorActive =
             this.isCommunityActive =
             this.isWorkFlowActive =
-              false
-          break
+              false;
+          break;
         }
-        case 'Community': {
-          this.isCommunityActive = true
+        case "Community": {
+          this.isCommunityActive = true;
           this.isInfoActive =
             this.isReproductionActive =
             this.isSettingsActive =
             this.isContributorActive =
             this.isWorkFlowActive =
-              false
+              false;
         }
       }
     },
   },
   mounted() {
-    this.init()
+    this.init();
   },
-  emits: ['toRouterType'],
-}
+  emits: ["toRouterType"],
+};
 </script>
 
 <style lang="scss" scoped>

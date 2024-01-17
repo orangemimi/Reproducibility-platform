@@ -22,7 +22,7 @@ public class AddProjectDTO implements ToDomainConverter<Project> {
     String privacy;// Ispublic
     String creatorId;
     List<Member> memberList;
-
+    List<String> scenarioList; //selected workspace
 
     Integer level=0;
     String forkingProjectId;// //从项目的那条记录开始fork的

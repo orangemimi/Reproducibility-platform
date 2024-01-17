@@ -26,7 +26,7 @@ export default {
       deep: true,
 
       handler(val) {
-        this.item = val
+        this.item = val;
       },
     },
   },
@@ -35,29 +35,31 @@ export default {
     return {
       item: this.stateItem,
       // toolPreview
-    }
+    };
   },
 
   methods: {},
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .main {
   width: 100%;
+  height: 100%;
   padding: 0; /*// ::v-deep .el-card:hover {
 */
   //   background-color: #3067d61c;
   //   border: 0.5px solid #25252534;
   // }
 
-  :deep(.el-card__body)  {
+  :deep(.el-card__body) {
     padding: 5px;
     // height: 40px;
     background: rgb(221, 238, 249);
   }
   .cardBody {
-    height: 60px;
+    min-height: 50px;
+    max-height: 50px;
     margin: 10px 0;
     border: 0.5px solid #4f769be6;
     background-color: rgb(221, 238, 249);
@@ -68,9 +70,9 @@ export default {
       width: 100%;
       .card_info_description {
         display: block;
-        width: 500px;
+        width: 100%;
         overflow: hidden;
-        white-space: nowrap;
+        white-space: wrap;
         text-overflow: ellipsis;
       }
     }

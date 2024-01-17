@@ -23,7 +23,7 @@ public class AddModelInstanceDTO implements ToDomainConverter<ModelInstance> {
     String modelId;
     String executorId;
     String scenarioId;
-    String status;//running 0, fail, success 2
+    Integer status;//running 0, fail, success 2
     RefreshForm refreshForm;
     Boolean isReproduced;
 

@@ -10,7 +10,6 @@ import edu.njnu.opengms.r2.domain.model.support.State;
 import edu.njnu.opengms.r2.domain.user.User;
 import edu.njnu.opengms.r2.domain.user.UserRepository;
 import edu.njnu.opengms.r2.remote.RemotePortalService;
-import org.apache.xpath.operations.String;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
@@ -39,15 +38,7 @@ public class ModelController {
     @Autowired
     RemotePortalService remotePortalService;
 
-    //create one project
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public JsonResult create(@RequestBody AddModelServiceDTO add) {
-        Model model;
-        JSONObject data;
 
-
-        return ResultUtils.success();
-    }
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void createPortal(@RequestBody List<String> add) {
@@ -159,10 +150,19 @@ public class ModelController {
         if (model.isPresent()) {
             return ResultUtils.success(model.get());
         } else {
-
-    @RequestMapping(value = "/invoke", method = RequestMethod.POST)
             return ResultUtils.error(404, "Model not found");
 }
+    }
+
+    @RequestMapping(value = "/getAssessmentMethod", method = RequestMethod.GET)
+    public JsonResult getModelById(@JwtTokenParser(key = "userId") String userId) {
+        Optional<Model> model = modelRepository.findById("65a0a40a1e8e312ef974d82b");
+        if (model.isPresent()) {
+            return ResultUtils.success(model.get());
+        } else {
+
+            return ResultUtils.error(404, "Model not found");
+        }
     }
 
 @RequestMapping(value = "/my", method = RequestMethod.GET)

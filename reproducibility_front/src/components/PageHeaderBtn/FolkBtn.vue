@@ -4,7 +4,7 @@
       <el-button class="btn-left" :disabled="isDisable" @click="folkClick">
         <div>
           <i class="iconfont icon-fork"></i>
-          Fork
+          Folk
         </div>
       </el-button>
       <div class="btn-right">
@@ -39,9 +39,7 @@ export default {
 
   methods: {
     folkClick() {
-      this.$router.push({
-        path: `/project/fork/${this.projectId}`,
-      })
+      this
     },
   },
 }

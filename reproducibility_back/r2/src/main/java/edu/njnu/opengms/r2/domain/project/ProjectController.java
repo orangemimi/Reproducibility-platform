@@ -28,6 +28,8 @@ public class ProjectController {
     @Autowired
     ProjectService projectService;
 
+
+
     //pdf convert to xml
     @RequestMapping(value = "/pdf", method = RequestMethod.POST)
     public JsonResult pdfConvert(@JwtTokenParser(key = "userId") String userId, @RequestParam("pdfFile") MultipartFile pdfFile) throws IOException {
@@ -48,11 +50,20 @@ public class ProjectController {
         return ResultUtils.success(projectService.create(userId, addProjectDTO));
     }
 
+    @RequestMapping(value = "/folk/{projectId}", method = RequestMethod.POST)
+    public JsonResult folk(@RequestBody JSONObject jsonObject,
+                           @JwtTokenParser String userId,
+                           @JwtTokenParser String userName,
+                           @PathVariable("projectId") String projectId) {
+        return ResultUtils.success(projectService.folk(jsonObject, userId, userName,projectId));
+    }
+
     //find one project
 
     @RequestMapping(value = "/info/{projectId}", method = RequestMethod.GET)
-    public JsonResult get(@PathVariable("projectId") String projectId, @JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success(projectService.get(projectId));
+    public JsonResult get(@PathVariable("projectId") String projectId) {
+        //    , @JwtTokenParser(key = "userId") String userId
+        return ResultUtils.success(projectService.getWithCreator(projectId));
     }
 
 
@@ -125,10 +136,7 @@ public class ProjectController {
 //
 //
 //
-//    @RequestMapping(value = "/fork", method = RequestMethod.POST)
-//    public JsonResult folk(@RequestBody JSONObject jsonObject, @JwtTokenParser String userId, @JwtTokenParser String userName) {
-//        return ResultUtils.success(projectService.fork(jsonObject, userId, userName));
-//    }
+
 //
 //    @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
 //    public JsonResult delete(@PathVariable("projectId") String projectId) {

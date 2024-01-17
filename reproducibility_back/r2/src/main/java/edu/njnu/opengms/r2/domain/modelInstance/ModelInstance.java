@@ -26,7 +26,7 @@ public class ModelInstance extends BaseEntity {
     String executorId;
     String scenarioId;
     Boolean isReproduced;
-    String status;//running 0, fail, success 2
+    Integer status;//running 0, fail, success 2
     RefreshForm refreshForm;
 
 

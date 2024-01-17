@@ -25,7 +25,7 @@ export default {
       deep: true,
 
       handler(val) {
-        this.item = val
+        this.item = val;
       },
     },
   },
@@ -36,11 +36,11 @@ export default {
       isOpen: this.isOpenTool,
       openTool: false,
       // toolPreview
-    }
+    };
   },
 
   methods: {},
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -52,7 +52,7 @@ export default {
       border: 0.5px solid #25252534;
     }
 
-    :deep(.el-card__body){
+    :deep(.el-card__body) {
       padding: 5px;
       height: 40px;
       background: rgb(221, 238, 249);
@@ -72,7 +72,7 @@ export default {
           display: block;
           width: 120px;
           overflow: hidden;
-          white-space: nowrap;
+          white-space: wrap;
           text-overflow: ellipsis;
         }
       }
@@ -104,7 +104,7 @@ export default {
           display: block;
           width: 160px;
           overflow: hidden;
-          white-space: nowrap;
+          white-space: wrap;
           text-overflow: ellipsis;
         }
       }

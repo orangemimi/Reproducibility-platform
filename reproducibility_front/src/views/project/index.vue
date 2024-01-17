@@ -15,11 +15,15 @@
       </div>
 
       <div class="menu">
+        <!-- {{ permission.role }} -->
         <builder-menu
-          v-if="permission.role == 'participant'"
+          v-show="permission.role == 'participant'"
           @toRouterType="toRouterType"
         ></builder-menu>
-        <re-builder-menu v-else @toRouterType="toRouterType"></re-builder-menu>
+        <re-builder-menu
+          v-show="permission.role != 'participant'"
+          @toRouterType="toRouterType"
+        ></re-builder-menu>
       </div>
     </div>
     <div class="page-content">
@@ -29,11 +33,11 @@
 </template>
 
 <script>
-import { getProjectAndUsers } from '@/api/request'
-import builderMenu from './components/BuilderMenu.vue'
-import reBuilderMenu from './components/ReBuilderMenu.vue'
-// import workFlow from
-import { mapState } from 'vuex'
+import { getProjectAndUsers } from "@/api/request";
+import builderMenu from "./components/BuilderMenu.vue";
+import reBuilderMenu from "./components/ReBuilderMenu.vue";
+import { ref } from "vue";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -43,13 +47,13 @@ export default {
   },
 
   async beforeRouteUpdate(to, from, next) {
-    this.projectId = to.params.id
-    await this.getProjectInfo()
-    next()
+    this.projectId = to.params.id;
+    await this.getProjectInfo();
+    next();
   },
 
   computed: {
-    ...mapState(['user', 'permission']),
+    ...mapState(["user", "permission"]),
   },
 
   data() {
@@ -58,38 +62,48 @@ export default {
       projectInfo: {},
       creator: {},
       memberList: [],
-    }
+    };
   },
 
   methods: {
     async init() {
-      await this.getProjectInfo()
-      await this.judgeRole(this.projectInfo, this.user.userId)
+      await this.getProjectInfo();
+      await this.judgeRole(this.projectInfo, this.user.userId);
+      // debugger;
+      if (this.permission.role == "participant") {
+        this.$router.push({
+          name: "Information",
+        });
+      } else {
+        this.$router.push({
+          name: "R_Info",
+        });
+      }
     },
     async judgeRole(project, userId) {
-      await this.$store.dispatch('permission/getRole', {
+      await this.$store.dispatch("permission/getRole", {
         project: project,
         userId: userId,
-      })
+      });
     },
 
     async getProjectInfo() {
-      let data = await getProjectAndUsers(this.projectId)
+      let data = await getProjectAndUsers(this.projectId);
 
-      this.projectInfo = data.project
-      this.creator = data.creator
-      this.memberList = data.memberList
+      this.projectInfo = data.project;
+      this.creator = data.creator;
+      this.memberList = data.memberList;
     },
 
     toRouterType(val) {
-      if (val != this.$router.currentRoute.name) {
+      if (val != this.$router.currentRoute.value.name) {
         this.$router.push({
+          // path: `/project/${this.$route.params.id}/val`,
           name: val,
-          query: {
-            forkingProjectId: this.projectInfo.forkingProjectId,
-            //   forkingProjectId: this.projectInfo.id,
-          },
-        })
+          // query: {
+          //   forkingProjectId: this.projectInfo.forkingProjectId,
+          // },
+        });
       }
     },
 
@@ -110,9 +124,9 @@ export default {
   },
 
   mounted() {
-    this.init()
+    this.init();
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -136,7 +150,7 @@ export default {
       }
       .project {
         width: 500px;
-        white-space: nowrap;
+        white-space: wrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }

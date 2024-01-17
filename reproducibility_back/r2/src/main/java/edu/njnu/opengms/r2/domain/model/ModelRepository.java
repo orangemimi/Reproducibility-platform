@@ -26,6 +26,5 @@ public interface ModelRepository extends MongoRepository<Model,String> {
 
     Page<Model> findByNameContainsIgnoreCase(String name, Pageable pageable);
     Page<Model> findByPrivacy(String privacy, Pageable pageable);
-//    Page<Model> findByPrivacyAndByNameContainsIgnoreCase(String privacy,String name, Pageable pageable);
-//    Page<ModelServiceVO> getByNameContainsIgnoreCase(String name, Pageable pageable);
+
 }

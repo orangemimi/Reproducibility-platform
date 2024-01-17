@@ -41,8 +41,15 @@
               :key="index"
               style="display: flex; margin-bottom: 5px"
             >
-              <router-link :to="{ path: `/project/${item.projectId}/info` }" v-slot="{  navigate }">
-                <div @click="navigate" style="height: 30px; line-height: 30px" class="router">
+              <router-link
+                :to="{ path: `/project/${item.projectId}/info` }"
+                v-slot="{ navigate }"
+              >
+                <div
+                  @click="navigate"
+                  style="height: 30px; line-height: 30px"
+                  class="router"
+                >
                   {{ user.name }}
                   <span>/</span>
                   {{ item.name }}
@@ -87,12 +94,12 @@
 import {
   DocumentAdd as ElIconDocumentAdd,
   Search as ElIconSearch,
-} from '@element-plus/icons-vue'
-import { getMyProjects, getAllProjects } from '@/api/request'
-import create from '../create/index.vue'
-import { imgBase64 } from '@/lib/utils'
-import projectCard from '../components/ProjectCard.vue'
-import { mapState } from 'vuex'
+} from "@element-plus/icons-vue";
+import { getMyProjects, getAllProjects } from "@/api/request";
+import create from "../create/index.vue";
+import { imgBase64 } from "@/lib/utils";
+import projectCard from "../components/ProjectCard.vue";
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -103,41 +110,41 @@ export default {
       myProjects: [],
       ElIconDocumentAdd,
       ElIconSearch,
-    }
+    };
   },
   components: { projectCard, create },
   watch: {},
   computed: {
-    ...mapState(['user']),
+    ...mapState(["user"]),
   },
   methods: {
     async init() {
-      this.myProjects = await getMyProjects()
-      let data = await getAllProjects(0, 16)
-      this.projectList = data.content
-      this.total = data.totalElements
+      this.myProjects = await getMyProjects();
+      let data = await getAllProjects(0, 16);
+      this.projectList = data.content;
+      this.total = data.totalElements;
     },
 
     imgBase64(projectName) {
-      return imgBase64(projectName)
+      return imgBase64(projectName);
     },
 
     async change(val) {
-      let data = await getAllProjects(val - 1, 16)
-      this.projectList = data.content
+      let data = await getAllProjects(val - 1, 16);
+      this.projectList = data.content;
     },
 
     async dialogShow(val) {
-      console.log(val,'out1');
-      this.dialogNewProject = val
-      await this.init()
+      console.log(val, "out1");
+      this.dialogNewProject = val;
+      await this.init();
     },
   },
   mounted() {
-    console.log(this.user)
-    this.init()
+    console.log(this.user);
+    this.init();
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -159,7 +166,7 @@ export default {
   .router {
     width: 220px;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: wrap;
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
   }

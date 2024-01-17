@@ -1,6 +1,6 @@
 <template>
   <div class="mainCardConstruction">
-    <div :class="item.isBinded == true ? 'cardBodyBinded' : 'cardBody'">
+    <div class="cardBodyBinded">
       <el-card shadow="hover" class="card_main">
         <div class="card_info">
           <h4 :title="item.name" class="card_info_name">
@@ -25,7 +25,7 @@ export default {
       deep: true,
 
       handler(val) {
-        this.item = val
+        this.item = val;
       },
     },
   },
@@ -33,16 +33,16 @@ export default {
   data() {
     return {
       item: this.secnarioForm,
-    }
+    };
   },
 
   methods: {},
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .mainCardConstruction {
-  width: 100%; /*// pointer-events: none;*/ /*//鼠标点击不可修改
+  width: 320px; /*// pointer-events: none;*/ /*//鼠标点击不可修改
 */
   // padding: 5px;/*// background-color: #3067d61c;*/.cardBodyBinded {
   :deep(.el-card__body) {
@@ -66,40 +66,9 @@ export default {
       width: 100%;
       .card_info_name {
         display: block;
-        width: 120px;
+        width: 300;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-}
-
-.cardBody {
-  :deep(.el-card:hover) {
-    background-color: #3067d61c;
-    border: 0.5px solid #25252534;
-  }
-
-  :deep(.el-card__body) {
-    padding: 5px;
-    height: 30px;
-  }
-
-  .card_main {
-    background-color: rgb(255, 255, 255);
-    cursor: pointer;
-    // height: 42px;
-    width: 100%;
-    padding: 0 5px;
-
-    .card_info {
-      width: 100%;
-      .card_info_name {
-        display: block;
-        width: 120px;
-        overflow: hidden;
-        white-space: nowrap;
+        white-space: wrap;
         text-overflow: ellipsis;
       }
     }
