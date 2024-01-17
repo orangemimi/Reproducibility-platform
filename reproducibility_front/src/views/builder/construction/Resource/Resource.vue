@@ -53,14 +53,14 @@
             </el-col>
             <el-col :span="2" :offset="1">
               <el-button
-                size="mini"
+                size="default"
                 class="el-icon-plus"
                 @click="addResourceDialogShow = true"
               ></el-button>
             </el-col>
             <el-col :span="2" :offset="2">
               <el-button
-                size="mini"
+                size="default"
                 class="el-icon-delete"
                 @click="deleteBtn"
               ></el-button>
@@ -68,16 +68,16 @@
           </el-row>
         </template>
         <template #default="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">EDIT</el-button>
+          <el-button size="default" @click="handleEdit(scope.row)">EDIT</el-button>
           <el-button
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
             >DEL</el-button
           >
-          <el-button size="mini" class="el-icon-view"></el-button>
+          <el-button size="default" class="el-icon-view"></el-button>
           <el-link :href="scope.row.value" style="margin-left: 10px">
-            <el-button size="mini" class="el-icon-download"></el-button>
+            <el-button size="default" class="el-icon-download"></el-button>
           </el-link>
         </template>
       </el-table-column>

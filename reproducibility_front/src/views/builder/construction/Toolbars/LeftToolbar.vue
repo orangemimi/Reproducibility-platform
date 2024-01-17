@@ -82,9 +82,8 @@ import {
   getScenariosByProjectId,
 } from "@/api/request";
 
-// 场景选择
-import scenarioCard from "_com/Cards/ScenarioListCard.vue";
-import createScenario from "../create.vue";
+import scenarioCard from '_com/Cards/ScenarioListCard.vue'
+import createScenario from '../create.vue'
 // 场景和数据选择工具
 import resourceToolbar from "./ResourceToolbar.vue";
 export default {

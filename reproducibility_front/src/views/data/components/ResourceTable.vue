@@ -19,7 +19,6 @@
             </el-button>
           </el-upload>
         </div>
-        <div class="btn"></div>
         <div class="btn">
           <el-button size="default" @click="addFolderShow"> <el-icon><FolderAdd /></el-icon> Add folder</el-button>
         </div>
@@ -80,14 +79,16 @@
       </el-table>
     </div>
     <el-dialog
-      title="edit"
+      title="form Online"
       v-model="editDataDialogShow"
+      width="94%"
     >
       <div class="contentBottom">
-        <div v-show="editDataDialogShow">还不知道写啥，插个眼</div>
+          <formOL :currentRow="currentRow"></formOL>
       </div>
     </el-dialog>
   </div>
+
 </template>
 
 <script>
@@ -102,6 +103,7 @@ import { saveData, addFolder, getFolders } from '@/api/request'
 // import dataUpload from './FileUpload'; //dialogcontent
 import { renderSize } from '@/utils/utils'
 import { mapState } from 'vuex'
+import formOL from '../../../components/formOL/luckySheet.vue'
 
 export default {
   components: {
@@ -110,6 +112,7 @@ export default {
     ElIconClose,
     ElIconEditOutline,
     ElIconDownload,
+    formOL,
   },
   data() {
     return {
@@ -165,7 +168,15 @@ export default {
       }
     },
     clickEditDialog(val) {
-      this.editDataDialogShow = true
+      this.rowClick(val)
+      if(val.suffix == ".csv" || val.suffix == ".xlsx"){
+        this.editDataDialogShow = true
+      }else{
+        this.$message({
+          type:'warning',
+          message:'Only supports online editing of csv and xlsx files'
+        })
+      }
     },
     download(val) {
       console.log(val)
@@ -179,7 +190,6 @@ export default {
     async getFolders() {
       let data = await getFolders()
       this.folderList = data
-
     },
 
     handleUploadFileChange(file, fileList) {
@@ -231,9 +241,9 @@ export default {
     //上传文件到服务器
     async submitFile(fileItem) {
       if (this.currentRow != '') {
-        console.log(fileItem.file)
         let param = fileItem.file
         let uploadFileForm = new FormData()
+        console.log(fileItem,'fileItem');
         uploadFileForm.append('file', param)
         // console.log( "datddd",uploadFileForm,
         //   renderSize(param.size) ,
@@ -292,23 +302,11 @@ export default {
   }
 
   .contentBottom {
-    height: 40px;
-    line-height: 40px;
-    margin-top: 10px;
+    height: 70vh;
+    width: 80%;
+    // line-height: 40px;
+    // margin-top: 10px;
 
-    .selectFile {
-      background-color: lightgoldenrodyellow;
-      float: left;
-      width: 250px;
-      margin: 0 0 0 10px;
-      border: 1px solid #dddddd;
-      border-radius: 4px;
-      // border-top: 5px solid #67c23a;
-    }
-    .submitBtn {
-      float: right;
-      // width: 30%;
-    }
   }
 }
 </style>

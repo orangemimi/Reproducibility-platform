@@ -117,6 +117,11 @@ export async function checkTaskStatus(tid) {
 export async function getModelsByPrivacy(form) {
   return await post(`/models/getPublicModels`, form);
 }
+
+export async function saveNewCodeModel(form) {
+  return await post(`/models/newCodeModel`, form)
+}
+
 export async function getMyModels() {
   return await get(`/models/my`);
 }
@@ -203,15 +208,32 @@ export async function getFoldersByTagId(tagId) {
   return await get(`/folders/${tagId}`);
 }
 
+export async function getFolderIdByDataItemId(dataId) {
+  return await get(`/folders/getFolderIdByDataItemId/${dataId}`)
+}
 //-----------------------------------------------data---------------------------------------------
 
 export async function saveData(form, fileSize, storedFolderId) {
   return await post(`/data/uploadFileForm/${fileSize}/${storedFolderId}`, form);
 }
 
+export async function saveDocument(form, fileSize, storedFolderId) {
+  return await post(`/data/saveAsNewDocument/${fileSize}/${storedFolderId}`, form)
+}
+
+export async function replaceDocument(form, fileSize, storedFolderId) {
+  return await post(`/data/replaceDocument/${fileSize}/${storedFolderId}`, form)
+}
+
+export async function getDataItems(dataItemIds) {
+  return await post(`/data/getDataItems`, dataItemIds)
+}
+
 export async function postFile(form) {
   return await axios.post("http://112.4.132.6:8083/data", form);
 }
+
+
 //-----------------------------------------------dataContainer---------------------------------------------
 
 export async function postDataContainer(form) {

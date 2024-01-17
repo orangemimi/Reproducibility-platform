@@ -8,7 +8,7 @@
             <el-button
               type="success"
               :icon="ElIconDocumentAdd"
-              size="mini"
+              size="default"
               class="btn"
               @click="dialogNewProject = true"
             ></el-button>

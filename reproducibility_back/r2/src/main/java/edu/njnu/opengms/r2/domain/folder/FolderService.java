@@ -212,7 +212,47 @@ public class FolderService {
 
         folder.setDataList(folderDataList);
         return folderRepository.save(folder);
+    }
 
+    public Folder replaceDataList(String id, String addedDataId, String oldDucumentId) {
+        Folder folder = folderRepository.findById(id).orElseThrow(MyException::noObject);
+        List<String> folderDataList = new ArrayList<>();
+        if (folder.getDataList() == null || folder.getDataList().size() == 0) {
+            folderDataList.add(addedDataId);
+        } else {
+            for (String dataId : folder.getDataList()) {
+                if (dataId.equals(oldDucumentId)) {
+                        folderDataList.add(addedDataId);
+                    } else {
+                        folderDataList.add(dataId);
+                }
+            }
+        }
+
+        folder.setDataList(folderDataList);
+        return folderRepository.save(folder);
+    }
+
+
+
+
+    public String getFolderIdByDataItemId(String userId, String dataId){
+        // 先拿到user对应的folders
+        Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC,"level"));
+        List<Folder> folderList = folderRepository.findAllByCreatorId(userId,sort);
+
+        //遍历folders，梳理
+        for(Folder item : folderList){
+            if(item.getDataList() != null && !item.getDataList().isEmpty()){
+                List<String> dataItemIds = item.getDataList();
+                for(String dataItemId :dataItemIds){
+                    if(dataItemId.equals(dataId)){
+                        return item.getId();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 

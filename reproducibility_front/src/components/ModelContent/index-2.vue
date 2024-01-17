@@ -1,7 +1,7 @@
 <template>
   <el-container style="width: 100%; height: 100%">
     <div v-if="codingOlShow" class="main">
-      <coding-OL :scenarioId="scenarioId"></coding-OL>
+      <coding-OL :scenarioId="scenarioId" :content="currentModel.content"></coding-OL>
     </div>
     <div v-else-if="modelItem" class="main">
       <el-row class="title">
@@ -15,7 +15,7 @@
         <el-col :span="7">
           <el-button
             type="success"
-            size="normal"
+            size="default"
             style="float: right"
             @click="getInstances"
           >
@@ -23,7 +23,7 @@
           </el-button>
           <el-button
             type="primary"
-            size="normal"
+            size="default"
             :disabled="!canInvoke"
             @click="initInvoke"
             style="float: right; margin-right: 5px"

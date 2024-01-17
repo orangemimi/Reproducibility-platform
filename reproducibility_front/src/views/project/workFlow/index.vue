@@ -70,7 +70,8 @@
                             <template v-slot="scope">
                               <el-button
                                 @click.prevent="download(scope.row)"
-                                type="text"
+                                link
+                                type="primary"
                                 :icon="ElIconDownload"
                                 >Download</el-button
                               >
@@ -104,12 +105,14 @@
                             <template v-slot="scope">
                               <el-button
                                 @click.prevent="view(scope.row, 'model')"
-                                type="text"
+                                type="primary"
+                                link
                                 >view</el-button
                               >
                               <el-button
                                 @click.prevent="invoke(scope.row, 'model')"
-                                type="text"
+                                type="primary"
+                                link
                                 >invoke</el-button
                               >
                             </template>

@@ -44,5 +44,9 @@ public class FolderController {
         return ResultUtils.success(folderService.update(add,userId));
     }
 
-
+    // 通过dataItem的ID获取所在folder的id
+    @RequestMapping(value = "/getFolderIdByDataItemId/{dataId}", method = RequestMethod.GET)
+    public JsonResult getFolderIdByDataItemId(@JwtTokenParser(key = "userId") String userId , @PathVariable String dataId) {
+        return ResultUtils.success(folderService.getFolderIdByDataItemId(userId,dataId));
+    }
 }

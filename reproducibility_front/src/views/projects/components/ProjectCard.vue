@@ -18,7 +18,7 @@
 
       <!-- <el-button class="config-btn" type="text" @click="view(project.id)">View</el-button> -->
       <div v-show="project.userRole == 'visitor'">
-        <el-button class="config-btn" type="text" @click="joinProjectCommand"
+        <el-button class="config-btn" type="primary" link @click="joinProjectCommand"
           >Join</el-button
         >
 
@@ -77,19 +77,19 @@ export default {
         path: `/project/${id}/info`,
       })
     },
-    // async joinProjectCommand() {
-    //   let notice = {
-    //     recipientId: this.project.creator,
-    //     type: 'apply',
-    //     content: {
-    //       type: 'joinProject',
-    //       role: 'rebuilder_operator',
-    //       projectId: this.project.id,
-    //       projectName: this.project.name,
-    //     },
-    //   }
-    //   await saveNotice(notice)
-    // },
+    async joinProjectCommand() {
+      // let notice = {
+      //   recipientId: this.project.creator,
+      //   type: 'apply',
+      //   content: {
+      //     type: 'joinProject',
+      //     role: 'rebuilder_operator',
+      //     projectId: this.project.id,
+      //     projectName: this.project.name,
+      //   },
+      // }
+      // await saveNotice(notice)
+    },
 
     async judgeRole(project) {
       await this.$store.dispatch('permission/getRole', {

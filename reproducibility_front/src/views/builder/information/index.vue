@@ -143,7 +143,7 @@
                 <div class="title">Participants</div>
                 <div class="add-participant">
                   <el-button
-                    size="mini"
+                    size="default"
                     @click="addParticipantDialogShow = true"
                   >
                     Add participant
@@ -153,11 +153,11 @@
               </div>
 
               <div class="content" v-if="creator.avatar != undefined">
-                <vue-scroll
+                <!-- <vue-scroll
                   :ops="ops"
                   class="scroll"
                   style="height: calc(100vh - 754px)"
-                >
+                > -->
                   <user-card
                     :user="{
                       name: creator.name,
@@ -186,7 +186,7 @@
                       </div>
                     </div>
                   </el-row>
-                </vue-scroll>
+                <!-- </vue-scroll> -->
               </div>
             </div>
             <div class="citation">
@@ -194,7 +194,7 @@
                 <div class="mark"></div>
                 <div class="title">Citation</div>
                 <div class="edit">
-                  <el-button size="mini" @click="editCitation = true"
+                  <el-button size="default" @click="editCitation = true"
                     >Edit</el-button
                   >
                 </div>

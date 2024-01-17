@@ -9,7 +9,7 @@
         <el-divider direction="vertical"></el-divider>
 
         <el-dropdown trigger="click" @command="zoom">
-          <el-button type="text" size="default">
+          <el-button type="primary" link size="default" style="margin-top:2px;">
             {{ size }}%
             <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
           </el-button>
@@ -23,18 +23,19 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-button @click="importGraphDialog = true" type="text" size="default"
+        <el-button @click="importGraphDialog = true" type="primary" link size="default"
           >Import</el-button
         >
 
-        <el-button @click="saveMx" type="text" size="default">Save</el-button>
+        <el-button @click="saveMx" type="primary" link size="default">Save</el-button>
         <el-button
           @click="graphLayout(true, 'hierarchicalLayout')"
-          type="text"
+          type="primary"
+          link
           size="default"
           >Suit</el-button
         >
-        <el-button @click="savePic" type="text" size="default"
+        <el-button @click="savePic" type="primary" link size="default"
           >save as pic</el-button
         >
       </div>

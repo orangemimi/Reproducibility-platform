@@ -1,6 +1,7 @@
 package edu.njnu.opengms.r2.domain.dataItem;
 
 import cn.hutool.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.njnu.opengms.common.enums.ResultEnum;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
@@ -22,10 +23,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -34,9 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @Author ：Zhiyi
@@ -57,6 +53,7 @@ public class DataItemController {
     @Value("${dataContainer}")
     private String dataContainer;
 
+
     @Autowired
     DataContainerService remoteDataContainerService;
 
@@ -72,6 +69,9 @@ public class DataItemController {
     @Autowired
     ScenarioRepository scenarioRepository;
 
+    @Autowired
+    DataItemService dataItemService;
+
 
 //    @RequestMapping(value = "", method = RequestMethod.POST)
 //    public JsonResult uploadMultipleData(@JwtTokenParser(key = "userId") String userId, @RequestBody AddDataItemDTO add) throws IOException, ServletException {
@@ -80,6 +80,37 @@ public class DataItemController {
 //        dataItem.setContributorId(userId);
 //        return ResultUtils.success(dataItemRepository.insert(dataItem));
 //    }
+    @RequestMapping(value = "/getDataItems", method = RequestMethod.POST)
+    public JsonResult getDataItems(@RequestBody List<String> itemIds){
+        List<DataItem> DataItems = dataItemRepository.findAllByIdIn(itemIds);
+        return ResultUtils.success(DataItems);
+    }
+
+    @RequestMapping(value = "/saveAsNewDocument/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
+    public JsonResult saveAsNewDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
+        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+
+        String historyJson = multiRequest.getParameter("history");
+        String[] historyArray = historyJson.split(",");
+        List<String> history = Arrays.asList(historyArray);
+        String notes = multiRequest.getParameter("notes");
+
+        return ResultUtils.success(dataItemService.SaveDocument(request,userId,storedFolderId,fileSize,history,notes));
+    }
+
+    @RequestMapping(value = "/replaceDocument/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
+    public JsonResult replaceDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
+        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+
+        String historyJson = multiRequest.getParameter("history");
+        String[] historyArray = historyJson.split(",");
+        List<String> history = Arrays.asList(historyArray);
+        String notes = multiRequest.getParameter("notes");
+        System.out.println(history+notes);
+        return ResultUtils.success(dataItemService.replaceDocument(request,userId,storedFolderId,fileSize,history,notes));
+//        return null;
+    }
+
 
     @RequestMapping(value = "/uploadFileForm/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
     public JsonResult uploadMultipleData(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
@@ -128,7 +159,7 @@ public class DataItemController {
             DataItem resultData = dataItemRepository.insert(dataItem);
 
             Folder returnFolder1 = folderService.updataDataList(storedFolderId,resultData.id);
-            String scenarioFolder= setScenrioResource(storedFolderId);
+            String scenarioFolder= dataItemService.setScenrioResource(storedFolderId);
 
             Folder folder= folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
             String tagId= folder.getTagId();
@@ -168,19 +199,4 @@ public class DataItemController {
 
     }
 
-    public  String setScenrioResource(String storedFolderId) {
-        Folder folder= folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
-        String object;
-        String tagId = folder.getTagId();
-        if (tagId == null) {
-            if (folder.getLevel() > 2) {
-                object = setScenrioResource(folder.getParent());
-            } else {
-                object = null;
-            }
-        } else {
-            object = folder.getId();
-        }
-        return object;
-    }
 }

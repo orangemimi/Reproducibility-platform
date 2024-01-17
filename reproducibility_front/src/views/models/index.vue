@@ -16,8 +16,11 @@
               @keyup.enter="searchData"
               v-model="value"
               placeholder=""
-              :prefix-icon="ElIconSearch"
-            ></el-input>
+            >
+            <template v-slot:prepend>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
           </el-row>
           <el-row class="search-note"
             >Trending searches: Geodynamics,Geostatics,Hydrology,Coastal
@@ -98,13 +101,16 @@
 </template>
 
 <script>
-import { Search as ElIconSearch } from '@element-plus/icons-vue'
 import { updateUsersModel, getModelsByPrivacy, getUser } from '@/api/request'
 // import { addModelByMD5Local } from "@/api/request";
 // import serviceCard from "_com/Cards/ModelCardInPortal.vue";
 import createModel from './create.vue'
 import { imgBase64 } from '@/lib/utils'
 export default {
+  components: { createModel },
+  // setup(){
+  //   const 
+  // },
   data() {
     return {
       data: [],
@@ -120,7 +126,6 @@ export default {
       modelList: [],
       selectedModels: [],
       currentUser: {},
-      ElIconSearch,
     }
   },
   computed: {
@@ -214,7 +219,6 @@ export default {
   mounted() {
     this.init()
   },
-  components: { createModel },
 }
 </script>
 

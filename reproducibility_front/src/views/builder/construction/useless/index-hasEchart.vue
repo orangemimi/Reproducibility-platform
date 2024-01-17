@@ -66,10 +66,10 @@
           v-show="!isSearching"
         ></el-pagination>
         <div class="dialog-footer">
-          <el-button @click="resourceCollectDialog = false" size="mini"
+          <el-button @click="resourceCollectDialog = false" size="default"
             >Cancle</el-button
           >
-          <el-button type="primary" @click="setResourceCollect()" size="mini"
+          <el-button type="primary" @click="setResourceCollect()" size="default"
             >Submit</el-button
           >
         </div>
@@ -102,10 +102,10 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button @click="createScenarioDialog = false" size="mini"
+          <el-button @click="createScenarioDialog = false" size="default"
             >Cancle</el-button
           >
-          <el-button type="primary" @click="setScenerio()" size="mini"
+          <el-button type="primary" @click="setScenerio()" size="default"
             >Create</el-button
           >
         </div>
@@ -414,7 +414,7 @@ export default {
 .clearfix:after {
   clear: both;
 }
->>> .el-dialog__body {
+ .el-dialog__body {
   padding: 5px 20px 40px 20px;
   margin: 20px;
 }

@@ -181,5 +181,35 @@ public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success();
     }
 
+    @RequestMapping(value = "/newCodeModel", method = RequestMethod.POST)
+    JsonResult newCodeModel(@JwtTokenParser(key = "userId") String userId,@RequestBody JSONObject newModel){
+        try {
+            // 从JSON数据中提取必要的字段
+            String name = newModel.get("name").toString();
+            String description = newModel.get("description").toString();
+            String privacy = newModel.get("privacy").toString();
+            String content = newModel.get("content").toString();
+
+            // 创建一个新的Model对象
+            Model model = Model.builder()
+                    .name(name)
+                    .description(description)
+                    .type("code")
+                    .privacy(privacy)
+                    .contributorId(userId)
+                    .content(content)
+                    .build();
+
+            model =modelRepository.insert(model);
+
+            String insertedId = model.getId();
+
+            return ResultUtils.success(insertedId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultUtils.error("Save Error.");
+        }
+    }
+
 
 }

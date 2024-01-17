@@ -5,6 +5,8 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 /**
  * @Author ：Zhiyi
  * @Date ：2023/8/25 16:38
@@ -29,5 +31,6 @@ public class DataItem extends BaseEntity {
     String contributorId;// if is reproduced intermediate data , the contributor is the executor
 
     String fileSize;
-
+    String notes;//数据备注
+    List<String> history;//历史数据id
 }

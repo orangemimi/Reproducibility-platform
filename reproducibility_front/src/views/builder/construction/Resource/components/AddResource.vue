@@ -121,11 +121,11 @@
       <el-button
         type="primary"
         @click="update"
-        size="mini"
+        size="default"
         v-if="parameter != undefined && parameter != null"
         >Update</el-button
       >
-      <el-button type="primary" @click="onSubmit" size="mini" v-else
+      <el-button type="primary" @click="onSubmit" size="default" v-else
         >Create</el-button
       >
     </div>

@@ -16,7 +16,7 @@
             type="primary"
             :icon="ElIconDelete"
             class="button"
-            size="mini"
+            size="default"
           ></el-button>
         </div>
       </div>
