@@ -137,7 +137,7 @@ export default {
     this.editor.on("change", (cm) => {
       this.content = cm.getValue();
       this.$emit("changed", this.content);
-      this.$emit("input", this.content);
+      // this.$emit("input", this.content);
     });
     this.unseenLineMarkers();
   },

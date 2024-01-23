@@ -2,7 +2,7 @@
   <div class="main">
     <br />
 
-    <LeftToolbar @currentScenario="currentScenario"></LeftToolbar>
+    <LeftToolbar @currentScenario="CurrentScenario"></LeftToolbar>
 
     <el-col :span="24">
       <el-card shadow="never">
@@ -30,11 +30,11 @@ export default {
     };
   },
   methods: {
-    currentScenario(val) {
+    CurrentScenario(val) {
       this.currentScenario = val;
 
       console.log("left", val);
-      debugger;
+      // debugger;
     },
   },
   mounted() {},

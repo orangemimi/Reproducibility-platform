@@ -1,7 +1,7 @@
 <!--  -->
 <template>
   <div>
-    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+    <el-tabs v-model="activeName" type="card">
       <el-tab-pane label="Info" name="info">
         <workflow
           @chosenInstance="chosenInstance"

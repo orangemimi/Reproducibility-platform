@@ -6,7 +6,7 @@
           :language="'python'"
           :value="codeMirrorInstance"
           style="height: 40vh; width: 100%"
-          @input="changeTextarea"
+          @changed="changeTextarea"
         ></CommonEditor>
         <div class="operationArea">
           <el-button @click="codeRunning" type="primary">run code</el-button>
@@ -167,7 +167,7 @@ export default {
 
       await saveNewCodeModel(form).then((result)=>{
         if(result == "Save Error."){
-                  this.$message({
+          this.$message({
             message:'Save error',
             type:'error'
           })

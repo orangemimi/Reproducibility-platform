@@ -15,7 +15,30 @@ export default [
     },
     component: () => import("@/views/error-page/404.vue"),
   },
-
+  {
+    path: '/code',
+    name: 'coding-test',
+    meta: {
+      title: 'coding-test',
+    },
+    component: () => import('@/views/project/codingOL/index.vue')
+  },
+  {
+    path: '/form',
+    name: 'form-test',
+    meta: {
+      title: 'form-test',
+    },
+    component: () => import('_com/formOL/formOL.vue')
+  },
+  {
+    path: '/pdf',
+    name: 'pdf-test',
+    meta: {
+      title: 'pdf-test',
+    },
+    component: () => import('@/views/project/document/index.vue')
+  },
 
   {
     path: "/login",
