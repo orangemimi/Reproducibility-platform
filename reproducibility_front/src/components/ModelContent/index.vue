@@ -1,12 +1,9 @@
 <template>
-  <el-container
-    style="
-      width: 100%;
-      height: 100%;
-     
-    "
-  >
-    <div class="main">
+  <el-container style="width: 100%; height: 100%;">
+    <div v-if="codingOlShow" class="main">
+      <coding-OL :scenarioId="initialScenarioId" :content="currentModel.content"></coding-OL>
+    </div>
+    <div v-else-if="modelItem" class="main">
       <div v-show="invokingType == 'construction'">
         <el-row class="title">
           <el-col>{{ modelItem.name }}</el-col>
@@ -30,7 +27,7 @@
             >
               <el-button
                 type="success"
-                size="normal"
+                size="default"
                 style="float: right"
                 @click="getInstances"
               >
@@ -38,7 +35,7 @@
               </el-button>
               <el-button
                 type="primary"
-                size="normal"
+                size="default"
                 :disabled="!canInvoke"
                 @click="initInvoke(invokingType)"
                 style="float: right; margin-right: 5px"
@@ -168,7 +165,7 @@
                 :type="
                   getStatus(scope.row.status) == 'initialized' ||
                   getStatus(scope.row.status) == 'started'
-                    ? 'primary'
+                    ? ''
                     : getStatus(scope.row.status)
                 "
                 disable-transitions
@@ -294,6 +291,8 @@
 <script>
 import ResourceTable from "@/views/builder/construction/Toolbars/DataTable.vue";
 import StateDescription from "_com/Cards/StateDescription.vue";
+import SelectTree from "_com/SelectTree/tree.vue";
+import codingOL from "_com/codingOL/codingOL.vue";
 import { errorNotification, successNotification } from "@/utils/notification";
 import {
   saveData,
@@ -310,7 +309,6 @@ import {
 } from "@/api/request";
 import { renderSize } from "@/utils/utils";
 import { mapState } from "vuex";
-import SelectTree from "_com/SelectTree/tree.vue";
 import { dateFormat } from "@/lib/utils";
 
 export default {
@@ -318,6 +316,7 @@ export default {
     ResourceTable,
     StateDescription,
     SelectTree,
+    codingOL,
   },
   props: {
     currentModel: {
@@ -331,6 +330,9 @@ export default {
     },
     invokingType: {
       type: String,
+    },
+    codingOlShow: {
+      type: Boolean,
     },
   },
   watch: {

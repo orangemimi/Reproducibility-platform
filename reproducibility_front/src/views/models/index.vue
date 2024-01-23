@@ -170,7 +170,7 @@ export default {
       })
       this.total = data.totalElements
       this.data = data.content
-      console.log(this.data,'111');
+      // console.log(this.data,'111');
     },
 
     judgeModelIsContained(modelId) {

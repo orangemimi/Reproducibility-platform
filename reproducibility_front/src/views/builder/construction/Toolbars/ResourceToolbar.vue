@@ -89,8 +89,8 @@
               sortable
             ></el-table-column>
             <el-table-column
-              prop="updateTime"
-              label="Update time"
+              prop="type"
+              label="Type"
               width="120"
               sortable
             ></el-table-column>

@@ -39,7 +39,6 @@ export default {
   methods: {
     selectModel(val, scenarioId) {
       if (val.type == "code") {
-        console.log();
         this.codingOl(true, scenarioId, val);
       } else {
         console.log("left", val, scenarioId);

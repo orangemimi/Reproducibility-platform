@@ -14,7 +14,7 @@
             multiple
           >
             <el-button size="default">
-              <el-icon><el-icon-upload /></el-icon>
+              <el-icon><Upload /></el-icon>
               Upload
             </el-button>
           </el-upload>
@@ -26,8 +26,8 @@
       <div v-else>
         <el-input v-model="folderName">
           <template #suffix>
-            <el-icon class="el-input__icon" @click="uploadFolder"><el-icon-check /></el-icon>
-            <el-icon class="el-input__icon" @click="closeAddFolder"><el-icon-close /></el-icon>
+            <el-icon class="el-input__icon" @click="uploadFolder"><Check /></el-icon>
+            <el-icon class="el-input__icon" @click="closeAddFolder"><Close /></el-icon>
           </template>
         </el-input>
       </div>
@@ -72,8 +72,8 @@
         </el-table-column>
         <el-table-column label="Operation" width="120" show-overflow-tooltip>
           <template #default="scope">
-            <el-icon @click="clickEditDialog(scope.row)" style="margin-right: 10px"><el-icon-edit-outline/></el-icon>
-            <el-icon @click="downloadFileResource(scope.row.value)"><el-icon-download /></el-icon>
+            <el-icon @click="clickEditDialog(scope.row)" style="margin-right: 10px"><Edit /></el-icon>
+            <el-icon @click="downloadFileResource(scope.row.value)"><Download /></el-icon>
         </template>
         </el-table-column>
       </el-table>
@@ -92,13 +92,13 @@
 </template>
 
 <script>
-import {
-  Upload as ElIconUpload,
-  Check as ElIconCheck,
-  Close as ElIconClose,
-  Edit as ElIconEditOutline,
-  Download as ElIconDownload,
-} from '@element-plus/icons-vue'
+// import {
+//   Upload as ElIconUpload,
+//   Check as ElIconCheck,
+//   Close as ElIconClose,
+//   Edit as ElIconEditOutline,
+//   Download as ElIconDownload,
+// } from '@element-plus/icons-vue'
 import { saveData, addFolder, getFolders } from '@/api/request'
 // import dataUpload from './FileUpload'; //dialogcontent
 import { renderSize } from '@/utils/utils'
@@ -107,11 +107,6 @@ import formOL from '../../../components/formOL/luckySheet.vue'
 
 export default {
   components: {
-    ElIconUpload,
-    ElIconCheck,
-    ElIconClose,
-    ElIconEditOutline,
-    ElIconDownload,
     formOL,
   },
   data() {

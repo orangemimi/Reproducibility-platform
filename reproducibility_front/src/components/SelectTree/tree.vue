@@ -13,7 +13,6 @@
       <el-input
         class="input"
         placeholder="Enter keywords to select"
-        :prefix-icon="Search"
         v-model="treeFilter"
         size="default"
         clearable

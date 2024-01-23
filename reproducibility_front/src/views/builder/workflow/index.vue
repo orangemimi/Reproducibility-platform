@@ -98,7 +98,7 @@ export default {
   watch: {
     currentScenario: {
       handler(newVal) {
-        if (Object.hasOwnProperty.call(newVal, "name")) {
+        if (newVal && Object.hasOwnProperty.call(newVal, "name")) {
           if (
             newVal.instanceObjectList != undefined &&
             newVal.instanceObjectList.length != 0

@@ -16,26 +16,22 @@
             title="upload data files"
           >
             <el-button size="default">
-              <el-icon><el-icon-upload /></el-icon>
+              <el-icon><UploadFilled /></el-icon>
             </el-button>
           </el-upload>
         </div>
 
         <div class="btn">
-          <el-button size="default" @click="addFolderShow" title="add a folder"
-            ><el-icon><UploadFilled /></el-icon
-          ></el-button>
+          <el-button size="default" @click="addFolderShow" title="add a folder">
+            <el-icon><DocumentAdd /></el-icon>
+          </el-button>
         </div>
       </div>
       <div v-else>
         <el-input v-model="folderName">
           <template #suffix>
-            <el-icon class="el-input__icon" @click="uploadFolder"
-              ><el-icon-check
-            /></el-icon>
-            <el-icon class="el-input__icon" @click="closeAddFolder"
-              ><el-icon-close
-            /></el-icon>
+            <el-icon @click="uploadFolder"><Check /></el-icon>
+            <el-icon @click="closeAddFolder"><Close /></el-icon>
           </template>
         </el-input>
       </div>

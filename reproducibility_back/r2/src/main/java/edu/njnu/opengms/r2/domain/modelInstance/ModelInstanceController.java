@@ -68,8 +68,13 @@ public class ModelInstanceController {
         List<JSONObject> objectList = new ArrayList<>();
         for (ModelInstance modelInstance:modelInstanceList){
             if (modelInstance != null) {
-                JSONObject obj =functionUtils.getFullModelInstance(modelInstance);
-                objectList.add(obj);
+                try{
+                    JSONObject obj =functionUtils.getFullModelInstance(modelInstance);
+                    objectList.add(obj);
+                }catch(Exception e){
+                    System.out.println(e);
+                }
+
             }
 
         }

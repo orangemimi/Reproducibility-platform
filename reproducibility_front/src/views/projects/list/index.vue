@@ -7,17 +7,21 @@
             projects
             <el-button
               type="success"
-              :icon="ElIconDocumentAdd"
               size="default"
               class="btn"
               @click="dialogNewProject = true"
-            ></el-button>
+            >
+              <el-icon><DocumentAdd /></el-icon>
+            </el-button>
           </div>
           <el-input
             placeholder="Please enter the content"
             size="small"
-            :prefix-icon="ElIconSearch"
-          ></el-input>
+          >
+            <template #prepend>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
 
           <div v-if="myProjects.length > 0">
             <!-- <div
@@ -91,10 +95,6 @@
 </template>
 
 <script>
-import {
-  DocumentAdd as ElIconDocumentAdd,
-  Search as ElIconSearch,
-} from "@element-plus/icons-vue";
 import { getMyProjects, getAllProjects } from "@/api/request";
 import create from "../create/index.vue";
 import { imgBase64 } from "@/lib/utils";
@@ -108,8 +108,6 @@ export default {
       total: 0,
       dialogNewProject: false,
       myProjects: [],
-      ElIconDocumentAdd,
-      ElIconSearch,
     };
   },
   components: { projectCard, create },

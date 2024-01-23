@@ -16,7 +16,7 @@
           <el-table-column prop="suffix" label="suffix"></el-table-column>
           <el-table-column fixed="right" label="operation" width="200">
             <template v-slot="scope">
-              <el-button @click.prevent="download(scope.row)" type="text"
+              <el-button @click.prevent="download(scope.row)" link
                 ><el-icon><Download /></el-icon>Download</el-button
               >
             </template>
@@ -46,7 +46,7 @@
           ></el-table-column>
           <el-table-column fixed="right" label="operation" width="200">
             <template v-slot="scope">
-              <el-button @click.prevent="view(scope.row, 'model')" type="text"
+              <el-button @click.prevent="view(scope.row, 'model')" link
                 >view</el-button
               >
             </template>
