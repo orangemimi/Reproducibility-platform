@@ -41,27 +41,27 @@ public class RemoteDataContainerController {
     DataContainerService dataContainerService;
 
 
-    @RequestMapping (value = "/uploadFileForm", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadFileForm", method = RequestMethod.POST)
     public JsonResult uploadMultipleData(HttpServletRequest request, @JwtTokenParser(key = "name") String name, @JwtTokenParser() String id) throws IOException, ServletException {
         MultipartHttpServletRequest request1 = (MultipartHttpServletRequest) request;
         Collection<Part> parts = request1.getParts();
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         for (Part part : parts) {
             String header = part.getHeader("Content-Disposition");
-            String filename2 = header.substring(header.indexOf("filename=\"") + 10,header.lastIndexOf("\""));//filename=" (整个字符串长度为10，所以要加10)
+            String filename2 = header.substring(header.indexOf("filename=\"") + 10, header.lastIndexOf("\""));//filename=" (整个字符串长度为10，所以要加10)
             // 获取文件名
             String fileName = part.getName();
             //  获取文件后缀名
-            String suffix ="." + FilenameUtils.getExtension(filename2);
-            File file=File.createTempFile(part.getName(),suffix);//创建临时文件
-            FileUtils.copyInputStreamToFile(part.getInputStream(),file);
-            FileSystemResource fileSystemResource=new FileSystemResource(file);
-            form.add("ogmsdata",fileSystemResource);
+            String suffix = "." + FilenameUtils.getExtension(filename2);
+            File file = File.createTempFile(part.getName(), suffix);//创建临时文件
+            FileUtils.copyInputStreamToFile(part.getInputStream(), file);
+            FileSystemResource fileSystemResource = new FileSystemResource(file);
+            form.add("ogmsdata", fileSystemResource);
         }
         form.add("serverNode", "china");
         form.add("userId", id);
         form.add("name", name);
-        form.add("origination","reproducibility");
+        form.add("origination", "reproducibility");
         return ResultUtils.success(dataContainerService.upload(form));
     }
 
@@ -118,7 +118,6 @@ public class RemoteDataContainerController {
     }
 
 
-
     @RequestMapping(value = "/download/{uid}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> download(@PathVariable("uid") String uid) {
         return dataContainerService.download(uid);
@@ -126,14 +125,14 @@ public class RemoteDataContainerController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public JsonResult getDataServices() {
-        String urlStr ="http://111.229.14.128:8898/onlineNodesAllPcs?token=fdtwTxlnhka8jY66lOT%2BkKutgZHnvi4NlnDc7QY5jR4%3D&type=Processing";
+        String urlStr = "http://111.229.14.128:8898/onlineNodesAllPcs?token=fdtwTxlnhka8jY66lOT%2BkKutgZHnvi4NlnDc7QY5jR4%3D&type=Processing";
 //        JSONObject form = new JSONObject();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type","application/json");
+        headers.add("Content-Type", "application/json");
         HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JSONObject>  jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET,requestEntity, JSONObject.class);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET, requestEntity, JSONObject.class);
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
@@ -152,11 +151,11 @@ public class RemoteDataContainerController {
 //    }
 
     @RequestMapping(value = "/dataService/getData", method = RequestMethod.POST)
-    public JsonResult getDataService( @RequestBody JSONObject jsonObject) {
+    public JsonResult getDataService(@RequestBody JSONObject jsonObject) {
         String serviceId = jsonObject.getStr("dataServiceId");
         String token = jsonObject.getStr("token");
         String type = jsonObject.getStr("type");
-        return ResultUtils.success( dataContainerService.getDataService(serviceId,token,type));
+        return ResultUtils.success(dataContainerService.getDataService(serviceId, token, type));
     }
 
 
@@ -175,7 +174,7 @@ public class RemoteDataContainerController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public JsonResult upload(@RequestParam("datafile") MultipartFile multipartFile, @RequestParam("name") String name) throws IOException {
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
-        String suffix="."+ FilenameUtils.getExtension(multipartFile.getOriginalFilename());
+        String suffix = "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());
         File temp = File.createTempFile("temp", suffix);
         multipartFile.transferTo(temp);
         FileSystemResource resource = new FileSystemResource(temp);

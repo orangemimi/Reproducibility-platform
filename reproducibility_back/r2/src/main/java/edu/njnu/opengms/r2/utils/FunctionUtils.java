@@ -62,7 +62,7 @@ public class FunctionUtils {
     @Autowired
     FolderService folderService;
 
-    public List<JSONObject> getAllInstances(List<String> modelInstanceIds){
+    public List<JSONObject> getAllInstances(List<String> modelInstanceIds) {
         List<JSONObject> modelInstanceList = new ArrayList<>();
         for (String id : modelInstanceIds) {
             ModelInstance modelInstance = modelInstanceRepository.findById(id).orElseThrow(MyException::noObject);
@@ -76,33 +76,37 @@ public class FunctionUtils {
     public JSONObject getFullModelInstance(ModelInstance modelInstance) {
 
         JSONObject object = new JSONObject();
-        Model model = modelRepository.findById(modelInstance.getModelId()).orElseThrow(MyException::noObject);
-        List<State> stateList =modelInstance.getBehavior();
-        for(State state: stateList){
+
+        Model model = modelInstance.getModelId().equals("Currently unavailable")
+                ? null
+                : modelRepository.findById(modelInstance.getModelId()).orElseThrow(MyException::noObject);
+
+        List<State> stateList = modelInstance.getBehavior();
+        for (State state : stateList) {
             List<ModelEvent> inputEvents = state.getInputs();
-            List<ModelEvent> outputEvents =   state.getOutputs();
-            for(ModelEvent input:inputEvents){
+            List<ModelEvent> outputEvents = state.getOutputs();
+            for (ModelEvent input : inputEvents) {
                 DataItem dataItem = dataItemRepository.findById(input.getDataId()).orElseThrow(MyException::noObject);
 //                JSONObject obj = new JSONObject();
                 JSONObject datasetItem = input.getDatasetItem();
 //                datasetItem.put("value",dataItem.getValue());
-                datasetItem.put("dataName",dataItem.getName()+"."+dataItem.getSuffix());
-                datasetItem.put("isInitial",dataItem.getIsInitial());
-                datasetItem.put("isReproduced",dataItem.getIsReproduced());
-                datasetItem.put("isParameter",dataItem.getIsParameter());
-                datasetItem.put("isIntermediate",dataItem.getIsIntermediate());
+                datasetItem.put("dataName", dataItem.getName() + "." + dataItem.getSuffix());
+                datasetItem.put("isInitial", dataItem.getIsInitial());
+                datasetItem.put("isReproduced", dataItem.getIsReproduced());
+                datasetItem.put("isParameter", dataItem.getIsParameter());
+                datasetItem.put("isIntermediate", dataItem.getIsIntermediate());
 
 
             }
-            for(ModelEvent output:outputEvents){
+            for (ModelEvent output : outputEvents) {
                 JSONObject datasetItem = output.getDatasetItem();
-                if(output.getDataId()!=null){
+                if (output.getDataId() != null) {
                     DataItem dataItem = dataItemRepository.findById(output.getDataId()).orElseThrow(MyException::noObject);
 //                    datasetItem.put("value",dataItem.getValue());
-                    datasetItem.put("dataName",dataItem.getName()+"."+dataItem.getSuffix());
-                    datasetItem.put("isInitial",dataItem.getIsInitial());
-                    datasetItem.put("isReproduced",dataItem.getIsReproduced());
-                    datasetItem.put("isIntermediate",dataItem.getIsIntermediate());
+                    datasetItem.put("dataName", dataItem.getName() + "." + dataItem.getSuffix());
+                    datasetItem.put("isInitial", dataItem.getIsInitial());
+                    datasetItem.put("isReproduced", dataItem.getIsReproduced());
+                    datasetItem.put("isIntermediate", dataItem.getIsIntermediate());
                 }
 
 
@@ -111,28 +115,28 @@ public class FunctionUtils {
         }
 
 
-        object.put("modelDescription",model.getDescription());
-        object.put("name",modelInstance.getName());
-        object.put("id",modelInstance.getId());
-        object.put("modelName",modelInstance.getModelName());
-        object.put("modelId",modelInstance.getModelId());
-        object.put("behavior",stateList);
-        object.put("status",modelInstance.getStatus());
-        object.put("executorId",modelInstance.getExecutorId());
-        object.put("scenarioId",modelInstance.getScenarioId());
-        object.put("refreshForm",modelInstance.getRefreshForm());
-        object.put("isReproduced",modelInstance.getIsReproduced());
-        object.put("createTime",modelInstance.getCreateTime());
-        object.put("updateTime",modelInstance.getUpdateTime());
+        object.put("modelDescription", (model != null) ? model.getDescription() : null);
+        object.put("name", modelInstance.getName());
+        object.put("id", modelInstance.getId());
+        object.put("modelName", modelInstance.getModelName());
+        object.put("modelId", modelInstance.getModelId());
+        object.put("behavior", stateList);
+        object.put("status", modelInstance.getStatus());
+        object.put("executorId", modelInstance.getExecutorId());
+        object.put("scenarioId", modelInstance.getScenarioId());
+        object.put("refreshForm", modelInstance.getRefreshForm());
+        object.put("isReproduced", modelInstance.getIsReproduced());
+        object.put("createTime", modelInstance.getCreateTime());
+        object.put("updateTime", modelInstance.getUpdateTime());
 
         JSONObject user = userService.getUserInfoById(modelInstance.getExecutorId());
-        object.put("executorName",user.get("name"));
+        object.put("executorName", user.get("name"));
         return object;
 
 
     }
 
-    public JSONObject getScenario(Scenario scenario){
+    public JSONObject getScenario(Scenario scenario) {
 
         JSONObject obj = new JSONObject();
         JSONObject scenarioNew = new JSONObject();
@@ -140,8 +144,8 @@ public class FunctionUtils {
 
         ////get model list
 //        List<String> modelIdList = resourceCollection.getModelList();
-        if(resourceCollection!=null){
-            if (resourceCollection.getModelList() != null ) {
+        if (resourceCollection != null) {
+            if (resourceCollection.getModelList() != null) {
                 obj.put("modelList", modelRepository.findAllById(resourceCollection.getModelList()));
             } else {
                 obj.put("modelList", null);
@@ -151,7 +155,7 @@ public class FunctionUtils {
 //        List<String> dataIdList = resourceCollection.getDataList();
             if (resourceCollection.getDataList() != null) {
                 List dataListWithObject = new ArrayList();
-                for(String dataid : resourceCollection.getDataList()){
+                for (String dataid : resourceCollection.getDataList()) {
                     DataItem dataItem = dataItemRepository.findById(dataid).orElseThrow(MyException::noObject);
                     dataListWithObject.add(dataItem);
 
@@ -181,6 +185,8 @@ public class FunctionUtils {
 
         scenarioNew.put("name", scenario.getName());
         scenarioNew.put("id", scenario.getId());
+        scenarioNew.put("env", scenario.getEnv());
+        scenarioNew.put("containerId", scenario.getContainerId());
         scenarioNew.put("type", scenario.getType());
         scenarioNew.put("instances", scenario.getInstances());
         scenarioNew.put("resourceCollection", scenario.getResourceCollection());
@@ -188,7 +194,6 @@ public class FunctionUtils {
         scenarioNew.put("initialScenarioId", scenario.getInitialScenarioId());
 
         return scenarioNew;
-
 
 
     }
@@ -206,8 +211,9 @@ public class FunctionUtils {
         }
         return 1;
     }
+
     public static String readFile(String path) {
-        String line="";
+        String line = "";
         String pathname = path; // 绝对路径或相对路径都可以，写入文件时演示相对路径,读取以上路径的input.txt文件
         //防止文件建立或读取失败，用catch捕捉错误并打印，也可以throw;
         //不关闭文件会导致资源的泄露，读写文件都同理

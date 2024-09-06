@@ -826,7 +826,7 @@ input.luckysheet-mousedown-cancel:focus {
 }
 
 .luckysheet-sheet-area .luckysheet-sheets-item,
-.luckysheet-sheet-area>div {
+.luckysheet-sheet-area > div {
     display: inline-block
 }
 
@@ -2427,7 +2427,7 @@ fieldset[disabled] a.btn {
 
 .btn-default.active,
 .btn-default:active,
-.open>.dropdown-toggle.btn-default {
+.open > .dropdown-toggle.btn-default {
     color: #333;
     background-color: #e6e6e6;
     border-color: #adadad
@@ -2439,9 +2439,9 @@ fieldset[disabled] a.btn {
 .btn-default:active.focus,
 .btn-default:active:focus,
 .btn-default:active:hover,
-.open>.dropdown-toggle.btn-default.focus,
-.open>.dropdown-toggle.btn-default:focus,
-.open>.dropdown-toggle.btn-default:hover {
+.open > .dropdown-toggle.btn-default.focus,
+.open > .dropdown-toggle.btn-default:focus,
+.open > .dropdown-toggle.btn-default:hover {
     color: #333;
     background-color: #d4d4d4;
     border-color: #8c8c8c
@@ -2449,7 +2449,7 @@ fieldset[disabled] a.btn {
 
 .btn-default.active,
 .btn-default:active,
-.open>.dropdown-toggle.btn-default {
+.open > .dropdown-toggle.btn-default {
     background-image: none
 }
 
@@ -2492,7 +2492,7 @@ fieldset[disabled] .btn-default:hover {
 
 .btn-primary.active,
 .btn-primary:active,
-.open>.dropdown-toggle.btn-primary {
+.open > .dropdown-toggle.btn-primary {
     color: #fff;
     background-color: #5391ff
 }
@@ -2503,9 +2503,9 @@ fieldset[disabled] .btn-default:hover {
 .btn-primary:active.focus,
 .btn-primary:active:focus,
 .btn-primary:active:hover,
-.open>.dropdown-toggle.btn-primary.focus,
-.open>.dropdown-toggle.btn-primary:focus,
-.open>.dropdown-toggle.btn-primary:hover {
+.open > .dropdown-toggle.btn-primary.focus,
+.open > .dropdown-toggle.btn-primary:focus,
+.open > .dropdown-toggle.btn-primary:hover {
     color: #fff;
     background-color: #204d74;
     border-color: transparent
@@ -2513,7 +2513,7 @@ fieldset[disabled] .btn-default:hover {
 
 .btn-primary.active,
 .btn-primary:active,
-.open>.dropdown-toggle.btn-primary {
+.open > .dropdown-toggle.btn-primary {
     background-image: none
 }
 
@@ -2580,7 +2580,7 @@ fieldset[disabled] .btn-primary:hover {
 
 .btn-danger.active,
 .btn-danger:active,
-.open>.dropdown-toggle.btn-danger {
+.open > .dropdown-toggle.btn-danger {
     color: #fff;
     background-color: #c9302c;
     border-color: #ac2925
@@ -2592,9 +2592,9 @@ fieldset[disabled] .btn-primary:hover {
 .btn-danger:active.focus,
 .btn-danger:active:focus,
 .btn-danger:active:hover,
-.open>.dropdown-toggle.btn-danger.focus,
-.open>.dropdown-toggle.btn-danger:focus,
-.open>.dropdown-toggle.btn-danger:hover {
+.open > .dropdown-toggle.btn-danger.focus,
+.open > .dropdown-toggle.btn-danger:focus,
+.open > .dropdown-toggle.btn-danger:hover {
     color: #fff;
     background-color: #ac2925;
     border-color: #761c19
@@ -2602,7 +2602,7 @@ fieldset[disabled] .btn-primary:hover {
 
 .btn-danger.active,
 .btn-danger:active,
-.open>.dropdown-toggle.btn-danger {
+.open > .dropdown-toggle.btn-danger {
     background-image: none
 }
 
@@ -2988,7 +2988,7 @@ fieldset[disabled] .btn-danger:hover {
 }
 
 .luckysheet-sort-modal table,
-.luckysheet-sort-modal>div {
+.luckysheet-sort-modal > div {
     margin-bottom: 10px
 }
 
@@ -3002,7 +3002,7 @@ fieldset[disabled] .btn-danger:hover {
     border-top: 1px solid #ffc6c6
 }
 
-.luckysheet-sort-modal table tr td>div:first-child {
+.luckysheet-sort-modal table tr td > div:first-child {
     margin-bottom: 8px
 }
 
@@ -3178,7 +3178,7 @@ fieldset[disabled] .btn-danger:hover {
     display: none
 }
 
-.luckysheet-datavisual-quick-menu>div {
+.luckysheet-datavisual-quick-menu > div {
     text-align: left;
     padding: 4px 4px;
     border-right: 3px solid #fff;
@@ -3188,25 +3188,25 @@ fieldset[disabled] .btn-danger:hover {
     word-wrap: break-word
 }
 
-.luckysheet-datavisual-quick-menu>div:hover {
+.luckysheet-datavisual-quick-menu > div:hover {
     color: #000
 }
 
-.luckysheet-datavisual-quick-menu>div i {
+.luckysheet-datavisual-quick-menu > div i {
     width: 15px
 }
 
-.luckysheet-datavisual-quick-menu>div:hover i {
+.luckysheet-datavisual-quick-menu > div:hover i {
     color: #ff7e7e
 }
 
-.luckysheet-datavisual-quick-menu>div.luckysheet-datavisual-quick-menu-active {
+.luckysheet-datavisual-quick-menu > div.luckysheet-datavisual-quick-menu-active {
     border-right: 3px solid #ff7e7e;
     color: #000;
     font-weight: 700
 }
 
-.luckysheet-datavisual-quick-menu>div.luckysheet-datavisual-quick-menu-active:hover i {
+.luckysheet-datavisual-quick-menu > div.luckysheet-datavisual-quick-menu-active:hover i {
     color: #000
 }
 
@@ -3821,7 +3821,7 @@ fieldset[disabled] .btn-danger:hover {
     position: relative
 }
 
-@media (max-width:776px) {
+@media (max-width: 776px) {
     .luckysheet-chart-point-config-set {
         width: 90%
     }
@@ -3831,7 +3831,7 @@ fieldset[disabled] .btn-danger:hover {
     }
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
     .luckysheet-chart-point-config-set {
         width: 80%
     }
@@ -3841,7 +3841,7 @@ fieldset[disabled] .btn-danger:hover {
     }
 }
 
-@media (min-width:1024px) {
+@media (min-width: 1024px) {
     .luckysheet-chart-point-config-set {
         width: 70%
     }
@@ -3851,7 +3851,7 @@ fieldset[disabled] .btn-danger:hover {
     }
 }
 
-@media (min-width:1280px) {
+@media (min-width: 1280px) {
     .luckysheet-chart-point-config-set {
         width: 60%
     }
@@ -3861,7 +3861,7 @@ fieldset[disabled] .btn-danger:hover {
     }
 }
 
-@media (min-width:1680px) {
+@media (min-width: 1680px) {
     .luckysheet-chart-point-config-set {
         width: 50%
     }
@@ -3901,12 +3901,12 @@ fieldset[disabled] .btn-danger:hover {
     font-size: 13px
 }
 
-.luckysheet-modal-dialog-slider .luckysheet-modal-dialog-slider-title>span:first-child {
+.luckysheet-modal-dialog-slider .luckysheet-modal-dialog-slider-title > span:first-child {
     margin-left: 5px;
     font-weight: 700
 }
 
-.luckysheet-modal-dialog-slider .luckysheet-modal-dialog-slider-title>span:last-child {
+.luckysheet-modal-dialog-slider .luckysheet-modal-dialog-slider-title > span:last-child {
     position: relative;
     float: right;
     margin-right: 20px;
@@ -3931,7 +3931,7 @@ fieldset[disabled] .btn-danger:hover {
     line-height: 40px
 }
 
-.luckysheet-modal-dialog-slider-range>div:first-child {
+.luckysheet-modal-dialog-slider-range > div:first-child {
     font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3942,7 +3942,7 @@ fieldset[disabled] .btn-danger:hover {
     white-space: nowrap
 }
 
-.luckysheet-modal-dialog-slider-range>div:last-child {
+.luckysheet-modal-dialog-slider-range > div:last-child {
     color: #00f;
     cursor: pointer;
     float: left
@@ -4085,7 +4085,7 @@ fieldset[disabled] .btn-danger:hover {
     position: absolute
 }
 
-.luckysheet-modal-dialog-slider-config>div:first-child {
+.luckysheet-modal-dialog-slider-config > div:first-child {
     color: #1b1b19;
     font-size: 13px;
     height: 20px;
@@ -4093,7 +4093,7 @@ fieldset[disabled] .btn-danger:hover {
     padding-left: 5px
 }
 
-.luckysheet-modal-dialog-slider-config>div:first-child span {
+.luckysheet-modal-dialog-slider-config > div:first-child span {
     font-weight: 700;
     font-weight: 700;
     overflow: hidden
@@ -4358,7 +4358,7 @@ fieldset[disabled] .btn-danger:hover {
     border-left: 1px solid #e5e5e5
 }
 
-#luckysheet-functionbox-container>div {
+#luckysheet-functionbox-container > div {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -6811,7 +6811,7 @@ fieldset[disabled] .btn-danger:hover {
     background: #d5d5d5
 }
 
-.luckysheet-protection-rangeItem>div {
+.luckysheet-protection-rangeItem > div {
     position: absolute;
     height: 100%;
     text-align: center;
@@ -7580,7 +7580,7 @@ span.flatpickr-weekday {
     opacity: 1
 }
 
-.dayContainer+.dayContainer {
+.dayContainer + .dayContainer {
     -webkit-box-shadow: -1px 0 0 #eceef1;
     box-shadow: -1px 0 0 #eceef1
 }
@@ -7677,9 +7677,9 @@ span.flatpickr-weekday {
     border-radius: 0 50px 50px 0
 }
 
-.flatpickr-day.endRange.startRange+.endRange:not(:nth-child(7n+1)),
-.flatpickr-day.selected.startRange+.endRange:not(:nth-child(7n+1)),
-.flatpickr-day.startRange.startRange+.endRange:not(:nth-child(7n+1)) {
+.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)) {
     -webkit-box-shadow: -10px 0 0 #ff5a5f;
     box-shadow: -10px 0 0 #ff5a5f
 }

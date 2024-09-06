@@ -11,9 +11,11 @@ import java.util.Optional;
  * @modified By：
  * @version: 1.0.0
  */
-public interface ScenarioRepository extends MongoRepository<Scenario,String> {
-//    Scenario findById(String id);
+public interface ScenarioRepository extends MongoRepository<Scenario, String> {
+    //    Scenario findById(String id);
     List<Scenario> findAllByProjectId(String projectId);
+
     Optional<Scenario> findById(String id);
+
     Scenario findByInitialScenarioId(String id);
 }

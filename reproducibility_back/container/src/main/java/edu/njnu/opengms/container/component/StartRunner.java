@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartRunner implements CommandLineRunner {
     @Override
-    public void run(String... args){
+    public void run(String... args) {
         new Server().start();
     }
 }

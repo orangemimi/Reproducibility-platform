@@ -11,6 +11,6 @@ import lombok.Data;
 @Data
 public class Member {
     String memberId;//member的userId
-//    String name;
+    //    String name;
     String role;////role: ['builder', 'rebuilder_explorer','rebuilder_operator']
 }

@@ -61,7 +61,7 @@ public class ServerHandlerImpl implements ServerHandler {
                 handleError(socketChannel);
             } else {
                 socketChannel.register(selectionKey.selector(), SelectionKey.OP_WRITE);
-                value = new String(readBuffer.array(), 0, num,System.getProperty("file.encoding"));
+                value = new String(readBuffer.array(), 0, num, System.getProperty("file.encoding"));
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

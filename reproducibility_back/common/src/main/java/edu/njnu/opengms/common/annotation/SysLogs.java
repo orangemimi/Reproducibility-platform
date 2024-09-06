@@ -9,8 +9,8 @@ import java.lang.annotation.*;
  * @Date 2018/9/8
  * @Version 1.0.0
  */
-@Target (ElementType.METHOD)
-@Retention (RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface SysLogs {
     String value() default "系统默认打印";

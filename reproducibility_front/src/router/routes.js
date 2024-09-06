@@ -16,28 +16,56 @@ export default [
     component: () => import("@/views/error-page/404.vue"),
   },
   {
-    path: '/code',
-    name: 'coding-test',
+    path: "/card1",
+    name: "testPage1",
     meta: {
-      title: 'coding-test',
+      title: "testPage1",
     },
-    component: () => import('@/views/project/codingOL/index.vue')
+    component: () => import("@/views/builder/AIAssistant/vueFlow/test.vue"),
   },
   {
-    path: '/form',
-    name: 'form-test',
+    path: "/card2",
+    name: "testPage2",
     meta: {
-      title: 'form-test',
+      title: "testPage1",
     },
-    component: () => import('_com/formOL/formOL.vue')
+    component: () =>
+      import("@/views/builder/AIAssistant/vueFlow/OpenGMSModelCard.vue"),
   },
   {
-    path: '/pdf',
-    name: 'pdf-test',
+    path: "/envy",
+    name: "envy-test",
     meta: {
-      title: 'pdf-test',
+      title: "envy-test",
     },
-    component: () => import('@/views/project/document/index.vue')
+    component: () => import("@/views/project/envyConfig/envySet.vue"),
+    // children: [
+    //   {
+    //     path: "py38",
+    //     name: "py38",
+    //     meta: {
+    //       title: "py38",
+    //     },
+    //     component: () => import("@/views/project/envyConfig/envs/python38.vue"),
+    //   },
+    //   // 可以添加更多的子路由
+    // ],
+  },
+  {
+    path: "/py38",
+    name: "py38",
+    meta: {
+      title: "envy",
+    },
+    component: () => import("@/views/project/envyConfig/envs/python38.vue"),
+  },
+  {
+    path: "/upload",
+    name: "upload",
+    meta: {
+      title: "upload",
+    },
+    component: () => import("@/views/project/envyConfig/index.vue"),
   },
 
   {
@@ -126,6 +154,14 @@ export default [
             },
           },
           {
+            path: "AIAssistant",
+            name: "AIAssistant",
+            component: () => import("@/views/builder/AIAssistant/AIHome.vue"),
+            meta: {
+              requireAuth: true,
+            },
+          },
+          {
             path: "construction",
             name: "Construction",
             component: () => import("@/views/builder/construction/index.vue"),
@@ -149,7 +185,7 @@ export default [
               requireAuth: true,
             },
           },
-          
+
           {
             path: "r",
             name: "R_Info",

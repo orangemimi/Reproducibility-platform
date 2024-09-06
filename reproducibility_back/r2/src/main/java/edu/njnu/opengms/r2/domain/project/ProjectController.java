@@ -29,7 +29,6 @@ public class ProjectController {
     ProjectService projectService;
 
 
-
     //pdf convert to xml
     @RequestMapping(value = "/pdf", method = RequestMethod.POST)
     public JsonResult pdfConvert(@JwtTokenParser(key = "userId") String userId, @RequestParam("pdfFile") MultipartFile pdfFile) throws IOException {
@@ -55,7 +54,7 @@ public class ProjectController {
                            @JwtTokenParser String userId,
                            @JwtTokenParser String userName,
                            @PathVariable("projectId") String projectId) {
-        return ResultUtils.success(projectService.folk(jsonObject, userId, userName,projectId));
+        return ResultUtils.success(projectService.folk(jsonObject, userId, userName, projectId));
     }
 
     //find one project
@@ -89,8 +88,8 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/user/{projectId}", method = RequestMethod.GET)
-    public JsonResult getProjectAndUsers(@JwtTokenParser(key = "userId") String userId,@PathVariable("projectId") String projectId) {
-        return ResultUtils.success(projectService.getProjectAndUsers(userId,projectId));
+    public JsonResult getProjectAndUsers(@JwtTokenParser(key = "userId") String userId, @PathVariable("projectId") String projectId) {
+        return ResultUtils.success(projectService.getProjectAndUsers(userId, projectId));
     }
 
     @RequestMapping(value = "/getStarredCount/{projectId}", method = RequestMethod.GET)
@@ -99,14 +98,12 @@ public class ProjectController {
     }
 
 
-
     @RequestMapping(value = "/{projectId}", method = RequestMethod.PATCH)
     public JsonResult update(@PathVariable("projectId") String projectId,
                              @JwtTokenParser(key = "userId") String userId,
                              @RequestBody UpdateProjectDTO update) {
         return ResultUtils.success(projectService.update(projectId, userId, update));
     }
-
 
 
 //    @RequestMapping(value = "/user/{projectId}", method = RequestMethod.GET)

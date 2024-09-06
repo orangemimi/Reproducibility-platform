@@ -20,6 +20,6 @@ public class ModelInstanceService {
     public ModelInstance updateInstance(String id, UpdateModelInstanceDTO update) {
         ModelInstance modelInstance = modelInstanceRepository.findById(id).orElseThrow(MyException::noObject);
         update.updateTo(modelInstance);
-        return modelInstanceRepository.save( modelInstance);
+        return modelInstanceRepository.save(modelInstance);
     }
 }

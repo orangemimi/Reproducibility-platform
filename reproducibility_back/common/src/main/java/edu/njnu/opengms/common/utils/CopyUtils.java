@@ -31,7 +31,7 @@ public class CopyUtils {
         return emptyNames.toArray(result);
     }
 
-    public static void copyProperties(Object source,Object target) {
+    public static void copyProperties(Object source, Object target) {
         BeanUtils.copyProperties(source, target, getNullPropertyNames(source));
     }
 

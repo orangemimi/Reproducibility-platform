@@ -33,11 +33,11 @@ public class HandleTimeInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        String queryString = request.getQueryString()!=null?request.getQueryString():"";
-        if(request.getAttribute("handling Time:")==null){
-            log.error(request.getMethod()+" "+ request.getRequestURL().toString()+"?"+queryString+" error");
-        }else{
-            log.info("handlingTime: "+request.getRequestURL().toString()+"?" +queryString+" "+ request.getAttribute("handling Time:") + "ms");
+        String queryString = request.getQueryString() != null ? request.getQueryString() : "";
+        if (request.getAttribute("handling Time:") == null) {
+            log.error(request.getMethod() + " " + request.getRequestURL().toString() + "?" + queryString + " error");
+        } else {
+            log.info("handlingTime: " + request.getRequestURL().toString() + "?" + queryString + " " + request.getAttribute("handling Time:") + "ms");
         }
     }
 }

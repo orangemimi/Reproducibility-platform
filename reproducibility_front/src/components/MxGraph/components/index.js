@@ -3,17 +3,17 @@ import mx from "mxgraph";
 //   "mxBasePath": '/mxgraph'
 // })
 const mxgraph = mx({
-  mxBasePath: "/mxgraph-base",
-  mxImageBasePath: "/mxgraph-base/images",
-  
-  // mxBasePath: "./../scr",
-  mxLoadResources: false,
-  mxLoadStylesheets: false, // 当通过commonjs加载时为false, 否则会向页面加载script
-  mxForceIncludes: false,
-  mxResourceExtension: ".txt",
+    mxBasePath: "/mxgraph-base",
+    mxImageBasePath: "/mxgraph-base/images",
+
+    // mxBasePath: "./../scr",
+    mxLoadResources: false,
+    mxLoadStylesheets: false, // 当通过commonjs加载时为false, 否则会向页面加载script
+    mxForceIncludes: false,
+    mxResourceExtension: ".txt",
 });
 Object.keys(mxgraph).forEach((key) => {
-  window[key] = mxgraph[key];
+    window[key] = mxgraph[key];
 });
 
 // decode bug https://github.com/jgraph/mxgraph/issues/49

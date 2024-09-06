@@ -130,6 +130,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.page-content {
+  height: calc(100vh - 180px);
+}
 .page-header {
   height: 120px;
   width: 100%;

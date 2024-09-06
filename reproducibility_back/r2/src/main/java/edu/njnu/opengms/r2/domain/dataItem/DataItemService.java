@@ -65,6 +65,7 @@ public class DataItemService {
 
     @Autowired
     ScenarioRepository scenarioRepository;
+
     // replace更新文档内容
     public String replaceDocument(HttpServletRequest request, String userId, String storedFolderId, String fileSize, List<String> history, String notes) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -79,8 +80,8 @@ public class DataItemService {
 
         String url = uploadToDataContainer(request);
 
-        if(storedFolderId.equals("intermediate")){
-            return "http://112.4.132.6:8083/data/"+url;
+        if (storedFolderId.equals("intermediate")) {
+            return "http://112.4.132.6:8083/data/" + url;
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
@@ -100,7 +101,7 @@ public class DataItemService {
             add.convertTo(dataItem);
             DataItem resultData = dataItemRepository.insert(dataItem);
 
-            Folder returnFolder1 = folderService.replaceDataList(storedFolderId, resultData.id,history.get(0));
+            Folder returnFolder1 = folderService.replaceDataList(storedFolderId, resultData.id, history.get(0));
             String scenarioFolder = setScenrioResource(storedFolderId);
 
             Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
@@ -143,7 +144,7 @@ public class DataItemService {
     }
 
 
-        // Save as为新的内容
+    // Save as为新的内容
     public String SaveDocument(HttpServletRequest request, String userId, String storedFolderId, String fileSize, List<String> history, String notes) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
         Part part = multiRequest.getPart("file");
@@ -158,9 +159,8 @@ public class DataItemService {
         String url = uploadToDataContainer(request);
 
 
-
-        if(storedFolderId.equals("intermediate")){
-            return "http://112.4.132.6:8083/data/"+url;
+        if (storedFolderId.equals("intermediate")) {
+            return "http://112.4.132.6:8083/data/" + url;
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
@@ -180,33 +180,33 @@ public class DataItemService {
             add.convertTo(dataItem);
             DataItem resultData = dataItemRepository.insert(dataItem);
 
-            Folder returnFolder1 = folderService.updataDataList(storedFolderId,resultData.id);
-            String scenarioFolder= setScenrioResource(storedFolderId);
+            Folder returnFolder1 = folderService.updataDataList(storedFolderId, resultData.id);
+            String scenarioFolder = setScenrioResource(storedFolderId);
 
-            Folder folder= folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
-            String tagId= folder.getTagId();
+            Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
+            String tagId = folder.getTagId();
 
             Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
-            ResourceCollection resourceCollectionUpdate =  Optional.ofNullable(scenario)
+            ResourceCollection resourceCollectionUpdate = Optional.ofNullable(scenario)
                     .map(x -> x.getResourceCollection())
                     .map(x -> {
                         List<String> dataIdList = x.getDataList();
                         List<String> modelIdList = x.getModelList();
                         if (dataIdList != null) {
-                            dataIdList.add( resultData.getId());
+                            dataIdList.add(resultData.getId());
                         }
-                        ResourceCollection resourceCollection =  ResourceCollection.builder()
+                        ResourceCollection resourceCollection = ResourceCollection.builder()
                                 .modelList(modelIdList)
                                 .dataList(dataIdList)
                                 .build();
                         return resourceCollection;
                     })
 
-                    .orElseGet(() ->  {
-                        List<String> dataIdList =new ArrayList<>();
+                    .orElseGet(() -> {
+                        List<String> dataIdList = new ArrayList<>();
                         dataIdList.add(resultData.getId());
 
-                        return  ResourceCollection.builder()
+                        return ResourceCollection.builder()
                                 .dataList(dataIdList)
                                 .build();
 
@@ -216,7 +216,6 @@ public class DataItemService {
             updateResourceScenarioDTO.setResourceCollection(resourceCollectionUpdate);
             updateResourceScenarioDTO.updateTo(scenario);
             scenarioRepository.save(scenario);
-
 
 
 //            return ResultUtils.success(folder);
@@ -253,8 +252,8 @@ public class DataItemService {
         return url;
     }
 
-    public  String setScenrioResource(String storedFolderId) {
-        Folder folder= folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
+    public String setScenrioResource(String storedFolderId) {
+        Folder folder = folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
         String object;
         String tagId = folder.getTagId();
         if (tagId == null) {

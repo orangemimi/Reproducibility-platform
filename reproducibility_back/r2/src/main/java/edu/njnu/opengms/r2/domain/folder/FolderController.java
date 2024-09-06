@@ -26,7 +26,7 @@ public class FolderController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public JsonResult create(@RequestBody AddFolderDTO add, @JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success(folderService.create(add,userId));
+        return ResultUtils.success(folderService.create(add, userId));
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -34,19 +34,20 @@ public class FolderController {
         return ResultUtils.success(folderService.getFolderByCreator(userId));
     }
 
+
     @RequestMapping(value = "/{scenarioId}", method = RequestMethod.GET)
-    public JsonResult getByUserId(@PathVariable("scenarioId") String scenarioId, String userId) {
+    public JsonResult getByScenarioId(@PathVariable("scenarioId") String scenarioId, String userId) {
         return ResultUtils.success(folderService.getFolderByScenarioId(scenarioId));
     }
 
     @RequestMapping(value = "", method = RequestMethod.PATCH)
-    public JsonResult update(@RequestBody AddFolderDTO add,@JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success(folderService.update(add,userId));
+    public JsonResult update(@RequestBody AddFolderDTO add, @JwtTokenParser(key = "userId") String userId) {
+        return ResultUtils.success(folderService.update(add, userId));
     }
 
     // 通过dataItem的ID获取所在folder的id
     @RequestMapping(value = "/getFolderIdByDataItemId/{dataId}", method = RequestMethod.GET)
-    public JsonResult getFolderIdByDataItemId(@JwtTokenParser(key = "userId") String userId , @PathVariable String dataId) {
-        return ResultUtils.success(folderService.getFolderIdByDataItemId(userId,dataId));
+    public JsonResult getFolderIdByDataItemId(@JwtTokenParser(key = "userId") String userId, @PathVariable String dataId) {
+        return ResultUtils.success(folderService.getFolderIdByDataItemId(userId, dataId));
     }
 }

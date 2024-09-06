@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @Builder
-public class AddDataItemDTO  implements ToDomainConverter<DataItem> {
+public class AddDataItemDTO implements ToDomainConverter<DataItem> {
     String name;
     String suffix;
     String description;

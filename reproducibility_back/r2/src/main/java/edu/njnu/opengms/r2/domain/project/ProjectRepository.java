@@ -15,10 +15,13 @@ import java.util.Optional;
  * @version: 1.0.0
  */
 @Repository
-public interface ProjectRepository extends MongoRepository<Project,String> {
+public interface ProjectRepository extends MongoRepository<Project, String> {
     Optional<Project> findById(String id);
-    Optional<Project> findByIdAndCreatorId(String id,String userId);
+
+    Optional<Project> findByIdAndCreatorId(String id, String userId);
+
     Page<Project> findByPrivacyInOrCreatorId(List<String> privacyList, String creatorId, Pageable pageable);
+
     Page<Project> findByPrivacy(String privacy, Pageable pageable);
 
 }

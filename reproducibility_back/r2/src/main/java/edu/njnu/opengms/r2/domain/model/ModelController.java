@@ -39,7 +39,6 @@ public class ModelController {
     RemotePortalService remotePortalService;
 
 
-
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void createPortal(@RequestBody List<String> add) {
         for (int i = 0; i < add.size(); i++) {
@@ -116,7 +115,7 @@ public class ModelController {
 
         PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
         Page<Model> modelList;
-        if(!key.equals("")){
+        if (!key.equals("")) {
             Model modelquery = Model.builder()
                     .name(key)
                     .privacy(privacy)
@@ -126,12 +125,12 @@ public class ModelController {
                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) //改变默认字符串匹配方式：模糊查询
                     .withIgnoreCase(true) //改变默认大小写忽略方式：忽略大小写
                     .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains())
-                    .withMatcher("privacy",ExampleMatcher.GenericPropertyMatchers.exact());
+                    .withMatcher("privacy", ExampleMatcher.GenericPropertyMatchers.exact());
 
-            modelList = modelRepository.findAll(Example.of(modelquery,matcher),pageable);
+            modelList = modelRepository.findAll(Example.of(modelquery, matcher), pageable);
 //            Page<Model> newModels = (Page<Model>) modelList.stream().filter(s->s.getPrivacy().equals("public")).collect(Collectors.toList());
             return ResultUtils.success(modelList);
-        } else{
+        } else {
             modelList = modelRepository.findByPrivacy("public", pageable);
             return ResultUtils.success(modelList);
         }
@@ -151,7 +150,7 @@ public class ModelController {
             return ResultUtils.success(model.get());
         } else {
             return ResultUtils.error(404, "Model not found");
-}
+        }
     }
 
     @RequestMapping(value = "/getAssessmentMethod", method = RequestMethod.GET)
@@ -165,12 +164,13 @@ public class ModelController {
         }
     }
 
-@RequestMapping(value = "/my", method = RequestMethod.GET)
-public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
+    @RequestMapping(value = "/my", method = RequestMethod.GET)
+    public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
-        List<Model> modelList=  modelRepository.findAllByIdInOrContributorId(user.getModelList(),userId);
+        List<Model> modelList = modelRepository.findAllByIdInOrContributorId(user.getModelList(), userId);
         return ResultUtils.success(modelList);
-        }
+    }
+
     JsonResult invoke(@RequestBody JSONObject obj) {
         return ResultUtils.success();
     }
@@ -182,7 +182,7 @@ public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
     }
 
     @RequestMapping(value = "/newCodeModel", method = RequestMethod.POST)
-    JsonResult newCodeModel(@JwtTokenParser(key = "userId") String userId,@RequestBody JSONObject newModel){
+    JsonResult newCodeModel(@JwtTokenParser(key = "userId") String userId, @RequestBody JSONObject newModel) {
         try {
             // 从JSON数据中提取必要的字段
             String name = newModel.get("name").toString();
@@ -200,7 +200,7 @@ public JsonResult getMyModels(@JwtTokenParser(key = "userId") String userId) {
                     .content(content)
                     .build();
 
-            model =modelRepository.insert(model);
+            model = modelRepository.insert(model);
 
             String insertedId = model.getId();
 

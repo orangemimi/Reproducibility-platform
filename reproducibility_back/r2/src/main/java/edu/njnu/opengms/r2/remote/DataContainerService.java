@@ -34,14 +34,14 @@ public class DataContainerService {
     @Value("${dataContainer}")
     private String dataContainer;
 
-    public JSONObject addDataItem(File file){
+    public JSONObject addDataItem(File file) {
         FileSystemResource resource = new FileSystemResource(file);      //临时文件
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", resource);
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://" + dataContainer  + ":8083" + "/dataitem/addByStorage" ; ////Step0:根据MD5获取可用的任务服务器
+        String urlStr = "http://" + dataContainer + ":8083" + "/dataitem/addByStorage"; ////Step0:根据MD5获取可用的任务服务器
 
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr,form, JSONObject.class);//虚拟http请求
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, form, JSONObject.class);//虚拟http请求
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
@@ -53,9 +53,9 @@ public class DataContainerService {
         RestTemplate restTemplate = new RestTemplate();
 //        String urlStr = "http://" + dataContainer + ":8082/data?uid=" + id;
         String urlStr = "http://" + dataContainer + ":8083/data/" + id;
-        ResponseEntity<byte []> response = restTemplate.exchange(urlStr, HttpMethod.GET,
+        ResponseEntity<byte[]> response = restTemplate.exchange(urlStr, HttpMethod.GET,
                 null, byte[].class);
-        return  response;
+        return response;
     }
 
     public JSONObject upload(MultiValueMap<String, Object> form) {
@@ -74,7 +74,7 @@ public class DataContainerService {
     }
 
     public String getIpByToken(String token) throws UnsupportedEncodingException {
-        String urlStr = "http://111.229.14.128:8898/state?token="+ URLEncoder.encode(token);
+        String urlStr = "http://111.229.14.128:8898/state?token=" + URLEncoder.encode(token);
 //
 //        HttpHeaders headers = new HttpHeaders();
 //        headers.add("Content-Type","application/json");
@@ -94,17 +94,17 @@ public class DataContainerService {
 
     public Object getDataService(String id, String token, String type) {
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr = "http://111.229.14.128:8898/capability?id=" + id + "&type="+type+"&token="+ token;
+        String urlStr = "http://111.229.14.128:8898/capability?id=" + id + "&type=" + type + "&token=" + token;
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type","application/json");
+        headers.add("Content-Type", "application/json");
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(null, headers);
-        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr,HttpMethod.GET, requestEntity, JSONObject.class);
+        ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(urlStr, HttpMethod.GET, requestEntity, JSONObject.class);
 
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
 
-        JSONObject  result = jsonObjectResponseEntity.getBody().getJSONObject("capability");//获得上传数据的URL
+        JSONObject result = jsonObjectResponseEntity.getBody().getJSONObject("capability");//获得上传数据的URL
         return result;
     }
 
@@ -127,12 +127,12 @@ public class DataContainerService {
         try {
             RestTemplate restTemplate = new RestTemplate();
             //设置RestTemplate编码格式，restemplate底层是默认使用ISO-8859-1编码
-            restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
+            restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
             ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
             String body = result.getBody();
 //            body = new String(body.getBytes("ISO8859-1"), "UTF-8");
             return body;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }
@@ -152,12 +152,12 @@ public class DataContainerService {
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity(param, headers);
         try {
             RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
+            restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
             ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
             String body = result.getBody();
 
             return body;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }

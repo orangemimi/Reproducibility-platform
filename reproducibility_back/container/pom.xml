@@ -32,13 +32,13 @@
             <version>2.1.1</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>it.geosolutions</groupId>-->
-<!--            <artifactId>layerService-manager</artifactId>-->
-<!--            <version>1.7.0</version>            　　-->
-<!--            <scope>system</scope>            　　-->
-<!--            <systemPath>${project.basedir}/libs/geoserver-manager-1.7.0.jar</systemPath>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>it.geosolutions</groupId>-->
+        <!--            <artifactId>layerService-manager</artifactId>-->
+        <!--            <version>1.7.0</version>            　　-->
+        <!--            <scope>system</scope>            　　-->
+        <!--            <systemPath>${project.basedir}/libs/geoserver-manager-1.7.0.jar</systemPath>-->
+        <!--        </dependency>-->
 
 
         <dependency>
@@ -69,8 +69,6 @@
             </plugin>
         </plugins>
     </build>
-
-
 
 
 </project>

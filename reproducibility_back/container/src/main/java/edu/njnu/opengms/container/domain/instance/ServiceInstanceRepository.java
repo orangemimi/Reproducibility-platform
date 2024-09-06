@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
  * @Version 1.0.0
  */
 @Repository
-public interface ServiceInstanceRepository extends MongoRepository<ServiceInstance,String> {
+public interface ServiceInstanceRepository extends MongoRepository<ServiceInstance, String> {
 }

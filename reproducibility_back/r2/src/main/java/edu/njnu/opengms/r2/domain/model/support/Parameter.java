@@ -13,8 +13,8 @@ import lombok.Data;
  * @Version 1.0.0
  */
 @Data
-@JsonTypeInfo (use = JsonTypeInfo.Id.NAME, property = "type",visible =true,defaultImpl = InputParameter.class)
-@JsonSubTypes ({@JsonSubTypes.Type(value = InputParameter.class, name = "input_parameter")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = InputParameter.class)
+@JsonSubTypes({@JsonSubTypes.Type(value = InputParameter.class, name = "input_parameter")
         , @JsonSubTypes.Type(value = RangeParameter.class, name = "range_parameter"),
         @JsonSubTypes.Type(value = SliderParameter.class, name = "slider_parameter"),
         @JsonSubTypes.Type(value = SelectParameter.class, name = "select_parameter"),
@@ -23,11 +23,11 @@ import lombok.Data;
 public class Parameter {
     public String name;
     public String eventId;
-    public Boolean isOptional=false;
+    public Boolean isOptional = false;
     public String type;
     public String description;
     public String tooltip;
     public String value;//参数构成
-//    public String dataId;
+    //    public String dataId;
     public JSONObject datasetItem;
 }

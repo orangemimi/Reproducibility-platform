@@ -8,10 +8,7 @@ import edu.njnu.opengms.r2.domain.folder.FolderRepository;
 import edu.njnu.opengms.r2.domain.folder.FolderService;
 import edu.njnu.opengms.r2.domain.folder.dto.AddFolderDTO;
 import edu.njnu.opengms.r2.domain.folder.dto.UpdateFolderChildrenDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.UpdateForkedScenarioDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
-import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceResourceDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.*;
 import edu.njnu.opengms.r2.utils.FunctionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,23 +121,27 @@ public class ScenarioService {
 //    }
 
     public JSONObject getScenarioByInitialScenarioId(String scenarioId) {
-        Scenario scenario  = scenarioRepository.findByInitialScenarioId(scenarioId);
-        if(scenario==null){
+        Scenario scenario = scenarioRepository.findByInitialScenarioId(scenarioId);
+        if (scenario == null) {
             return null;
-        } else{
-          return functionUtils.getScenario(scenario);
+        } else {
+            return functionUtils.getScenario(scenario);
         }
-
     }
 
     public List<JSONObject> getScenariosByProjectId(String projectId) {
-        List<Scenario> scenarios = scenarioRepository.findAllByProjectId(projectId);
-        List<JSONObject> jsonObjectList = new ArrayList<>();
-        for(Scenario s : scenarios){
-            jsonObjectList.add(getScenario(s.getId()));
+        try{
+            List<Scenario> scenarios = scenarioRepository.findAllByProjectId(projectId);
+            List<JSONObject> jsonObjectList = new ArrayList<>();
+            for (Scenario s : scenarios) {
+                jsonObjectList.add(getScenario(s.getId()));
 
+            }
+            return jsonObjectList;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
-        return jsonObjectList;
+        return null;
     }
 
     public Scenario updateScenario(String id, UpdateScenarioDTO update) {
@@ -148,21 +149,22 @@ public class ScenarioService {
         update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
+
     public Scenario updateScenarioForked(String id, UpdateForkedScenarioDTO updateForkedScenarioDTO) {
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
         updateForkedScenarioDTO.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
 
-    public Scenario saveScenario(AddScenarioDTO add, String userId,String initialScenatioId) {
+    public Scenario saveScenario(AddScenarioDTO add, String userId, String initialScenatioId) {
         Scenario scenario = new Scenario();
         add.convertTo(scenario);
         scenario.setCreator(userId);
-        if(!initialScenatioId.equals("initial")){
+        if (!initialScenatioId.equals("initial")) {
             scenario.setInitialScenarioId(initialScenatioId);
         }
 
-        Scenario newScenario =  scenarioRepository.insert(scenario);
+        Scenario newScenario = scenarioRepository.insert(scenario);
 
         Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
 
@@ -170,23 +172,23 @@ public class ScenarioService {
         AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
                 .level(1)
                 .tagId(newScenario.getId())
-                .name(newScenario.getName()+" --folder")
+                .name(newScenario.getName() + " --folder")
                 .parent(parentFolder.getId())
                 .build();
 
-        Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
+        Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
 
 //        Folder childFolder = folderRepository.insert(folder);
         List<String> parentFolderChildren = new ArrayList<String>();
         String id = newScenarioFolder.getId();
-        parentFolderChildren.add(id) ;
+        parentFolderChildren.add(id);
 
         UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
                 .children(parentFolderChildren)
                 .build();
 
 
-        folderService.updateFolderChildren(parentFolder.getId(),updateProjectFolderChildrenDTO,userId);
+        folderService.updateFolderChildren(parentFolder.getId(), updateProjectFolderChildrenDTO, userId);
 
         //todo
 
@@ -223,9 +225,9 @@ public class ScenarioService {
 //        return scenarioRepository.save(scenario);
 //    }
 
-    public Scenario updateresourceCollection(String id,  String userId, JSONObject update) {
+    public Scenario updateresourceCollection(String id, String userId, JSONObject update) {
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
-        ResourceCollection resourceCollection =  ResourceCollection.builder()
+        ResourceCollection resourceCollection = ResourceCollection.builder()
                 .modelList((List<String>) update.get("modelList"))
                 .dataList((List<String>) update.get("dataList")).build();
         scenario.setResourceCollection(resourceCollection);
@@ -234,6 +236,12 @@ public class ScenarioService {
     }
 
     public Scenario updateScenarioInstance(String id, UpdateScenarioInstanceResourceDTO update) {
+        Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
+        update.updateTo(scenario);
+        return scenarioRepository.save(scenario);
+    }
+
+    public Scenario updateScenarioContainerId(String id, UpdateScenarioContainerIdDTO update) {
         Scenario scenario = scenarioRepository.findById(id).orElseThrow(MyException::noObject);
         update.updateTo(scenario);
         return scenarioRepository.save(scenario);

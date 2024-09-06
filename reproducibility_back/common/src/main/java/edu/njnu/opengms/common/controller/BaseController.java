@@ -19,22 +19,22 @@ import java.io.IOException;
  * @Date 2018/9/8
  * @Version 1.0.0
  */
-public interface BaseController<AD,FD,UD> {
-    @RequestMapping (value = "", method = RequestMethod.POST)
+public interface BaseController<AD, FD, UD> {
+    @RequestMapping(value = "", method = RequestMethod.POST)
     JsonResult add(@RequestBody @Validated AD a);
 
-    @RequestMapping (value = "/{id}", method = RequestMethod.DELETE)
-    JsonResult delete(@PathVariable ("id") String id);
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    JsonResult delete(@PathVariable("id") String id);
 
-    @RequestMapping (value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     JsonResult list(FD findDTO);
 
-    @RequestMapping (value = "/count", method = RequestMethod.GET)
+    @RequestMapping(value = "/count", method = RequestMethod.GET)
     JsonResult count();
 
-    @RequestMapping (value = "/{id}", method = RequestMethod.GET)
-    JsonResult get(@PathVariable ("id") String id);
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    JsonResult get(@PathVariable("id") String id);
 
-    @RequestMapping (value = "/{id}", method = RequestMethod.PUT)
-    JsonResult update(@PathVariable ("id") String id, @RequestBody UD updateDTO) throws ParserConfigurationException, SAXException, IOException;
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    JsonResult update(@PathVariable("id") String id, @RequestBody UD updateDTO) throws ParserConfigurationException, SAXException, IOException;
 }

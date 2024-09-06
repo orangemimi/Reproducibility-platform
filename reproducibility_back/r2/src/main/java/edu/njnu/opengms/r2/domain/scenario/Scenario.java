@@ -19,10 +19,12 @@ public class Scenario extends BaseEntity {
     String name;
     String projectId;
     List<String> instances;//绑定的instanceId；
-    String type;//notebook or integrateTask or sequentModels
+    String type;//notebook or integrateTask or sequentModels or dockerScenario
     ResourceCollection resourceCollection;
     String creator;
     String initialScenarioId;// if this scenario is created by others
+    String env;
+    String containerId;
 //    List<ForkedScenarios> forkedScenarios;
 
 }

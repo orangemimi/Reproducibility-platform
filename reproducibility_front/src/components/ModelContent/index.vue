@@ -1,9 +1,17 @@
 <template>
-  <el-container style="width: 100%; height: 100%;">
+  <el-container style="width: 100%; height: 100%">
     <div v-if="codingOlShow" class="main">
-      <coding-OL :scenarioId="initialScenarioId" :content="currentModel.content"></coding-OL>
+      <coding-OL
+        :scenarioId="initialScenarioId"
+        :content="currentModel.content"
+      ></coding-OL>
     </div>
-    <div v-else-if="modelItem" class="main">
+    <python38
+      v-else-if="currentModel.type == 'docker'"
+      :initialScenarioId="initialScenarioId"
+      :invokingType="invokingType"
+    ></python38>
+    <div v-else-if="modelItem && currentModel.type" class="main">
       <div v-show="invokingType == 'construction'">
         <el-row class="title">
           <el-col>{{ modelItem.name }}</el-col>
@@ -293,6 +301,7 @@ import ResourceTable from "@/views/builder/construction/Toolbars/DataTable.vue";
 import StateDescription from "_com/Cards/StateDescription.vue";
 import SelectTree from "_com/SelectTree/tree.vue";
 import codingOL from "_com/codingOL/codingOL.vue";
+import python38 from "@/views/builder/construction/envyConfig/envs/python38.vue";
 import { errorNotification, successNotification } from "@/utils/notification";
 import {
   saveData,
@@ -317,6 +326,7 @@ export default {
     StateDescription,
     SelectTree,
     codingOL,
+    python38,
   },
   props: {
     currentModel: {

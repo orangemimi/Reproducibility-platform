@@ -34,9 +34,7 @@
           size="default"
           >Suit</el-button
         >
-        <el-button @click="savePic" link size="default"
-          >save as pic</el-button
-        >
+        <el-button @click="savePic" link size="default">save as pic</el-button>
       </div>
 
       <perfect-scrollbar style="height: 600px">
@@ -90,12 +88,20 @@ export default {
   props: ["expectedInstances"],
   watch: {
     expectedInstances() {
+      // 清空用来做工作流的文件，否则会重复生成越来越多
+      this.mxContent =
+        '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>';
+      this.modelListInGraph = [];
+      this.dataItemList = [];
       this.graph.removeCells(
         this.graph.getChildVertices(this.graph.getDefaultParent())
       );
+
       this.initInstance();
+
       // this.mxContent += `</root></mxGraphModel>`;
       this.graph.importGraph(this.mxContent);
+
       this.graphLayout(true, "hierarchicalLayout");
       // this.getDocument();
     },
@@ -255,7 +261,7 @@ export default {
     //--------------初始化 bar的modelItem的内容--由 AllModels组件返回
     initInstance() {
       let getExpectedInstances = this.expectedInstances;
-      if (getExpectedInstances == undefined) {
+      if (getExpectedInstances == undefined || getExpectedInstances == []) {
         return;
       }
       let x = 1;

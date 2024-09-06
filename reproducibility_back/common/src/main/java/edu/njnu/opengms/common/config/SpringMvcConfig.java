@@ -56,7 +56,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 
     /**
      * @param resolvers
-     *
      * @Description 添加参数resolvers
      */
     @Override

@@ -15,7 +15,7 @@ import lombok.Data;
 public class ModelEvent {
     public String eventId;//自动生成
     public String name;
-    public Boolean isOptional=false;
+    public Boolean isOptional = false;
     public String description;
     public String dataId;
     public String value;

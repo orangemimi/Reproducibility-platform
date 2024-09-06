@@ -56,132 +56,130 @@ public class ProjectService {
     FolderRepository folderRepository;
 
     public Project get(String projectId) {
-        return  projectRepository.findById(projectId).orElse(null);
+        return projectRepository.findById(projectId).orElse(null);
     }
 
-    public JSONObject getWithCreator(String projectId)  {
-        Project project= get(projectId);
+    public JSONObject getWithCreator(String projectId) {
+        Project project = get(projectId);
 
         JSONObject object = new JSONObject();
         JSONObject user = userService.getUserInfoById(project.getCreatorId());
-        object.put("creatorName",user.get("name"));
+        object.put("creatorName", user.get("name"));
 
         List<JSONObject> jsonObjectList = new ArrayList<>();
-        for(String i : project.getScenarioList()){
+        for (String i : project.getScenarioList()) {
             JSONObject scenario = scenarioService.getScenario(i);
             jsonObjectList.add(scenario);
         }
 
 
-        object.put("name",project.getName());
-        object.put("description",project.getDescription());
-        object.put("privacy",project.getPrivacy());
-        object.put("creatorId",project.getCreatorId());
-        object.put("scenarioList",project.getScenarioList());
+        object.put("name", project.getName());
+        object.put("description", project.getDescription());
+        object.put("privacy", project.getPrivacy());
+        object.put("creatorId", project.getCreatorId());
+        object.put("scenarioList", project.getScenarioList());
         object.put("scenarioObjectList", jsonObjectList);
-        object.put("level",project.getLevel());
-        object.put("starredCount",project.getStarredCount());
-        object.put("watchedCount",project.getWatchedCount());
-        object.put("picture",project.getPicture());
-        object.put("tags",project.getTags());
-        object.put("createTime",project.getCreateTime());
-        object.put("updateTime",project.getUpdateTime());
+        object.put("level", project.getLevel());
+        object.put("starredCount", project.getStarredCount());
+        object.put("watchedCount", project.getWatchedCount());
+        object.put("picture", project.getPicture());
+        object.put("tags", project.getTags());
+        object.put("createTime", project.getCreateTime());
+        object.put("updateTime", project.getUpdateTime());
 
 
         return object;
     }
 
 
-
-
-
     public Project create(String userId, AddProjectDTO add) {
         Project project = new Project();
         add.setCreatorId(userId);
         add.convertTo(project);
+        try{
+            Project proj = projectRepository.insert(project);
 
-        Project proj = projectRepository.insert(project);
+            //create scenario
+            Scenario exampleScenario = new Scenario();
+            exampleScenario.setName("Example scenario");
+            exampleScenario.setType("sequentModels");
+            exampleScenario.setProjectId(proj.getId());
+            exampleScenario.setCreator(userId);
+            Scenario newScenario = scenarioRepository.insert(exampleScenario);
 
-        //create scenario
-        Scenario exampleScenario = new Scenario();
-        exampleScenario.setName("Example scenario");
-        exampleScenario.setType("sequentModels");
-        exampleScenario.setProjectId(proj.getId());
-        exampleScenario.setCreator(userId);
-        Scenario newScenario = scenarioRepository.insert(exampleScenario);
+            List<String> temp = new ArrayList<>();
+            temp.add(newScenario.getId());
 
-        List<String> temp = new ArrayList<>();
-        temp.add(newScenario.getId());
+            proj.setScenarioList(temp);
+            Project result = projectRepository.save(proj);
 
+            //create project folder
+            Folder mainFolder = folderRepository.findByCreatorIdAndName(userId, "Main");
+            AddFolderDTO addFolderDTO = AddFolderDTO.builder()
+                    .level(1)
+                    .tagId(proj.getId())
+                    .name(proj.getName() + " --folder")
+                    .parent(mainFolder.getId())
+                    .build();
 
-        proj.setScenarioList(temp);
-        Project result= projectRepository.save(proj);
-
-        //create project folder
-        Folder mainFolder = folderRepository.findByCreatorIdAndName(userId, "Main");
-        AddFolderDTO addFolderDTO = AddFolderDTO.builder()
-                .level(1)
-                .tagId(proj.getId())
-                .name(proj.getName()+" --folder")
-                .parent(mainFolder.getId())
-                .build();
-
-        Folder newProjectFolder =  folderService.create(addFolderDTO,userId);
+            Folder newProjectFolder = folderService.create(addFolderDTO, userId);
 //        Folder childFolder = folderRepository.insert(folder);
-        List<String> mainFolderChildren = new ArrayList<String>();
-        if(mainFolder.getChildren()==(null)){
-            String id = newProjectFolder.getId();
-            mainFolderChildren.add(id) ;
-        } else{
-            mainFolderChildren = mainFolder.getChildren();
-            mainFolderChildren.add(newProjectFolder.getId());
-        }
+            List<String> mainFolderChildren = new ArrayList<String>();
+            if (mainFolder.getChildren() == (null)) {
+                String id = newProjectFolder.getId();
+                mainFolderChildren.add(id);
+            } else {
+                mainFolderChildren = mainFolder.getChildren();
+                mainFolderChildren.add(newProjectFolder.getId());
+            }
 
-        UpdateFolderChildrenDTO updateMainFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
-                .children(mainFolderChildren)
-                .build();
-       folderService.updateFolderChildren(mainFolder.getId(),updateMainFolderChildrenDTO,userId);
+            UpdateFolderChildrenDTO updateMainFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+                    .children(mainFolderChildren)
+                    .build();
+            folderService.updateFolderChildren(mainFolder.getId(), updateMainFolderChildrenDTO, userId);
 
 
-        //create folderScenario
-        AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
-                .level(2)
-                .tagId(newScenario.getId())
-                .name("Example scenario --folder")
-                .parent(newProjectFolder.getId())
-                .build();
+            //create folderScenario
+            AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
+                    .level(2)
+                    .tagId(newScenario.getId())
+                    .name("Example scenario --folder")
+                    .parent(newProjectFolder.getId())
+                    .build();
 
-        Folder newScenarioFolder =  folderService.create(addScenarioFolderDTO,userId);
+            Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
 //        Folder childFolder = folderRepository.insert(folder);
-        List<String> parentFolderChildren = new ArrayList<String>();
-        String id = newScenarioFolder.getId();
-        parentFolderChildren.add(id) ;
+            List<String> parentFolderChildren = new ArrayList<String>();
+            String id = newScenarioFolder.getId();
+            parentFolderChildren.add(id);
 
-        UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
-                .children(parentFolderChildren)
-                .build();
+            UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+                    .children(parentFolderChildren)
+                    .build();
 
 
-        folderService.updateFolderChildren(newProjectFolder.getId(),updateProjectFolderChildrenDTO,userId);
+            folderService.updateFolderChildren(newProjectFolder.getId(), updateProjectFolderChildrenDTO, userId);
 
-        User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
-        if (user.getCreatedProjects()==null){
-            List<String> newProjects =new ArrayList<>();
-            newProjects.add(result.getId());
-            user.setCreatedProjects(newProjects);
+            User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
+            if (user.getCreatedProjects() == null) {
+                List<String> newProjects = new ArrayList<>();
+                newProjects.add(result.getId());
+                user.setCreatedProjects(newProjects);
+            } else {
+                user.getCreatedProjects().add(result.getId());
+            }
+
+            userService.update(user);
+
+            return result;
+        }catch(Exception e ){
+            System.out.println(e.getMessage());
+            return null;
         }
-        else {
-            user.getCreatedProjects().add(result.getId());
-        }
-
-        userService.update(user);
-
-        return result;
-
     }
 
     public Object folk(JSONObject jsonObject, String userId, String userName, String projectId) {
-        Project project =  projectRepository.findById(projectId).orElseThrow(MyException::noObject);
+        Project project = projectRepository.findById(projectId).orElseThrow(MyException::noObject);
         AddProjectDTO add = new AddProjectDTO();
         add.setCreatorId(userId);
         add.setName(project.name);
@@ -191,7 +189,7 @@ public class ProjectService {
         add.setTags(project.tags);
         add.setScenarioList(project.scenarioList);
 
-        Project project2 =new Project();
+        Project project2 = new Project();
         add.convertTo(project2);
 
         return projectRepository.save(project2);
@@ -204,13 +202,13 @@ public class ProjectService {
         List<String> createdProjects = (List<String>) userProjectInfo.get("createdProjects");
         List<String> joinedProjects = (List<String>) userProjectInfo.get("joinedProjects");
         List<Project> projectList = new ArrayList<>();
-        if(createdProjects!=null) {
+        if (createdProjects != null) {
             for (String projectId : createdProjects) {
                 projectList.add(get(projectId));
             }
         }
-        if(joinedProjects!=null){
-            for(String projectId : joinedProjects) {
+        if (joinedProjects != null) {
+            for (String projectId : joinedProjects) {
                 projectList.add(get(projectId));
             }
         }
@@ -234,7 +232,7 @@ public class ProjectService {
         JSONObject userProjectInfo = userService.getUserProjectInfo(userId);
         List<String> createdProjects = (List<String>) userProjectInfo.get("createdProjects");
         JSONArray jsonArray = new JSONArray();
-        for(String s : createdProjects) {
+        for (String s : createdProjects) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("projectId", s);
             jsonObject.put("name", projectRepository.findById(s).orElseThrow(MyException::noObject).getName());

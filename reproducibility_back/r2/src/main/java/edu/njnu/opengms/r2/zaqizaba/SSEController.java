@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version 1.0.0
  */
 
-@RequestMapping ("/sse")
+@RequestMapping("/sse")
 @RestController
 public class SSEController {
-    @RequestMapping (value = "getdata", produces = "text/event-stream;charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value = "getdata", produces = "text/event-stream;charset=UTF-8", method = RequestMethod.GET)
     public JsonResult push() {
         return ResultUtils.success(Math.random());
     }

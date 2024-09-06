@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
  * @Version 1.0.0
  */
 @Component
-@PropertySource (value = "classpath:application.properties")
-@ConfigurationProperties (prefix = "hello")
+@PropertySource(value = "classpath:application.properties")
+@ConfigurationProperties(prefix = "hello")
 @Data
 public class ClassFromProperties {
     String name;

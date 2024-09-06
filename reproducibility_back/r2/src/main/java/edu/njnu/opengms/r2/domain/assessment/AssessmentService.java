@@ -60,7 +60,6 @@ public class AssessmentService {
     }
 
 
-
     public Object get(String assessmentId) {
         Assessment assessment = assessmentRepository.findById(assessmentId).orElseThrow(MyException::noObject);
         return getAssessmentObject(assessment);
@@ -71,28 +70,29 @@ public class AssessmentService {
     }
 
     public Object autoAssessment(String reproducedScenarioId) {
-      JSONObject reproducedScenario= scenarioService.getScenario(reproducedScenarioId);
-      JSONObject initialScenario= reproducedScenario.getJSONObject("initialScenarioObject");
-      List<JSONObject> initialInstanceObjectList = (List<JSONObject>) initialScenario.get("instanceObjectList");
-      List<JSONObject> reproducedInstanceObjectList = (List<JSONObject>) reproducedScenario.get("instanceObjectList");
-      getFlow(initialInstanceObjectList);
+        JSONObject reproducedScenario = scenarioService.getScenario(reproducedScenarioId);
+        JSONObject initialScenario = reproducedScenario.getJSONObject("initialScenarioObject");
+        List<JSONObject> initialInstanceObjectList = (List<JSONObject>) initialScenario.get("instanceObjectList");
+        List<JSONObject> reproducedInstanceObjectList = (List<JSONObject>) reproducedScenario.get("instanceObjectList");
+        getFlow(initialInstanceObjectList);
 
-      return null;
+        return null;
     }
-    public Object getFlow(List<JSONObject> instanceObjectList){
 
-        for (JSONObject instance : instanceObjectList){
+    public Object getFlow(List<JSONObject> instanceObjectList) {
+
+        for (JSONObject instance : instanceObjectList) {
             List<JSONObject> stateList = (List<JSONObject>) instance.get("behavior");
-            for (JSONObject state:  stateList){
+            for (JSONObject state : stateList) {
                 List<JSONObject> inputEvents = (List<JSONObject>) state.get("inputs");
-                Boolean existIntermediate = false ;
-                for(JSONObject input:inputEvents){
-                    Boolean isIntermediate =  input.getJSONObject("datasetItem").getBool("isIntermediate");
-                    if(isIntermediate){
+                Boolean existIntermediate = false;
+                for (JSONObject input : inputEvents) {
+                    Boolean isIntermediate = input.getJSONObject("datasetItem").getBool("isIntermediate");
+                    if (isIntermediate) {
                         existIntermediate = true;
                     }
                 }
-                if(!existIntermediate){
+                if (!existIntermediate) {
                     //这个model是leveL1 的 操作
                 }
 
@@ -103,44 +103,42 @@ public class AssessmentService {
             }
 
 
-
         }
         return null;
     }
 
-    JSONObject getAssessmentObject(Assessment assessment){
+    JSONObject getAssessmentObject(Assessment assessment) {
         JSONObject obj = new JSONObject();
         JSONObject newAssessment = new JSONObject();
-        String initialResourceId=  assessment.getInitialResourceId();
+        String initialResourceId = assessment.getInitialResourceId();
         String reproducedResourceId = assessment.getReproducedResourceId();
 
-        if(assessment.getObject().equals("model")){
-            Optional<Model> initialResourceObject=  modelRepository.findById(initialResourceId);
-            Optional<Model> reproducedResourceObject=  modelRepository.findById(reproducedResourceId);
+        if (assessment.getObject().equals("model")) {
+            Optional<Model> initialResourceObject = modelRepository.findById(initialResourceId);
+            Optional<Model> reproducedResourceObject = modelRepository.findById(reproducedResourceId);
             newAssessment.put("initialResourceObject", initialResourceObject);
             newAssessment.put("reproducedResourceObject", reproducedResourceObject);
         }
-        if(assessment.getObject().equals("data")){
-            Optional<DataItem> initialResourceObject=  dataItemRepository.findById(initialResourceId);
-            Optional<DataItem> reproducedResourceObject=  dataItemRepository.findById(reproducedResourceId);
+        if (assessment.getObject().equals("data")) {
+            Optional<DataItem> initialResourceObject = dataItemRepository.findById(initialResourceId);
+            Optional<DataItem> reproducedResourceObject = dataItemRepository.findById(reproducedResourceId);
             newAssessment.put("initialResourceObject", initialResourceObject);
             newAssessment.put("reproducedResourceObject", reproducedResourceObject);
         }
         Optional<AssessmentMethod> assessmentMethod = assessmentMethodRepository.findById(assessment.getComparasionMethodId());
         newAssessment.put("comparasionMethodObject", assessmentMethod);
-        newAssessment.put("object",assessment.object);
-        newAssessment.put("creatorId",assessment.creatorId);
-        newAssessment.put("projectId",assessment.projectId);
-        newAssessment.put("id",assessment.id);
-        newAssessment.put("initialScenarioId",assessment.initialScenarioId);
-        newAssessment.put("reproducedScenarioId",assessment.reproducedScenarioId);
-        newAssessment.put("purpose",assessment.purpose);
+        newAssessment.put("object", assessment.object);
+        newAssessment.put("creatorId", assessment.creatorId);
+        newAssessment.put("projectId", assessment.projectId);
+        newAssessment.put("id", assessment.id);
+        newAssessment.put("initialScenarioId", assessment.initialScenarioId);
+        newAssessment.put("reproducedScenarioId", assessment.reproducedScenarioId);
+        newAssessment.put("purpose", assessment.purpose);
 
-        return  newAssessment;
+        return newAssessment;
 
 
     }
-
 
 
 }

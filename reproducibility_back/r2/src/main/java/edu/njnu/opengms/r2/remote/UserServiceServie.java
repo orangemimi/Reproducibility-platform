@@ -41,7 +41,7 @@ public class UserServiceServie {
 //            ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.postForEntity(urlStr, add, JSONObject.class);
             ResponseEntity<JSONObject> result = restTemplate.exchange(urlStr, HttpMethod.POST, httpEntity, JSONObject.class);
             return result.getBody();
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             System.out.println("用户数据库注册时出现错误");
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
@@ -57,12 +57,12 @@ public class UserServiceServie {
         paramMap.add("password", password);
         paramMap.add("scope", "all");
         paramMap.add("grant_type", "password");
-        String authUri = "http://"+ userServiceIp + "/userServer/oauth/token";
+        String authUri = "http://" + userServiceIp + "/userServer/oauth/token";
         RestTemplate restTemplate = new RestTemplate();
         try {
             JSONObject result = restTemplate.postForObject(authUri, paramMap, JSONObject.class);
             return result;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             System.out.println("获取token时出错了");
             return null;
@@ -84,7 +84,7 @@ public class UserServiceServie {
         try {
             ResponseEntity<JSONObject> result = restTemplate.exchange(urlStr, HttpMethod.GET, httpEntity, JSONObject.class);
             return result.getBody();
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("用户服务器登录时出错");
             System.out.println(e);
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
@@ -100,7 +100,7 @@ public class UserServiceServie {
         try {
             JSONObject result = restTemplate.getForObject(getCodeUrl, JSONObject.class);
             return result;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("获取邮箱验证码时出错");
             System.out.println(e);
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
@@ -110,12 +110,12 @@ public class UserServiceServie {
     //用邮箱验证码更新密码
     public JSONObject changePWDbyEmail(String email, String code, String newPassWord) {
 
-        String url = "http://" + userServiceIp + "/userServer/user/resetPwd/" + email +"/" + code + "/" + newPassWord;
+        String url = "http://" + userServiceIp + "/userServer/user/resetPwd/" + email + "/" + code + "/" + newPassWord;
         RestTemplate restTemplate = new RestTemplate();
         try {
             JSONObject result = restTemplate.getForObject(url, JSONObject.class);
             return result;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("通过邮箱验证码修改密码时出错");
             System.out.println(e);
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
@@ -139,13 +139,12 @@ public class UserServiceServie {
         try {
             ResponseEntity<JSONObject> result = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class);
             return result.getBody();
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("旧密码更新新密码时出错");
             System.out.println(e);
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }
-
 
 
     //获取用户信息
@@ -160,7 +159,7 @@ public class UserServiceServie {
         try {
             ResponseEntity<JSONObject> result = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class);
             return result.getBody();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }

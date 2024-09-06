@@ -184,7 +184,6 @@ export default {
       this.initialScenario = await getScenarioById(
         this.project.scenarioList[0]
       );
-
       this.reproducedScenario = await getScenariosByScenarioId(
         this.initialScenario.id
       );

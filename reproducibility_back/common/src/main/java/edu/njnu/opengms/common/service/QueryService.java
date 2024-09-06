@@ -14,7 +14,6 @@ public interface QueryService<E, VO, FD> {
      * 获取所有实体（分页）
      *
      * @param findDTO 过滤条件
-     *
      * @return
      */
     Page<VO> list(FD findDTO);
@@ -22,8 +21,7 @@ public interface QueryService<E, VO, FD> {
     /**
      * 根据id 查询实体
      *
-     * @param  id 实体id
-     *
+     * @param id 实体id
      * @return
      */
     E get(String id);

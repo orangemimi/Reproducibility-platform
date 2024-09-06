@@ -37,7 +37,7 @@ public class AddModelServiceDTO implements ToDomainConverter<ModelService> {
 
     //service
     ModelBehavior behavior;
-//    List<State> behavior;
+    //    List<State> behavior;
     String md5;
     String serviceId;
     String sponsor;

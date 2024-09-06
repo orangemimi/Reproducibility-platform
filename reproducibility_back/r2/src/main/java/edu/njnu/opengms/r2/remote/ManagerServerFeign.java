@@ -1,4 +1,4 @@
- package edu.njnu.opengms.r2.remote;
+package edu.njnu.opengms.r2.remote;
 
 import cn.hutool.json.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
- /**
+/**
  * @Author Zhiyi
  * @Date 2020/6/2  11:31
  * @Version 1.0.0
@@ -20,16 +20,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Primary
 public interface ManagerServerFeign {
 
-    @RequestMapping(value = "/GeoModeling/taskNode/getServiceTask/{pid}",method = RequestMethod.GET)
+    @RequestMapping(value = "/GeoModeling/taskNode/getServiceTask/{pid}", method = RequestMethod.GET)
     JSONObject getServiceTask(@PathVariable String pid);
 
-    @RequestMapping(value = "/GeoModeling/computableModel/createTask",method = RequestMethod.POST)
+    @RequestMapping(value = "/GeoModeling/computableModel/createTask", method = RequestMethod.POST)
     JSONObject createTask(@RequestBody JSONObject createTaskJson);
 
-    @RequestMapping(value = "/GeoModeling/computableModel/invoke",method = RequestMethod.POST)
+    @RequestMapping(value = "/GeoModeling/computableModel/invoke", method = RequestMethod.POST)
     JSONObject invoke(@RequestBody JSONObject invokeJson);
 
-    @RequestMapping(value = "/GeoModeling/computableModel/refreshTaskRecord",method = RequestMethod.POST)
+    @RequestMapping(value = "/GeoModeling/computableModel/refreshTaskRecord", method = RequestMethod.POST)
     JSONObject refresh(@RequestBody JSONObject refreshJson);
 
 //    @RequestMapping(value = "/GeoModeling/runTask",method = RequestMethod.POST)

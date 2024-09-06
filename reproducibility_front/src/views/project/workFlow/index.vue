@@ -13,7 +13,7 @@
         :icon="ElIconConnection"
       ></el-button>
     </div>
-    <el-row > 
+    <el-row>
       <el-col :span="22" :offset="1">
         <el-row>
           <!-- <el-col :span="5">
@@ -66,7 +66,11 @@
                             prop="description"
                             label="description"
                           ></el-table-column>
-                          <el-table-column fixed="right" label="operation" width="200">
+                          <el-table-column
+                            fixed="right"
+                            label="operation"
+                            width="200"
+                          >
                             <template v-slot="scope">
                               <el-button
                                 @click.prevent="download(scope.row)"
@@ -101,7 +105,11 @@
                             prop="modelDescription"
                             label="Description"
                           ></el-table-column>
-                          <el-table-column fixed="right" label="operation" width="200">
+                          <el-table-column
+                            fixed="right"
+                            label="operation"
+                            width="200"
+                          >
                             <template v-slot="scope">
                               <el-button
                                 @click.prevent="view(scope.row, 'model')"
@@ -154,7 +162,7 @@
               <el-card class="container">
                 <h1>Simulation Dataflow</h1>
                 <mxgraph
-                  style="width: 100%;"
+                  style="width: 100%"
                   id="fullScreenComponent"
                   :expectedInstances="instanceList"
                 ></mxgraph>
@@ -209,11 +217,11 @@
 import {
   Connection as ElIconConnection,
   Download as ElIconDownload,
-} from '@element-plus/icons-vue'
+} from "@element-plus/icons-vue";
 // import workflow from "./components/workflow";
-import mxgraph from './components/MxGraph.vue'
-import { post } from '@/axios'
-import InstanceCard from '_com/common/InstanceCard.vue'
+import mxgraph from "./components/MxGraph.vue";
+import { post } from "@/axios";
+import InstanceCard from "_com/common/InstanceCard.vue";
 // import config from "@/config";
 import {
   getProjectById,
@@ -221,14 +229,14 @@ import {
   getInstancesByIds,
   getUserInfoByUserId,
   getModelById,
-} from '@/api/request'
+} from "@/api/request";
 export default {
   data() {
     return {
       scenario: [],
       project: [],
       userInfo: [],
-      creator: '',
+      creator: "",
       ExpectedInstances: [],
       instanceTest: [],
       id: this.$route.params.id,
@@ -253,22 +261,22 @@ export default {
         },
         evaluation: [],
       },
-      activeNamesLeft: ['1', '2'],
-      activeNamesRight: ['1', '2'],
-      activeResource: 'data',
-      activeContext: 'theme',
-      activeExpected: 'instance',
+      activeNamesLeft: ["1", "2"],
+      activeNamesRight: ["1", "2"],
+      activeResource: "data",
+      activeContext: "theme",
+      activeExpected: "instance",
       fullscreenFlag: false,
-      url: '',
+      url: "",
       ElIconConnection,
       ElIconDownload,
-    }
+    };
   },
   computed: {
     instanceList() {
-      console.log(this.ExpectedInstances, 'originData')
+      console.log(this.ExpectedInstances, "originData");
       return this.ExpectedInstances.map((item) => {
-        let [name, createTime] = item.name.split('||')
+        let [name, createTime] = item.name.split("||");
         let {
           id,
           index,
@@ -277,14 +285,14 @@ export default {
           status,
           modelId,
           modelDescription,
-        } = item
+        } = item;
         let stateEnum =
-          status === '2' ? 'success' : status === '-1' ? 'failed' : 'running'
-        let service = {}
-        service.behavior = item.behavior[0]
-        service.name = name
-        let instanceEnum = 'MODEL'
-        let creator = this.creator
+          status === "2" ? "success" : status === "-1" ? "failed" : "running";
+        let service = {};
+        service.behavior = item.behavior[0];
+        service.name = name;
+        let instanceEnum = "MODEL";
+        let creator = this.creator;
         return {
           createTime,
           creator,
@@ -298,11 +306,11 @@ export default {
           updateTime,
           modelId,
           modelDescription,
-        }
-      })
+        };
+      });
     },
     instanceCard() {
-      let arr = []
+      let arr = [];
       this.instanceList.forEach(
         ({
           id,
@@ -322,25 +330,25 @@ export default {
             creator,
             serviceId: service.id,
             isReproduced,
-          }
-          if (instanceEnum === 'MODEL') {
-            inner.type = 'model'
+          };
+          if (instanceEnum === "MODEL") {
+            inner.type = "model";
           } else {
-            inner.type = 'process'
+            inner.type = "process";
           }
           // 检查新JSON对象的name属性是否与已有JSON对象相等
           let duplicate = arr.some(function (item) {
-            return item.name === inner.name
-          })
+            return item.name === inner.name;
+          });
           if (!duplicate) {
-            arr.push(inner)
+            arr.push(inner);
           }
         }
-      )
-      return arr
+      );
+      return arr;
     },
     evaluationCard() {
-      let arr = []
+      let arr = [];
       this.g2s.evaluation.forEach(
         ({ id, name, description, createTime, creator }) => {
           let inner = {
@@ -349,29 +357,29 @@ export default {
             description,
             createTime,
             creator,
-          }
-          inner.type = 'evaluation'
-          arr.push(inner)
+          };
+          inner.type = "evaluation";
+          arr.push(inner);
         }
-      )
-      return arr
+      );
+      return arr;
     },
     dataTable() {
       let arr = this.ExpectedInstances.map((item) => {
-        let behavior = item.behavior[0]
-        let { inputs, outputs, parameters } = behavior
-        return [...inputs, ...outputs, ...parameters]
-      })
-      let newArr = []
+        let behavior = item.behavior[0];
+        let { inputs, outputs, parameters } = behavior;
+        return [...inputs, ...outputs, ...parameters];
+      });
+      let newArr = [];
       arr.forEach((item) => {
-        newArr = [...newArr, ...item]
-      })
-      return newArr
+        newArr = [...newArr, ...item];
+      });
+      return newArr;
     },
     dataProcessTable() {
-      let arr = []
+      let arr = [];
       if (this.g2s.resourceCollect.dataProcessServices == null) {
-        return
+        return;
       }
       this.g2s.resourceCollect.dataProcessServices.forEach(
         ({ id, name, description, createTime }) => {
@@ -381,59 +389,59 @@ export default {
             description,
             createTime,
             // type:"Simulation calculation"，
-          }
-          arr.push(inner)
+          };
+          arr.push(inner);
         }
-      )
-      return arr
+      );
+      return arr;
     },
     modelTable() {
       return this.ExpectedInstances.map((item) => {
-        let { modelDescription, modelId, name } = item
+        let { modelDescription, modelId, name } = item;
 
-        let [modelName, invokeTime] = name.split('||')
+        let [modelName, invokeTime] = name.split("||");
         return {
           modelId,
           modelDescription,
           modelName,
           invokeTime,
-        }
-      })
+        };
+      });
     },
   },
   methods: {
     // 这个方法叫什么不重要，只需要知道所有的数据，这个页面和子页面你需要的所有原始数据都在这里，就够了
     async getExpectedInstances() {
       // 先拿到对应的工程 所包含的场景id
-      this.project = await getProjectById(this.id)
-  
-      this.userInfo = await getUserInfoByUserId(this.project.creatorId)
-      this.creator = this.userInfo.name
+      this.project = await getProjectById(this.id);
+
+      this.userInfo = await getUserInfoByUserId(this.project.creatorId);
+      this.creator = this.userInfo.name;
       // 根据场景中instances获取对应的boundInstanceList
-      this.scenario = await getScenarioById(this.project.scenario)
-     
-      let boundInstanceList = await getInstancesByIds(this.scenario.instances)
+      this.scenario = await getScenarioById(this.project.scenario);
+
+      let boundInstanceList = await getInstancesByIds(this.scenario.instances);
 
       let newBoundInstanceList = boundInstanceList.map(async (item) => {
-        let modelInfo = await getModelById(item.modelId)
+        let modelInfo = await getModelById(item.modelId);
         return {
           ...item,
           modelDescription: modelInfo.description,
-        }
-      })
-      newBoundInstanceList = await Promise.all(newBoundInstanceList)
-      console.log(newBoundInstanceList, '222')
-      this.ExpectedInstances = newBoundInstanceList
+        };
+      });
+      newBoundInstanceList = await Promise.all(newBoundInstanceList);
+      console.log(newBoundInstanceList, "222");
+      this.ExpectedInstances = newBoundInstanceList;
     },
     download(row) {
-      let urls = row.value
+      let urls = row.value;
       // 创建一个链接元素
-      const link = document.createElement('a')
-      link.href = urls
-      link.target = '_blank' // 在新窗口中打开链接
-      link.download = 'downloaded_file' // 设置下载的文件名
+      const link = document.createElement("a");
+      link.href = urls;
+      link.target = "_blank"; // 在新窗口中打开链接
+      link.download = "downloaded_file"; // 设置下载的文件名
       // 模拟点击链接，触发下载
-      link.click()
+      link.click();
       // this.url = `${config.containerURL}/data_service/fetch/${row.id}`;
       // console.log(this.url);
       // window.open(`${config.containerURL}/data_service/fetch/${row.id}`);
@@ -441,12 +449,12 @@ export default {
     view(row, type) {
       this.$router.push({
         path: `/resource/${row.id}/${type}`,
-      })
+      });
     },
     invoke(row, type) {
       this.$router.push({
         path: `/resource/${row.id}/${type}/invoke`,
-      })
+      });
     },
     // fullScreen() {
     //   let element = document.getElementById("fullScreenComponent");
@@ -454,22 +462,22 @@ export default {
     //   this.fullscreenFlag = true;
     // },
     async folk() {
-      this.g2s_folk.creator = this.$store.state.user.name
-      let { id } = await post(`/g2s/${this.id}/folk`, this.g2s_folk)
-      this.$router.push({ path: `/g2s/${id}` })
-      this.folkVisible = false
+      this.g2s_folk.creator = this.$store.state.user.name;
+      let { id } = await post(`/g2s/${this.id}/folk`, this.g2s_folk);
+      this.$router.push({ path: `/g2s/${id}` });
+      this.folkVisible = false;
     },
   },
   created() {
-    document.addEventListener('keyup', (el) => {
+    document.addEventListener("keyup", (el) => {
       if (el.keyCode == 27) {
-        this.fullscreenFlag = false
+        this.fullscreenFlag = false;
       }
-    })
+    });
   },
   async mounted() {
-    console.log(this.id,'id');
-    this.getExpectedInstances()
+    console.log(this.id, "id");
+    this.getExpectedInstances();
     // this.g2s = await get("/g2s/{id}/view", null, {
     //   id: this.id,
     // });
@@ -479,14 +487,14 @@ export default {
     InstanceCard,
     mxgraph,
   },
-}
+};
 </script>
 
 <style scoped>
 .mainContent {
   height: 100%;
 }
-.container{
+.container {
   width: 100%;
   /* background-color: #666; */
 }
@@ -538,10 +546,10 @@ export default {
   border-bottom: 0;
   line-height: 0;
 }
-.rightContent :deep(.el-tabs__item){
+.rightContent :deep(.el-tabs__item) {
   height: 35px;
 }
-.rightContent :deep(.el-table th){
+.rightContent :deep(.el-table th) {
   background: rgb(243, 243, 243);
   height: 35px;
   border-radius: 5px;
@@ -550,7 +558,7 @@ export default {
 .rightContentCard {
   margin-bottom: 20px;
 }
-.instanceCard :deep(.el-card:hover){
+.instanceCard :deep(.el-card:hover) {
   background-color: #f2f6fc;
 }
 </style>

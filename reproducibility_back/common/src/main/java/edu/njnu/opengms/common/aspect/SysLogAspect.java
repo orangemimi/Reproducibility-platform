@@ -29,19 +29,19 @@ import java.util.Date;
  */
 @Aspect
 @Component
-@Order (1)
+@Order(1)
 public class SysLogAspect {
 
     @Autowired
     MongoTemplate mongoTemplate;
 
 
-    @Pointcut ("@annotation(edu.njnu.opengms.common.annotation.SysLogs)")
+    @Pointcut("@annotation(edu.njnu.opengms.common.annotation.SysLogs)")
     public void log() {
     }
 
 
-    @Before ("log()")
+    @Before("log()")
     public void doBeforePoint(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
@@ -50,7 +50,7 @@ public class SysLogAspect {
         log.setActionName(getMethodSysLogsAnnotationValue(joinPoint));
         log.setIp(getClientIp(request));
         log.setUri(request.getRequestURI());
-        String s =        JSONUtil.toJsonStr(joinPoint.getArgs());
+        String s = JSONUtil.toJsonStr(joinPoint.getArgs());
 
         log.setParams(s.length() > 500 ? "数据过大，不给予记录" : s);
         log.setHttpMethod(request.getMethod());
@@ -103,11 +103,11 @@ public class SysLogAspect {
         return ip;
     }
 
-    @After ("log()")
+    @After("log()")
     public void doAfterPoint() {
     }
 
-    @AfterReturning ("log()")
+    @AfterReturning("log()")
     public void afterReturn() {
     }
 

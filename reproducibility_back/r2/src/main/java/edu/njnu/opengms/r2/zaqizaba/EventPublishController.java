@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version 1.0.0
  */
 @RestController
-@RequestMapping ("event")
+@RequestMapping("event")
 public class EventPublishController {
 
     @Autowired
     ApplicationEventPublisher publisher;
 
-    @RequestMapping (value = "/publish", method = RequestMethod.GET)
+    @RequestMapping(value = "/publish", method = RequestMethod.GET)
     public JsonResult eventPublish() {
         publisher.publishEvent(new CustomEvent<>("触发了某个事件"));
         return ResultUtils.success("触发了某个事件");

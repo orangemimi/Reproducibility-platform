@@ -48,19 +48,16 @@ public class UserService {
     }
 
     public JSONArray getUserInfoLike(String value) {
-        List<User> userList =userRepository.findByEmailLike(value);
+        List<User> userList = userRepository.findByEmailLike(value);
         return filterUserInfo(userList);
     }
 
 
-
-
-
     /*
-    * 目的：在本地数据库注册，同时在用户服务器注册
-    * 1.检查email是否已经存在
-    * 2.注册
-    * */
+     * 目的：在本地数据库注册，同时在用户服务器注册
+     * 1.检查email是否已经存在
+     * 2.注册
+     * */
     public User register(String name, String email, String password) {
 
         //用户邮箱已经被注册的情况,抛出自定义异常
@@ -69,16 +66,16 @@ public class UserService {
         }
 
 
-        User user=User.builder().name(name).email(email).password(password).build();
+        User user = User.builder().name(name).email(email).password(password).build();
 
-        User newUser =  userRepository.insert(user);
+        User newUser = userRepository.insert(user);
 
-        AddFolderDTO add =  AddFolderDTO.builder()
+        AddFolderDTO add = AddFolderDTO.builder()
                 .name("Main")
                 .level(0)
                 .parent("0")
                 .build();
-        folderService.create(add,newUser.id);
+        folderService.create(add, newUser.id);
         return newUser;
     }
 
@@ -108,7 +105,6 @@ public class UserService {
     }
 
 
-
     public User updateJoinedProjects(String userId, String update) {
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
         userFromDB.getJoinedProjects().add(update);
@@ -134,11 +130,11 @@ public class UserService {
     //修改密码
     public User updatePassword(String oldPWD, String newPWD, String email) {
         JSONObject jsonObj = userServiceServie.changePassword(oldPWD, newPWD, email);
-        if(((int) jsonObj.get("code")) == 0) {
+        if (((int) jsonObj.get("code")) == 0) {
             User userFromDB = userRepository.findByEmail(email).orElseThrow(MyException::noObject);
             userFromDB.setPassword(newPWD);
             return userRepository.save(userFromDB);
-        }else {
+        } else {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }
@@ -148,7 +144,7 @@ public class UserService {
         return userServiceServie.getUserinfo(email, password);
     }
 
-        //JUST GET THE PROJECTS INFO
+    //JUST GET THE PROJECTS INFO
     public JSONObject getUserProjectInfo(String userId) {
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
         return filterUserInfoProjects(userFromDB);
@@ -159,7 +155,7 @@ public class UserService {
         User userFromDB = userRepository.findById(userId).orElseThrow(MyException::noObject);
         JSONObject obj = new JSONObject();
         JSONObject userNew = new JSONObject();
-        if(userFromDB.getModelList()!=null) {
+        if (userFromDB.getModelList() != null) {
             JSONObject models = Optional.ofNullable(userFromDB)
                     .map(x -> x.getModelList())
                     .map(x -> {
@@ -177,21 +173,21 @@ public class UserService {
                     .orElseGet(null);
 //            userNew.put("modelItemList",obj);
         }
-        userNew.put("name",userFromDB.getName());
-        userNew.put("modelList",userFromDB.getModelList());
-        userNew.put("createdProjects",userFromDB.getCreatedProjects());
+        userNew.put("name", userFromDB.getName());
+        userNew.put("modelList", userFromDB.getModelList());
+        userNew.put("createdProjects", userFromDB.getCreatedProjects());
 
         return userNew;
     }
 
-    public User update(User user){
+    public User update(User user) {
         return userRepository.save(user);
     }
 
     public User star(String userId, String projectId) {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         List<String> temp = user.getStaredProjects();
-        if(temp == null) {
+        if (temp == null) {
             List<String> list = new ArrayList<>();
             list.add(projectId);
             user.setStaredProjects(list);
@@ -205,13 +201,13 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         List<String> temp = user.getStaredProjects();
         int flag = 0;
-        for(String str : temp) {
-            if(str.equals(projectId)) {
+        for (String str : temp) {
+            if (str.equals(projectId)) {
                 break;
             }
             flag++;
         }
-        if(flag != temp.size()) {
+        if (flag != temp.size()) {
             user.getStaredProjects().remove(flag);
         }
         return userRepository.save(user);
@@ -220,11 +216,11 @@ public class UserService {
     public int isSartedProject(String userId, String projectId) {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         List<String> temp = user.getStaredProjects();
-        if(temp == null) {
+        if (temp == null) {
             return 0;
         } else {
-            for(String str : temp) {
-                if(str.equals(projectId)) {
+            for (String str : temp) {
+                if (str.equals(projectId)) {
                     return 1;
                 }
             }
@@ -252,15 +248,15 @@ public class UserService {
     }
 
     /**
-    * @Description:查询用户创建和加入的项目
-    * @Author: Yiming
-    * @Date: 2022/1/10
-    */
+     * @Description:查询用户创建和加入的项目
+     * @Author: Yiming
+     * @Date: 2022/1/10
+     */
     public JSONArray getUserProjects(String userId) {
         User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
         JSONArray result = new JSONArray();
-        if( user.getCreatedProjects()!=null){
-            for(String projectId : user.getCreatedProjects()) {
+        if (user.getCreatedProjects() != null) {
+            for (String projectId : user.getCreatedProjects()) {
                 Project temp = projectRepository.findById(projectId).orElseThrow(MyException::noObject);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("userName", user.getName());
@@ -270,8 +266,8 @@ public class UserService {
                 result.add(jsonObject);
             }
         }
-        if( user.getJoinedProjects()!=null){
-            for(String projectId : user.getJoinedProjects()) {
+        if (user.getJoinedProjects() != null) {
+            for (String projectId : user.getJoinedProjects()) {
                 Project temp = projectRepository.findById(projectId).orElseThrow(MyException::noObject);
                 JSONObject jsonObject = new JSONObject();
                 String userName = userRepository.findById(temp.getCreatorId()).orElseThrow(MyException::noObject).getName();

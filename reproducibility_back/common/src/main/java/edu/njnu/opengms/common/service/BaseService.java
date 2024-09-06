@@ -7,9 +7,9 @@ package edu.njnu.opengms.common.service;
  * @Date 2019/11/22
  * @Version 1.0.0
  */
-public interface BaseService<E, VO, AD, FD, UD > extends
+public interface BaseService<E, VO, AD, FD, UD> extends
         CreateService<E, AD>,
         QueryService<E, VO, FD>,
         DeleteService,
-        UpdateService<E,UD> {
+        UpdateService<E, UD> {
 }

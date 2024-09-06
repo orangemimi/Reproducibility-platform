@@ -24,40 +24,40 @@ public class UserController {
 
 
     //userId 均为 user--id;
-    @RequestMapping (value = "", method = RequestMethod.GET)
-    public JsonResult getUserInfo(@JwtTokenParser(key="userId") String userId)  {
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public JsonResult getUserInfo(@JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success(userService.getUserInfoById(userId));
     }
 
-    @RequestMapping (value = "/projects", method = RequestMethod.GET)
-    public JsonResult getUserProjectInfo(@JwtTokenParser(key="userId") String userId)  {
+    @RequestMapping(value = "/projects", method = RequestMethod.GET)
+    public JsonResult getUserProjectInfo(@JwtTokenParser(key = "userId") String userId) {
         return ResultUtils.success(userService.getUserProjectInfo(userId));
     }
 
 
-    @RequestMapping (value = "/like/{email}", method = RequestMethod.GET)
-    public JsonResult getUserInfoLike(@PathVariable String email)  {
+    @RequestMapping(value = "/like/{email}", method = RequestMethod.GET)
+    public JsonResult getUserInfoLike(@PathVariable String email) {
         return ResultUtils.success(userService.getUserInfoLike(email));
     }
 
-    @RequestMapping (value = "/register", method = RequestMethod.POST)
-    public JsonResult doRegister(@RequestParam("email") String email,@RequestParam ("name") String name,@RequestParam ("password") String password) {
-        return ResultUtils.success(userService.register(name,email, password));
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public JsonResult doRegister(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("password") String password) {
+        return ResultUtils.success(userService.register(name, email, password));
     }
 
-    @RequestMapping (value = "/login", method = RequestMethod.POST)
-    public JsonResult doLogin(@RequestParam ("email") String email,@RequestParam ("password") String password) {
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public JsonResult doLogin(@RequestParam("email") String email, @RequestParam("password") String password) {
         return ResultUtils.success(userService.login(email, password));
     }
 
-    @RequestMapping (value = "/create", method = RequestMethod.PATCH)
-    public JsonResult updateCreatedProjects(@JwtTokenParser(key="userId") String userId, @RequestBody String update) {
-        return ResultUtils.success(userService.updateCreatedProjects(userId,update));
+    @RequestMapping(value = "/create", method = RequestMethod.PATCH)
+    public JsonResult updateCreatedProjects(@JwtTokenParser(key = "userId") String userId, @RequestBody String update) {
+        return ResultUtils.success(userService.updateCreatedProjects(userId, update));
     }
 
 
     //调用远程服务器，获取用户基本信息
-    @RequestMapping (value = "/getuserinfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/getuserinfo", method = RequestMethod.GET)
     public JsonResult getUserinfo(@JwtTokenParser(key = "email") String email, @JwtTokenParser(key = "password") String password) {
         return ResultUtils.success(userService.getUserinfoByUserService(email, password));
     }
@@ -79,9 +79,9 @@ public class UserController {
     }
 
     //model related
-    @RequestMapping (value = "/model", method = RequestMethod.PATCH)
-    public JsonResult updateModelList(@JwtTokenParser(key="userId") String userId, @RequestBody List<String> update) {
-        return ResultUtils.success(userService.updateModelList(userId,update));
+    @RequestMapping(value = "/model", method = RequestMethod.PATCH)
+    public JsonResult updateModelList(@JwtTokenParser(key = "userId") String userId, @RequestBody List<String> update) {
+        return ResultUtils.success(userService.updateModelList(userId, update));
     }
 
 }

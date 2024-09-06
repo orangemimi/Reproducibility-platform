@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Builder
 public class ResourceCollection {
-   public List<String> dataList;
-  public  List<String> modelList;
+    public List<String> dataList;
+    public List<String> modelList;
 //    List<String> reproducedDataResourceList;
 }

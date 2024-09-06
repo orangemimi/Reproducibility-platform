@@ -29,6 +29,6 @@ public class JwtTokenArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         String authorization = JwtUtils.getTokenFromRequest(request);
         JwtTokenParser jwtTokenParser = methodParameter.getParameterAnnotation(JwtTokenParser.class);
-        return authorization == null ? null : JwtUtils.parseJWT(authorization,jwtTokenParser.key() );
+        return authorization == null ? null : JwtUtils.parseJWT(authorization, jwtTokenParser.key());
     }
 }

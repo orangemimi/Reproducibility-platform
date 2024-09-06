@@ -17,13 +17,14 @@ public class JavaBeanCollectionUtils {
     /**
      * demo: Set<String> strings = JavaBeanCollectionUtils.fetchProperty(books, Book::getName);
      * 作用：获取所有的Name字段
+     *
      * @param collection
      * @param mappingFunction 即R的某个字段的getter函数
-     * @param <R> 返回类型
-     * @param <T> 指定的javaBean
+     * @param <R>             返回类型
+     * @param <T>             指定的javaBean
      * @return 以R为返回类型的Set
      */
-    public static <R,T> Set<R> fetchProperty(final Collection<T> collection, Function<T, R> mappingFunction) {
+    public static <R, T> Set<R> fetchProperty(final Collection<T> collection, Function<T, R> mappingFunction) {
         return org.springframework.util.CollectionUtils.isEmpty(collection) ?
                 Collections.emptySet() :
                 collection.stream().map(mappingFunction).collect(Collectors.toSet());
@@ -33,10 +34,11 @@ public class JavaBeanCollectionUtils {
     /**
      * deomo: Map<String, Book> stringBookMap = JavaBeanCollectionUtils.convertToMap(books, Book::getName);
      * 作用： 根据Name 获取 Book
+     *
      * @param collection
      * @param mappingFunction T获取R的setter函数
      * @param <R>
-     * @param <T> 指定的javaBean
+     * @param <T>             指定的javaBean
      * @return 以R为key，以T为value的Map对象
      */
     public static <R, T> Map<R, T> convertToMap(Collection<T> collection, Function<T, R> mappingFunction) {
@@ -56,10 +58,11 @@ public class JavaBeanCollectionUtils {
     /**
      * Example： Map<String, String> stringStringMap = JavaBeanCollectionUtils.convertToMap(books, Book::getId, Book::getName);
      * 作用： 构建 id：name的键值对
+     *
      * @param collection
-     * @param keyFunction T获取R的getter函数
+     * @param keyFunction   T获取R的getter函数
      * @param valueFunction T获取V的getter函数
-     * @param <T> 指定的javaBean
+     * @param <T>           指定的javaBean
      * @param <R>
      * @param <V>
      * @return 以R为key，以V为value的Map集合

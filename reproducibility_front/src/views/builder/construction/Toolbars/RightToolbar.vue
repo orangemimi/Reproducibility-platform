@@ -2,7 +2,6 @@
   <div class="main">
     <div class="scenarioCard">
       <el-card>
-       
         <model-content
           :currentModel="currentModel"
           :initialScenarioId="scenarioId"

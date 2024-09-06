@@ -91,7 +91,7 @@ public class ModelController {
 
     @RequestMapping(value = "/allPublic", method = RequestMethod.GET)
     public JsonResult getAllPublicModels(@PathVariable String userId) {
-         List<ModelService> modelList = modelRepository.findAll();
+        List<ModelService> modelList = modelRepository.findAll();
         return ResultUtils.success(modelList);
     }
 
@@ -102,14 +102,14 @@ public class ModelController {
     }
 
     @RequestMapping(value = "/getPublicModelListByIgnoreName/{text}", method = RequestMethod.GET)
-    public JsonResult getPublicModelListByIgnoreName(@PathVariable String userId,@PathVariable String text) {
+    public JsonResult getPublicModelListByIgnoreName(@PathVariable String userId, @PathVariable String text) {
 //        PageRequest pageable = PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
         return ResultUtils.success(modelRepository.findByNameContainsIgnoreCase(text));
     }
 
 
-    @RequestMapping (value = "/listVOByIds", method = RequestMethod.GET)
-    public JsonResult listVOByIds(@RequestParam ("ids") List<String> ids) {
+    @RequestMapping(value = "/listVOByIds", method = RequestMethod.GET)
+    public JsonResult listVOByIds(@RequestParam("ids") List<String> ids) {
         return ResultUtils.success(StreamSupport.stream(modelRepository.findAllById(ids).spliterator(), true).map(service -> {
 //            ModelServiceVO vo = new ModelServiceVO();
 //            CopyUtils.copyProperties(service, vo);
@@ -117,13 +117,13 @@ public class ModelController {
         }).collect(Collectors.toList()));
     }
 
-    @RequestMapping (value = "/listByIds", method = RequestMethod.GET)
-    public JsonResult listByIds(@RequestParam("ids")List<String>ids){
+    @RequestMapping(value = "/listByIds", method = RequestMethod.GET)
+    public JsonResult listByIds(@RequestParam("ids") List<String> ids) {
         return ResultUtils.success(Lists.newArrayList(modelRepository.findAllById(ids)));
     }
 
-    @RequestMapping (value = "/all", method = RequestMethod.GET)
-    public JsonResult findAll(){
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public JsonResult findAll() {
         return ResultUtils.success(modelRepository.findAll());
     }
 

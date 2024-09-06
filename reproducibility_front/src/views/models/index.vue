@@ -10,17 +10,15 @@
         <el-row class="top-info">
           <el-row class="top-title">Models</el-row>
           <el-row class="top-desc">Various, useful Models.</el-row>
-          <el-row class="top-desc">Collected by generous community of OpenGMS Team. 🎁</el-row>
+          <el-row class="top-desc"
+            >Collected by generous community of OpenGMS Team. 🎁</el-row
+          >
           <el-row class="input-container">
-            <el-input
-              @keyup.enter="searchData"
-              v-model="value"
-              placeholder=""
-            >
-            <template v-slot:prepend>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
+            <el-input @keyup.enter="searchData" v-model="value" placeholder="">
+              <template v-slot:prepend>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
           </el-row>
           <el-row class="search-note"
             >Trending searches: Geodynamics,Geostatics,Hydrology,Coastal
@@ -47,45 +45,40 @@
     </div>
 
     <div class="main">
-      <div>
-        <el-row>
-          <el-col :span="6" v-for="(item, index) in data" :key="index">
-            <div class="main-container">
-              <el-card class="box-card" v-if="item.type == 'service'">
-                <el-row>
-                  <el-col :span="4">
-                    <img :src="imgPath(item.snapshot, item.name)" />
-                  </el-col>
-                  <el-col :span="20">
-                    <div class="content">
-                      <h3 class="title" :title="item.name">{{ item.name }}</h3>
-                      <p class="desc" :title="item.description">
-                        {{ item.description }}
-                      </p>
-                    </div>
-                    <div>
-                      <el-button
-                        class="config-btn"
-                        type="success"
-                        @click="
-                          operateModel(item.id, judgeModelIsContained(item.id))
-                        "
-                        :icon="
-                          judgeModelIsContained(item.id)
-                            ? 'Remove'
-                            : 'ShoppingCart'
-                        "
-                        circle
-                      />
-                    </div>
-                  </el-col>
-                </el-row>
-
-              </el-card>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
+      <el-row :gutter="20" class="allContainer">
+        <el-col :span="6" v-for="(item, index) in data" :key="index">
+          <div class="main-container">
+            <el-card class="box-card" v-if="item.type == 'service'">
+              <el-row :gutter="20">
+                <el-col :span="24" style="display: flex">
+                  <img :src="imgPath(item.snapshot, item.name)" />
+                  <div class="content">
+                    <h2 class="title" :title="item.name">{{ item.name }}</h2>
+                    <p class="desc" :title="item.description">
+                      {{ item.description }}
+                    </p>
+                  </div>
+                  <div>
+                    <el-button
+                      class="config-btn"
+                      type="success"
+                      @click="
+                        operateModel(item.id, judgeModelIsContained(item.id))
+                      "
+                      :icon="
+                        judgeModelIsContained(item.id)
+                          ? 'Remove'
+                          : 'ShoppingCart'
+                      "
+                      circle
+                    />
+                  </div>
+                </el-col>
+              </el-row>
+            </el-card>
+          </div>
+        </el-col>
+      </el-row>
     </div>
 
     <!-- add model -->
@@ -101,21 +94,21 @@
 </template>
 
 <script>
-import { updateUsersModel, getModelsByPrivacy, getUser } from '@/api/request'
+import { updateUsersModel, getModelsByPrivacy, getUser } from "@/api/request";
 // import { addModelByMD5Local } from "@/api/request";
 // import serviceCard from "_com/Cards/ModelCardInPortal.vue";
-import createModel from './create.vue'
-import { imgBase64 } from '@/lib/utils'
+import createModel from "./create.vue";
+import { imgBase64 } from "@/lib/utils";
 export default {
   components: { createModel },
   // setup(){
-  //   const 
+  //   const
   // },
   data() {
     return {
       data: [],
       is_extending: false,
-      value: '',
+      value: "",
       pageFilter: {
         pageSize: 20,
         page: 0,
@@ -126,106 +119,110 @@ export default {
       modelList: [],
       selectedModels: [],
       currentUser: {},
-    }
+    };
   },
   computed: {
     noMore() {
-      return this.count >= 20
+      return this.count >= 20;
     },
     disabled() {
-      return this.loading || this.noMore
+      return this.loading || this.noMore;
     },
   },
   methods: {
     imgPath(snapshot, name) {
       if (snapshot != undefined) {
-        return snapshot
+        return snapshot;
       } else {
-        return imgBase64(name)
+        return imgBase64(name);
       }
     },
     async operateModel(id, isContained) {
-      let newarray = []
+      let newarray = [];
       if (isContained) {
         //remove
-        newarray = this.selectedModels.filter((item) => item != id)
+        newarray = this.selectedModels.filter((item) => item != id);
       } else {
         if (this.selectedModels.length == 0) {
-          newarray = this.selectedModels = [id]
+          newarray = this.selectedModels = [id];
         } else {
-          newarray = this.selectedModels.concat(id)
+          newarray = this.selectedModels.concat(id);
         }
       }
-      let data = await updateUsersModel(newarray)
-      this.selectedModels = data.modelList
-      console.log('newnew', newarray, data)
+      let data = await updateUsersModel(newarray);
+      this.selectedModels = data.modelList;
+      console.log("newnew", newarray, data);
     },
 
     async getPublicModels(val) {
       let data = await getModelsByPrivacy({
-        privacy: 'public',
+        privacy: "public",
         currentPage: val,
         pageSize: 20,
-        key: '',
-      })
-      this.total = data.totalElements
-      this.data = data.content
+        key: "",
+      });
+      this.total = data.totalElements;
+      this.data = data.content;
       // console.log(this.data,'111');
     },
 
     judgeModelIsContained(modelId) {
-      return this.selectedModels.some((select) => select == modelId)
+      return this.selectedModels.some((select) => select == modelId);
     },
     async init() {
-      this.currentUser = await getUser()
+      this.currentUser = await getUser();
       if (
-        Object.prototype.hasOwnProperty.call(this.currentUser, 'modelList') &&
+        Object.prototype.hasOwnProperty.call(this.currentUser, "modelList") &&
         this.currentUser.modelList != null
       ) {
-        this.selectedModels = this.currentUser.modelList
+        this.selectedModels = this.currentUser.modelList;
       } else {
-        this.selectedModels = []
+        this.selectedModels = [];
       }
-      await this.getPublicModels(0)
+      await this.getPublicModels(0);
     },
     async currentChange(val) {
       this.data = (
         await getModelsByPrivacy({
-          privacy: 'public',
+          privacy: "public",
           currentPage: val - 1,
           pageSize: 20,
-          key: '',
+          key: "",
         })
-      ).content
+      ).content;
     },
     async searchData() {
       let params = {
         page: 0,
         pageSize: 20,
         searchText: this.value,
-      }
+      };
 
       let data = await getModelsByPrivacy({
-        privacy: 'public',
+        privacy: "public",
         currentPage: params.page,
         pageSize: params.pageSize,
         key: this.value,
-      })
-      this.total = data.totalElements
-      this.data = data.content
-      this.$forceUpdate()
+      });
+      this.total = data.totalElements;
+      this.data = data.content;
+      this.$forceUpdate();
     },
   },
   mounted() {
-    this.init()
+    this.init();
   },
-}
+};
 </script>
 
 <style lang="scss">
 .container {
+  // 不知道为什么，超过这个值底部就会出现横向滚动条
+  min-width: 99vw;
+  overflow-x: hidden;
   .top {
     // background-color: #000;
+    width: 99vw;
     color: #fff;
     //   margin-bottom: 48px;
     .top-container {
@@ -235,7 +232,7 @@ export default {
         img {
           position: relative;
           object-fit: cover;
-          //obackground-size: cover;
+          // background-size: cover;
           width: 100%;
           height: calc(100vh - 500px);
           filter: brightness(0.8);
@@ -252,7 +249,7 @@ export default {
       width: 45%;
       transform: translate3d(-50%, -50%, 0);
       font-size: 1.4rem;
-      font-family: Arial, Georgia, Times, 'Times New Roman', serif;
+      font-family: Arial, Georgia, Times, "Times New Roman", serif;
       .el-row {
         margin: 0.5rem 0;
         margin-bottom: 3px;
@@ -285,62 +282,69 @@ export default {
 
   .main {
     position: relative;
-    .main-container {
-      // p {
-      //   position: relative;
-      //   display: flex;
-      //   justify-content: center;
-      //   flex-wrap: wrap;
-      //   overflow: hidden;
-      // }
-      .box-card {
-        margin: 10px 2%;
-        width: 95%;
-        transition: box-shadow 0.1s ease;
-
-        height: 120px;
-        /* 相对定位 */
-        position: relative;
-        :deep(.el-card__body) {
-          padding: 10px;
-        }
-        .content {
-          padding: 5px;
-          word-wrap: break-word;
-          width: 86%;
-          min-height: 40px;
-          max-height: 40px;
-          .title,
-          .desc {
-            max-height: 40px;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-            font-size: 8px;
-          }
-        }
-
-        // &:hover {
-        //   box-shadow: 0px 0px 20px #666;
+    margin: 0 0.5vw;
+    width: 98vw;
+    .allContainer {
+      .main-container {
+        // p {
+        //   position: relative;
+        //   display: flex;
+        //   justify-content: center;
+        //   flex-wrap: wrap;
+        //   overflow: hidden;
         // }
-        img {
+        display: flex;
+        justify-content: space-around;
+
+        .box-card {
+          box-sizing: border-box;
+          margin: 10px 0%;
           width: 100%;
-          object-fit: cover;
-          height: 100px;
-        }
-        .config-btn {
-          margin-bottom: 0;
-          height: 40px;
-          /* 绝对定位 */
-          position: absolute;
-          bottom: 10px;
-          right: 10px;
-          // position: relative; //将button按钮固定在页面底部，注意，：和；是英文的哦，一定不要写成中文哦。
-          // bottom: 5px;
-          // float: ;
-          // margin: 0px 0px;
-          // padding: 10px;
+
+          transition: box-shadow 0.1s ease;
+          padding: 0;
+          // height: 120px;
+          /* 相对定位 */
+          position: relative;
+
+          .content {
+            padding: 5px;
+            word-wrap: break-word;
+            width: calc(100% - 110px);
+            min-height: 40px;
+            max-height: 40px;
+            .desc {
+              // max-height: 40px;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 3;
+              overflow: hidden;
+              font-size: 12px;
+            }
+          }
+
+          // &:hover {
+          //   box-shadow: 0px 0px 20px #666;
+          // }
+          img {
+            min-width: 100px;
+            object-fit: cover;
+            height: 100px;
+          }
+          .config-btn {
+            margin-bottom: 0;
+            height: 36px;
+            width: 36px;
+            /* 绝对定位 */
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            // position: relative; //将button按钮固定在页面底部，注意，：和；是英文的哦，一定不要写成中文哦。
+            // bottom: 5px;
+            // float: ;
+            // margin: 0px 0px;
+            // padding: 10px;
+          }
         }
       }
     }

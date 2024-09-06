@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @Date 2019/7/10
  * @Version 1.0.0
  */
-@Target (ElementType.METHOD)
-@Retention (RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface BeforeUpdate {
 }

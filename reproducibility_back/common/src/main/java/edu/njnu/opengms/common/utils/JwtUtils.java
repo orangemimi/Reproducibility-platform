@@ -45,7 +45,6 @@ public class JwtUtils {
      * request的token信息可以放在Header的Authorization字段 或者 Parameter的token字段 Cookie的token字段
      *
      * @param request
-     *
      * @return
      */
     public static String getTokenFromRequest(HttpServletRequest request) {
@@ -64,7 +63,6 @@ public class JwtUtils {
 
     /**
      * @param token
-     *
      * @return Claims 可以使用get 获取Claims.get("name") Claims.get("password") Claims.get("id")
      */
     public static Claims parseJWT(String token) {
@@ -82,7 +80,6 @@ public class JwtUtils {
     /**
      * @param token
      * @param key   定义返回的key值，可以是"name","password","id","type"
-     *
      * @return
      */
     public static Object parseJWT(String token, String key) {

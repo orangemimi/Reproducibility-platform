@@ -119,7 +119,7 @@ export async function getModelsByPrivacy(form) {
 }
 
 export async function saveNewCodeModel(form) {
-  return await post(`/models/newCodeModel`, form)
+  return await post(`/models/newCodeModel`, form);
 }
 
 export async function getMyModels() {
@@ -137,12 +137,15 @@ export async function getMyModels() {
 export async function getModelById(id) {
   return await get(`/models/getModelById/${id}`);
 }
+
 export async function getAssessmentMethod() {
   return await get(`/models/getAssessmentMethod`);
 }
+
 export async function addModelByMD5Local(form) {
   return await get(`/models/local`, form);
 }
+
 // export async function getMyModels(id) {
 //   return await get(`/models/getModelById/${id}`);
 // }
@@ -165,6 +168,7 @@ export async function getScenarioById(id) {
 export async function getScenariosByProjectId(projectId) {
   return await get(`/scenario/project/${projectId}`);
 }
+
 export async function getScenariosByScenarioId(scenarioId) {
   return await get(`/scenario/r/${scenarioId}`);
 }
@@ -194,6 +198,10 @@ export async function updateresourceCollection(id, form) {
   return data;
 }
 
+export async function updateContainerId(formData) {
+  return await post(`/scenario/containerId`, formData);
+}
+
 //-----------------------------------------------folder---------------------------------------------
 
 export async function addFolder(form) {
@@ -204,13 +212,18 @@ export async function getFolders() {
   return await get(`/folders`);
 }
 
+export async function getFoldersByScenarioId(scenarioId) {
+  return await get(`/folders/${scenarioId}`);
+}
+
 export async function getFoldersByTagId(tagId) {
   return await get(`/folders/${tagId}`);
 }
 
 export async function getFolderIdByDataItemId(dataId) {
-  return await get(`/folders/getFolderIdByDataItemId/${dataId}`)
+  return await get(`/folders/getFolderIdByDataItemId/${dataId}`);
 }
+
 //-----------------------------------------------data---------------------------------------------
 
 export async function saveData(form, fileSize, storedFolderId) {
@@ -218,21 +231,26 @@ export async function saveData(form, fileSize, storedFolderId) {
 }
 
 export async function saveDocument(form, fileSize, storedFolderId) {
-  return await post(`/data/saveAsNewDocument/${fileSize}/${storedFolderId}`, form)
+  return await post(
+    `/data/saveAsNewDocument/${fileSize}/${storedFolderId}`,
+    form
+  );
 }
 
 export async function replaceDocument(form, fileSize, storedFolderId) {
-  return await post(`/data/replaceDocument/${fileSize}/${storedFolderId}`, form)
+  return await post(
+    `/data/replaceDocument/${fileSize}/${storedFolderId}`,
+    form
+  );
 }
 
 export async function getDataItems(dataItemIds) {
-  return await post(`/data/getDataItems`, dataItemIds)
+  return await post(`/data/getDataItems`, dataItemIds);
 }
 
 export async function postFile(form) {
   return await axios.post("http://112.4.132.6:8083/data", form);
 }
-
 
 //-----------------------------------------------dataContainer---------------------------------------------
 
@@ -287,11 +305,15 @@ export async function getInstancesInScenario(
     `/model_instances/inscenario/${scenarioId}/${modelId}/${isReproduced}`
   );
 }
+
+export async function getInstanceByScenarioId(scenarioId) {
+  return await get(`/model_instances/getByScenarioId/${scenarioId}`);
+}
+
 export async function getAssessmentInstancesInScenario(scenarioId) {
   return await get(`/model_instances/inscenario/assessment/${scenarioId}`);
 }
 
-//这是一个另类，读取数据但是用的POST，注意
 export async function getInstancesByIds(instances) {
   return await post(`/model_instances/getBoundInstances`, instances);
 }
@@ -313,13 +335,117 @@ export async function getAssessment(id) {
 export async function startAssessment(formData) {
   return await patch(`/assessment/start`, formData);
 }
+
 export async function autoAssessment(reproducedScenarioId) {
   return await patch(`/assessment/${reproducedScenarioId}`);
 }
 
-//===============================extra=================================================
+//===============================docker-codeOnline=================================================
 
 //docker
 export async function codingPython(code) {
   return await post(`/execute-python`, code);
 }
+
+//===============================envsAutoConfig=================================================
+
+// getWorkDirectory
+export async function getDirectory(formData) {
+  return await post(`/envs/getWorkDirectory`, formData);
+}
+
+//------------------python38-back------------------
+
+// 步骤1：生成dockerfile
+// export async function getPython38DockerFile() {
+//   return await get(`/envs/py38dockerFile`);
+// }
+
+// 步骤2：上传数据和代码文件
+// export async function uploadDataAndCode(formData) {
+//   return await post(`/envs/uploadDataAndCode`, formData);
+// }
+
+// // 步骤3（可选）：创建自动识别依赖库
+// export async function createDependency() {
+//   return await get(`/envs/createDependency`);
+// }
+
+// // 步骤4（可选）：编辑工作目录中文件
+// export async function editUploadedFile(path) {
+//   return await post(`/envs/editUploadedFile`, path);
+// }
+
+// // 步骤5（可选）：保存编辑好的文件
+// export async function SaveFileContent(forData) {
+//   return await post(`/envs/SaveFileContent`, forData);
+// }
+
+// 步骤6：构建镜像
+// export async function buildImage() {
+//   return await get(`/envs/buildImage`);
+// }
+
+// 步骤7：生成容器并执行代码
+export async function runContainer(forData) {
+  return await post(`/envs/runContainer`, forData);
+}
+
+// 将输出数据上传至数据容器，并更新folders、modelItem
+export async function uploadAndUpdateOutput(formData) {
+  return await post(`/envs/uploadAndUpdateOutput`, formData);
+}
+
+// 步骤8：销毁所有容器，删除镜像，清空工作目录
+export async function overReproTask() {
+  return await get(`/envs/deleteContainerAndImage`);
+}
+
+//------------------python38------------------
+
+// 步骤1：（创建场景的时候）创建容器，并将容器的id写入对应场景
+export async function createContainer(formData) {
+  return await post(`/envs/createContainer`, formData);
+}
+
+// 步骤2：上传数据和代码文件
+export async function uploadDataAndCode(formData) {
+  return await post(`/envs/uploadDataAndCode`, formData);
+}
+
+// 步骤3（可选）：创建自动识别依赖库
+export async function createDependency(formData) {
+  return await post(`/envs/createDependency`, formData);
+}
+
+// 步骤4（可选）：编辑工作目录中文件
+export async function editUploadedFile(formData) {
+  return await post(`/envs/editUploadedFile`, formData);
+}
+
+// 步骤5（可选）：保存编辑好的文件
+export async function SaveFileContent(formData) {
+  return await post(`/envs/SaveFileContent`, formData);
+}
+
+// 步骤6：安装依赖
+export async function installDependencies(formData) {
+  return await post(`/envs/installRequires`, formData);
+}
+
+// 步骤7：反复利用该容器执行代码
+export async function executeScript(formData) {
+  return await post(`/envs/executeScript`, formData);
+}
+////===============================Ai Assistant=================================================
+
+// 获取pdf解析结果
+export async function getPdfContent(pdfFile) {
+  return await post(`/AI/pdfParsing`, pdfFile);
+}
+
+export async function modelQuery(formData) {
+  return await post(`/AI/modelQuery`, formData);
+}
+
+//===============================extra=================================================

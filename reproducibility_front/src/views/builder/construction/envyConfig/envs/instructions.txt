@@ -1,0 +1,15 @@
+
+一、识别一个instances的输入及输出：
+    1.1、上传时间节点
+        上传文件完成时，即第一个按钮，执行handleFileChange()
+        执行完容器命令后，扫描文件夹发现有新增文件时，即发现输出文件时
+    1.2、输入输出文件元数据获取节点
+        运行容器代码时，执行顺序：
+            扫描data文件夹，通过scanDataFile()，存储到dataFileListBefore中
+            识别输入数据，通过extractInputData()，存储到inputData中
+            执行容器，即runContainer()及相关内容
+            通过extractOutputData()，scanData首先再次扫描文件夹File()，用新的结果与dataFileList对比，获取输出文件
+            将数据文件上传到数据容器
+            整个instance执行完毕，保存为一个新的instance？
+
+

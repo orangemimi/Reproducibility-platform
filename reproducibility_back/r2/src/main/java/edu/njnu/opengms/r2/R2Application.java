@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication (scanBasePackages = {"edu.njnu.opengms.common", "edu.njnu.opengms.r2"})
+@SpringBootApplication(scanBasePackages = {"edu.njnu.opengms.common", "edu.njnu.opengms.r2"})
 @ServletComponentScan
 @EnableFeignClients
 public class R2Application {

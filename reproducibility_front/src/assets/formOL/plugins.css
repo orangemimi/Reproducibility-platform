@@ -52,7 +52,7 @@
     list-style-type: none
 }
 
-.fa-ul>li {
+.fa-ul > li {
     position: relative
 }
 
@@ -3194,18 +3194,18 @@ input.ui-button::-moz-focus-inner {
     display: inline-block
 }
 
-.ui-controlgroup>.ui-controlgroup-item {
+.ui-controlgroup > .ui-controlgroup-item {
     float: left;
     margin-left: 0;
     margin-right: 0
 }
 
-.ui-controlgroup>.ui-controlgroup-item.ui-visual-focus,
-.ui-controlgroup>.ui-controlgroup-item:focus {
+.ui-controlgroup > .ui-controlgroup-item.ui-visual-focus,
+.ui-controlgroup > .ui-controlgroup-item:focus {
     z-index: 9999
 }
 
-.ui-controlgroup-vertical>.ui-controlgroup-item {
+.ui-controlgroup-vertical > .ui-controlgroup-item {
     display: block;
     float: none;
     width: 100%;
@@ -3226,11 +3226,11 @@ input.ui-button::-moz-focus-inner {
     font-size: 80%
 }
 
-.ui-controlgroup-horizontal .ui-controlgroup-label+.ui-controlgroup-item {
+.ui-controlgroup-horizontal .ui-controlgroup-label + .ui-controlgroup-item {
     border-left: none
 }
 
-.ui-controlgroup-vertical .ui-controlgroup-label+.ui-controlgroup-item {
+.ui-controlgroup-vertical .ui-controlgroup-label + .ui-controlgroup-item {
     border-top: none
 }
 

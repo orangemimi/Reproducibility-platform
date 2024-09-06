@@ -1,3 +1,47 @@
+<template>
+  <el-container>
+    <el-card class="main">
+
+      <el-upload
+        ref="upload"
+        class="upload-demo"
+        :limit="1"
+        :on-exceed="handleExceed"
+        :auto-upload="false"
+        :http-request="submitFile"
+      >
+
+        <template #trigger>
+          <div>
+            <el-button type="primary"  :icon="Plus" circle />
+          </div>
+        </template>
+        <el-button type="warning" :icon="Aim" circle @click="submitUpload" />
+        <el-button type="danger" :icon="Delete" circle @click="test" />
+        <el-button type="success" :icon="Check" circle @click="test" />
+
+
+        <template #tip>
+          <div class="uploadTips">
+            limit 1 file, new file will cover the old file
+          </div>
+        </template>
+      </el-upload>
+
+      <el-card class="text">
+        <label for="userText">Type your text:</label><br />
+        <el-input
+          v-model="userText"
+          :rows="24"
+          type="textarea"
+          placeholder="Please input"
+          class="textarea"
+        ></el-input>
+      </el-card>
+    </el-card>
+  </el-container>
+</template>
+
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 // import {pdfConvert} from '@/api/request';
@@ -55,52 +99,6 @@ export default defineComponent({
   },
 });
 </script>
-
-
-<template>
-  <el-container>
-    <el-card class="main">
-
-      <el-upload
-        ref="upload"
-        class="upload-demo"
-        :limit="1"
-        :on-exceed="handleExceed"
-        :auto-upload="false"
-        :http-request="submitFile"
-      >
-
-        <template #trigger>
-          <div>
-            <el-button type="primary"  :icon="Plus" circle />
-          </div>
-        </template>
-        <el-button type="warning" :icon="Aim" circle @click="submitUpload" />
-        <el-button type="danger" :icon="Delete" circle @click="test" />
-        <el-button type="success" :icon="Check" circle @click="test" />
-
-
-        <template #tip>
-          <div class="uploadTips">
-            limit 1 file, new file will cover the old file
-          </div>
-        </template>
-      </el-upload>
-
-      <el-card class="text">
-        <label for="userText">Type your text:</label><br />
-        <el-input
-          v-model="userText"
-          :rows="24"
-          type="textarea"
-          placeholder="Please input"
-          class="textarea"
-        ></el-input>
-      </el-card>
-    </el-card>
-  </el-container>
-</template>
-
 
 <style scoped>
 * {

@@ -20,8 +20,8 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
 
     @Bean
-    public RestTemplate restTemplate(@Qualifier ("simpleClientHttpRequestFactory") ClientHttpRequestFactory factory) {
-        RestTemplate restTemplate=new RestTemplate(factory);
+    public RestTemplate restTemplate(@Qualifier("simpleClientHttpRequestFactory") ClientHttpRequestFactory factory) {
+        RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
         restTemplate.getMessageConverters().add(new CustomUdxConverter());
         return restTemplate;

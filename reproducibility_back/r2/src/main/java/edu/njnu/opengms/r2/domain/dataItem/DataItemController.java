@@ -13,6 +13,7 @@ import edu.njnu.opengms.r2.domain.folder.FolderService;
 import edu.njnu.opengms.r2.domain.scenario.ResourceCollection;
 import edu.njnu.opengms.r2.domain.scenario.Scenario;
 import edu.njnu.opengms.r2.domain.scenario.ScenarioRepository;
+import edu.njnu.opengms.r2.domain.scenario.ScenarioService;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateResourceScenarioDTO;
 import edu.njnu.opengms.r2.remote.DataContainerService;
 import org.apache.commons.io.FileUtils;
@@ -73,7 +74,7 @@ public class DataItemController {
     DataItemService dataItemService;
 
 
-//    @RequestMapping(value = "", method = RequestMethod.POST)
+    //    @RequestMapping(value = "", method = RequestMethod.POST)
 //    public JsonResult uploadMultipleData(@JwtTokenParser(key = "userId") String userId, @RequestBody AddDataItemDTO add) throws IOException, ServletException {
 //        DataItem dataItem = new DataItem();
 //        add.convertTo(dataItem);
@@ -81,13 +82,22 @@ public class DataItemController {
 //        return ResultUtils.success(dataItemRepository.insert(dataItem));
 //    }
     @RequestMapping(value = "/getDataItems", method = RequestMethod.POST)
-    public JsonResult getDataItems(@RequestBody List<String> itemIds){
+    public JsonResult getDataItems(@RequestBody List<String> itemIds) {
         List<DataItem> DataItems = dataItemRepository.findAllByIdIn(itemIds);
         return ResultUtils.success(DataItems);
     }
 
+//    @RequestMapping(value = "/getDataItemsByScenarioId", method = RequestMethod.POST)
+//    public JsonResult getDataItemsByScenarioId(@RequestBody String scenarioId) {
+//        // 先通过scenarioId获取Folder信息，然后通过folder中的dataList获取所有的dataItem
+//        Folder folder =  (Folder)folderService.getFolderByScenarioId(scenarioId);
+//
+//        return ResultUtils.success(folder);
+//    }
+
+    // 在线表格编辑中，保存为新的文档
     @RequestMapping(value = "/saveAsNewDocument/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
-    public JsonResult saveAsNewDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
+    public JsonResult saveAsNewDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId, @PathVariable String storedFolderId, @PathVariable String fileSize) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 
         String historyJson = multiRequest.getParameter("history");
@@ -95,25 +105,26 @@ public class DataItemController {
         List<String> history = Arrays.asList(historyArray);
         String notes = multiRequest.getParameter("notes");
 
-        return ResultUtils.success(dataItemService.SaveDocument(request,userId,storedFolderId,fileSize,history,notes));
+        return ResultUtils.success(dataItemService.SaveDocument(request, userId, storedFolderId, fileSize, history, notes));
     }
 
+    // 在线表格编辑中，替换原文档
     @RequestMapping(value = "/replaceDocument/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
-    public JsonResult replaceDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
+    public JsonResult replaceDocument(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId, @PathVariable String storedFolderId, @PathVariable String fileSize) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
 
         String historyJson = multiRequest.getParameter("history");
         String[] historyArray = historyJson.split(",");
         List<String> history = Arrays.asList(historyArray);
         String notes = multiRequest.getParameter("notes");
-        System.out.println(history+notes);
-        return ResultUtils.success(dataItemService.replaceDocument(request,userId,storedFolderId,fileSize,history,notes));
+//        System.out.println(history + notes);
+        return ResultUtils.success(dataItemService.replaceDocument(request, userId, storedFolderId, fileSize, history, notes));
 //        return null;
     }
 
 
     @RequestMapping(value = "/uploadFileForm/{fileSize}/{storedFolderId}", method = RequestMethod.POST)
-    public JsonResult uploadMultipleData(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId,@PathVariable String storedFolderId,@PathVariable String fileSize) throws IOException, ServletException {
+    public JsonResult uploadMultipleData(HttpServletRequest request, @JwtTokenParser(key = "userId") String userId, @PathVariable String storedFolderId, @PathVariable String fileSize) throws IOException, ServletException {
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
         Part part = multiRequest.getPart("file");
         String header = part.getHeader("Content-Disposition");
@@ -137,10 +148,11 @@ public class DataItemController {
         if (!jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
+
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");//获得上传数据的URL
 
-        if(storedFolderId.equals("intermediate")){
-            return ResultUtils.success("http://112.4.132.6:8083/data/" +url);
+        if (storedFolderId.equals("intermediate")) {
+            return ResultUtils.success("http://112.4.132.6:8083/data/" + url);
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
@@ -158,33 +170,33 @@ public class DataItemController {
             add.convertTo(dataItem);
             DataItem resultData = dataItemRepository.insert(dataItem);
 
-            Folder returnFolder1 = folderService.updataDataList(storedFolderId,resultData.id);
-            String scenarioFolder= dataItemService.setScenrioResource(storedFolderId);
+            Folder returnFolder1 = folderService.updataDataList(storedFolderId, resultData.id);
+            String scenarioFolder = dataItemService.setScenrioResource(storedFolderId);
 
-            Folder folder= folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
-            String tagId= folder.getTagId();
+            Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
+            String tagId = folder.getTagId();
 
             Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
-            ResourceCollection resourceCollectionUpdate =  Optional.ofNullable(scenario)
+            ResourceCollection resourceCollectionUpdate = Optional.ofNullable(scenario)
                     .map(x -> x.getResourceCollection())
                     .map(x -> {
                         List<String> dataIdList = x.getDataList();
                         List<String> modelIdList = x.getModelList();
                         if (dataIdList != null) {
-                            dataIdList.add( resultData.getId());
+                            dataIdList.add(resultData.getId());
                         }
-                        ResourceCollection resourceCollection =  ResourceCollection.builder()
+                        ResourceCollection resourceCollection = ResourceCollection.builder()
                                 .modelList(modelIdList)
                                 .dataList(dataIdList)
                                 .build();
                         return resourceCollection;
                     })
 
-                    .orElseGet(() ->  {
-                        List<String> dataIdList =new ArrayList<>();
+                    .orElseGet(() -> {
+                        List<String> dataIdList = new ArrayList<>();
                         dataIdList.add(resultData.getId());
 
-                        return  ResourceCollection.builder()
+                        return ResourceCollection.builder()
                                 .dataList(dataIdList)
                                 .build();
 

@@ -1,4 +1,4 @@
-package edu.njnu.opengms.r2.domain.codingol;
+package edu.njnu.opengms.r2.config;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -25,8 +25,9 @@ public class dockerConfig {
         return connect();
 //        return DockerClientBuilder.getInstance().build();
     }
-//    连接docker
-    private DockerClient connect(){
+
+    //    连接docker
+    private DockerClient connect() {
         String host = "tcp://" + clientHost + ":" + clientPort;
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(host)
@@ -37,7 +38,7 @@ public class dockerConfig {
                 .connectionTimeout(Duration.ofSeconds(30))
                 .responseTimeout(Duration.ofSeconds(180))
                 .build();
-        DockerClient client = DockerClientImpl.getInstance(config,httpClient);
+        DockerClient client = DockerClientImpl.getInstance(config, httpClient);
         return client;
 //        log.info("docker initialize successfully");
     }

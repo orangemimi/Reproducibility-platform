@@ -19,13 +19,13 @@ public class AddUserDTO implements ToDomainConverter<User> {
     String name;
     String password;    //MD5
     String email;   //used for registration
-//    String userId;
+    //    String userId;
     String avatar;
     String institution;
     List<String> tags;
 
-    List<String> joinedProjects =new ArrayList<>();
-    List<String> createdProjects=new ArrayList<>();
-    List<String> forkedProjects=new ArrayList<>();
+    List<String> joinedProjects = new ArrayList<>();
+    List<String> createdProjects = new ArrayList<>();
+    List<String> forkedProjects = new ArrayList<>();
 
 }

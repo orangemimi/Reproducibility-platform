@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class  ModelService extends BaseEntity {
+public class ModelService extends BaseEntity {
     @Id
     String id;
     String name;
@@ -34,7 +34,7 @@ public class  ModelService extends BaseEntity {
     String type; //service or code
     String privacy;// is public?
 
-//    List<Dependency> dependencies;
+    //    List<Dependency> dependencies;
     String boundaryCondition;
 
     List<AgentInfo> agentInfo;
@@ -45,7 +45,7 @@ public class  ModelService extends BaseEntity {
 
     //service
     ModelBehavior behavior;
-//    List<State> behavior;
+    //    List<State> behavior;
     String md5;
     String serviceId;
 //    String sponsor;

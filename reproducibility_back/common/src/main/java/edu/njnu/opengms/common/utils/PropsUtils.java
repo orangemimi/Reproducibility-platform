@@ -13,9 +13,9 @@ import java.util.Properties;
  */
 public class PropsUtils {
 
-    private static final String PATH="project.properties";
+    private static final String PATH = "project.properties";
 
-    public static String getProp(String type){
+    public static String getProp(String type) {
         InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PATH);
         Properties prop = new Properties();
         try {

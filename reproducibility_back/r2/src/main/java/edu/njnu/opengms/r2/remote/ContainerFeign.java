@@ -21,87 +21,80 @@ import java.util.List;
  * @Date 2020/4/30
  * @Version 1.0.0
  */
-@FeignClient (name = "container",
+@FeignClient(name = "container",
         url = "http://127.0.0.1:8081",
         fallbackFactory = ContainerFeign.FeignServiceFallBack.class)
 @Primary
 public interface ContainerFeign {
 
-    @RequestMapping (value = "/model_services",method = RequestMethod.GET)
-    JsonResult listModelServices(@SpringQueryMap  SplitPageDTO splitPageDTO);
+    @RequestMapping(value = "/model_services", method = RequestMethod.GET)
+    JsonResult listModelServices(@SpringQueryMap SplitPageDTO splitPageDTO);
 
-    @RequestMapping (value = "/model_services/all",method = RequestMethod.GET)
+    @RequestMapping(value = "/model_services/all", method = RequestMethod.GET)
     JsonResult listAllModelServices();
 
 
-    @RequestMapping (value = "/model_services/listByIds", method = RequestMethod.GET)
-    JsonResult listModelServiceByIds(@RequestParam ("ids") List<String> ids);
+    @RequestMapping(value = "/model_services/listByIds", method = RequestMethod.GET)
+    JsonResult listModelServiceByIds(@RequestParam("ids") List<String> ids);
 
 
-    @RequestMapping (value = "/model_services/listVOByIds", method = RequestMethod.GET)
-    JsonResult listModelServiceVOByIds(@RequestParam ("ids") List<String> ids);
+    @RequestMapping(value = "/model_services/listVOByIds", method = RequestMethod.GET)
+    JsonResult listModelServiceVOByIds(@RequestParam("ids") List<String> ids);
 
-    @RequestMapping (value = "/model_services/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
-    JsonResult getModelsByPrivacy(@PathVariable String privacy,@PathVariable int currentPage,@PathVariable int pageSize);
-
-
+    @RequestMapping(value = "/model_services/getPublicModels/{privacy}/{currentPage}/{pageSize}", method = RequestMethod.GET)
+    JsonResult getModelsByPrivacy(@PathVariable String privacy, @PathVariable int currentPage, @PathVariable int pageSize);
 
 
+    @RequestMapping(value = "/data_service", method = RequestMethod.GET)
+    JsonResult listDataServices(@SpringQueryMap SplitPageDTO splitPageDTO);
 
-
-    @RequestMapping (value = "/data_service",method = RequestMethod.GET)
-    JsonResult listDataServices(@SpringQueryMap  SplitPageDTO splitPageDTO);
-
-    @RequestMapping (value = "/data_service/all",method = RequestMethod.GET)
+    @RequestMapping(value = "/data_service/all", method = RequestMethod.GET)
     JsonResult listAllDataServices();
 
 
-
-    @RequestMapping (value = "/model/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/model/{id}", method = RequestMethod.GET)
     JsonResult getModelService(@PathVariable String id);
 
-    @RequestMapping (value = "/data_service/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/data_service/{id}", method = RequestMethod.GET)
     JsonResult getDataService(@PathVariable String id);
 
-    @RequestMapping (value = "/instance",method = RequestMethod.POST)
+    @RequestMapping(value = "/instance", method = RequestMethod.POST)
     JsonResult addInstance(@RequestBody JSONObject serviceInstance);
 
-    @RequestMapping (value = "/instance/{id}",method = RequestMethod.GET)
-    JsonResult getInstance(@PathVariable("id")String id);
+    @RequestMapping(value = "/instance/{id}", method = RequestMethod.GET)
+    JsonResult getInstance(@PathVariable("id") String id);
 
-    @RequestMapping (value = "/instance/{id}/invoke", method = RequestMethod.POST)
-    JsonResult invoke(@PathVariable ("id") String id);
+    @RequestMapping(value = "/instance/{id}/invoke", method = RequestMethod.POST)
+    JsonResult invoke(@PathVariable("id") String id);
 
-    @RequestMapping (value = "/data_service/addByFile",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    JsonResult addDataServiceByFile(@RequestPart ("file") MultipartFile file);
+    @RequestMapping(value = "/data_service/addByFile", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    JsonResult addDataServiceByFile(@RequestPart("file") MultipartFile file);
 
 
-    @RequestMapping (value = "/data_service/addByFileToPublic",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    JsonResult addByFileToPublic(@RequestPart ("file") MultipartFile file,
-                                 @RequestPart ("name") String name,
+    @RequestMapping(value = "/data_service/addByFileToPublic", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    JsonResult addByFileToPublic(@RequestPart("file") MultipartFile file,
+                                 @RequestPart("name") String name,
 //                                 @RequestPart ("resourceUrl") String resourceUrl,
-                                 @RequestPart ("description") String description);
+                                 @RequestPart("description") String description);
 
-    @RequestMapping (value = "/evaluation_service",method = RequestMethod.POST)
+    @RequestMapping(value = "/evaluation_service", method = RequestMethod.POST)
     JsonResult createEvaluationService(@RequestBody JSONObject evaluationService);
 
-    @RequestMapping (value = "/instance/listByIds",method = RequestMethod.GET)
-    JsonResult listInstanceByIds(@RequestParam ("ids") List<String> id);
+    @RequestMapping(value = "/instance/listByIds", method = RequestMethod.GET)
+    JsonResult listInstanceByIds(@RequestParam("ids") List<String> id);
 
-    @RequestMapping (value = "/instance/{id}/getOutputs",method = RequestMethod.GET)
-    JsonResult getInstanceOutputs(@PathVariable ("id") String id);
+    @RequestMapping(value = "/instance/{id}/getOutputs", method = RequestMethod.GET)
+    JsonResult getInstanceOutputs(@PathVariable("id") String id);
 
-    @RequestMapping (value = "/evaluation_service/{id}",method = RequestMethod.GET)
-    JsonResult getEvaluationServiceById(@PathVariable ("id") String id);
-
-
-    @RequestMapping (value = "/evaluation_service/listVOByIds", method = RequestMethod.GET)
-    JsonResult listEvaluationServicesVO(@RequestParam ("ids") List<String> evaluationServices);
-
-    @RequestMapping (value = "/data_service/listByIds", method = RequestMethod.GET)
-    JsonResult listDataServiceByIds(@RequestParam ("ids") List<String> id);
+    @RequestMapping(value = "/evaluation_service/{id}", method = RequestMethod.GET)
+    JsonResult getEvaluationServiceById(@PathVariable("id") String id);
 
 
+    @RequestMapping(value = "/evaluation_service/listVOByIds", method = RequestMethod.GET)
+    JsonResult listEvaluationServicesVO(@RequestParam("ids") List<String> evaluationServices);
+
+    @RequestMapping(value = "/data_service/listByIds", method = RequestMethod.GET)
+    JsonResult listDataServiceByIds(@RequestParam("ids") List<String> id);
 
 
     @Component

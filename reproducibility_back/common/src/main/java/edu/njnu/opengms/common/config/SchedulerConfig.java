@@ -14,8 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
-    @Scheduled (cron = "0 0 3 * * ?")
-    public void Schedule(){
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void Schedule() {
         System.out.println("凌晨三点对你思念是一天又一天");
     }
 }

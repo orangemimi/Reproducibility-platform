@@ -38,10 +38,10 @@ export default {
   },
   methods: {
     selectModel(val, scenarioId) {
+      // console.log("left information", val, scenarioId);
       if (val.type == "code") {
         this.codingOl(true, scenarioId, val);
       } else {
-        console.log("left", val, scenarioId);
         this.currentModel = val;
         this.scenarioId = scenarioId;
         this.codingOlShow = false;
@@ -49,7 +49,7 @@ export default {
     },
     // 添加codingOl组件所需要的scenarioId
     codingOl(state, scenarioId, currentModel) {
-      console.log("right", state, scenarioId, currentModel);
+      // console.log("right", state, scenarioId, currentModel);
       this.scenarioId = scenarioId;
       this.codingOlShow = state;
       if (currentModel) {

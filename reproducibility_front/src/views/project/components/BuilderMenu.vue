@@ -20,6 +20,14 @@
             </div> -->
       <div
         class="construction1 menu-item"
+        @click="handleClick('AIAssistant')"
+        :class="{ isActive: isAIActive }"
+      >
+        <el-icon><InfoFilled /></el-icon>
+        AI Assistant
+      </div>
+      <div
+        class="construction1 menu-item"
         @click="handleClick('Construction')"
         :class="{ isActive: isConstruction1Active }"
       >
@@ -76,6 +84,7 @@ export default {
       isCommunityActive: false,
       isConstruction1Active: false,
       isWorkFlowActive: false,
+      isAIActive: false,
     };
   },
   methods: {
@@ -88,10 +97,21 @@ export default {
           this.isCommunityActive =
           this.isConstruction1Active =
           this.isWorkFlowActive =
+          this.isAIActive =
+            false;
+      } else if (type == "AIAssistant") {
+        this.isAIActive = true;
+        this.isInfoActive =
+          this.isConstructionActive =
+          this.isSettingsActive =
+          this.isCommunityActive =
+          this.isConstruction1Active =
+          this.isWorkFlowActive =
             false;
       } else if (type == "Contributor") {
         this.isContributorActive = true;
         this.isInfoActive =
+          this.isAIActive =
           this.isConstructionActive =
           this.isSettingsActive =
           this.isCommunityActive =
@@ -101,6 +121,7 @@ export default {
       } else if (type == "Community") {
         this.isCommunityActive = true;
         this.isInfoActive =
+          this.isAIActive =
           this.isConstructionActive =
           this.isSettingsActive =
           this.isContributorActive =
@@ -110,6 +131,7 @@ export default {
       } else if (type == "Settings") {
         this.isSettingsActive = true;
         this.isInfoActive =
+          this.isAIActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isCommunityActive =
@@ -119,6 +141,7 @@ export default {
       } else if (type == "Construction") {
         this.isConstruction1Active = true;
         this.isInfoActive =
+          this.isAIActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isSettingsActive =
@@ -128,6 +151,7 @@ export default {
       } else if (type == "WorkFlow") {
         this.isWorkFlowActive = true;
         this.isInfoActive =
+          this.isAIActive =
           this.isConstructionActive =
           this.isContributorActive =
           this.isSettingsActive =
@@ -147,12 +171,25 @@ export default {
             this.isSettingsActive =
             this.isCommunityActive =
             this.isWorkFlowActive =
+            this.isAIActive =
+              false;
+          break;
+        }
+        case "AIAssistant": {
+          this.isAIActive = true;
+          this.isInfoActive =
+            this.isConstructionActive =
+            this.isContributorActive =
+            this.isSettingsActive =
+            this.isCommunityActive =
+            this.isWorkFlowActive =
               false;
           break;
         }
         case "Construction": {
           this.isConstructionActive = true;
           this.isInfoActive =
+            this.isAIActive =
             this.isContributorActive =
             this.isSettingsActive =
             this.isCommunityActive =
@@ -163,6 +200,7 @@ export default {
         case "WorkFlow": {
           this.isWorkFlowActive = true;
           this.isInfoActive =
+            this.isAIActive =
             this.isContributorActive =
             this.isSettingsActive =
             this.isCommunityActive =
@@ -173,6 +211,7 @@ export default {
         case "Contributor": {
           this.isContributorActive = true;
           this.isInfoActive =
+            this.isAIActive =
             this.isConstructionActive =
             this.isSettingsActive =
             this.isCommunityActive =
@@ -183,6 +222,7 @@ export default {
         case "Settings": {
           this.isSettingsActive = true;
           this.isInfoActive =
+            this.isAIActive =
             this.isConstructionActive =
             this.isContributorActive =
             this.isCommunityActive =
@@ -193,6 +233,7 @@ export default {
         case "Community": {
           this.isCommunityActive = true;
           this.isInfoActive =
+            this.isAIActive =
             this.isReproductionActive =
             this.isSettingsActive =
             this.isContributorActive =

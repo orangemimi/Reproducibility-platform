@@ -27,7 +27,7 @@ public class Project extends BaseEntity {
     List<Member> memberList;
     List<String> scenarioList; //selected workspace
 
-    Integer level=0;
+    Integer level = 0;
     String forkingProjectId;// //从项目的那条记录开始fork的
     List<String> forkedProjectIdList;//有哪些项目是从这个project fork的
 

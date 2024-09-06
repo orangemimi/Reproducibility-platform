@@ -31,7 +31,8 @@ public class FileUtil {
 
     /**
      * 删除单个文件
-     * @param   fileName    被删除文件的文件名
+     *
+     * @param fileName 被删除文件的文件名
      * @return 单个文件删除成功返回true，否则返回false
      */
     public static boolean deleteFile(String fileName) {
@@ -47,20 +48,21 @@ public class FileUtil {
 
     /**
      * 删除单个文件
-     * @param   content    内容
-     * @param   prefix    文件名前缀
-     * @param   suffix    文件名后缀
+     *
+     * @param content 内容
+     * @param prefix  文件名前缀
+     * @param suffix  文件名后缀
      * @return 单个文件删除成功返回true，否则返回false
      */
-    public static File getFile(String content, String filePath,String prefix,String suffix) throws IOException{
+    public static File getFile(String content, String filePath, String prefix, String suffix) throws IOException {
         File file = new File(filePath);
         if (!file.exists()) {
             file.mkdirs();
         }
 
-        String newFileName = UUID.randomUUID() + prefix+"."+suffix;
+        String newFileName = UUID.randomUUID() + prefix + "." + suffix;
         String newFilePath = filePath + newFileName; //新文件的路径
-        File file2= new File(newFilePath);
+        File file2 = new File(newFilePath);
 
         OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(file2), "UTF-8");
         BufferedWriter bw = new BufferedWriter(fw);

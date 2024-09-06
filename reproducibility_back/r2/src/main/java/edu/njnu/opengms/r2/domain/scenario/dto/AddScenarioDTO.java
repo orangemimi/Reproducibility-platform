@@ -19,4 +19,5 @@ public class AddScenarioDTO implements ToDomainConverter<Scenario> {
     String name;
     ResourceCollection resourceCollection;
     String type;
+    String env;
 }

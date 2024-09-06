@@ -141,6 +141,7 @@ export default {
     },
 
     createNewScenario() {
+      console.log("in");
       this.createScenarioDialog = true;
     },
 

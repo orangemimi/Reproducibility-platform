@@ -1,4 +1,5 @@
-import { ElNotification } from "element-plus";
+import {ElNotification} from "element-plus";
+
 /**
  * @param {string} behavior
  * @description create /upload
@@ -6,25 +7,25 @@ import { ElNotification } from "element-plus";
  * @description 成功信息
  */
 export function successNotification(behavior, message) {
-  ElNotification({
-    title: "Success",
-    message: `You have ${behavior} the ${message} successfully`,
-    type: "success",
-  });
+    ElNotification({
+        title: "Success",
+        message: `You have ${behavior} the ${message} successfully`,
+        type: "success",
+    });
 }
 
 export function errorNotification(message) {
-  ElNotification({
-    title: "Error",
-    message: message,
-    type: "error",
-  });
+    ElNotification({
+        title: "Error",
+        message: message,
+        type: "error",
+    });
 }
 
 export function successNot(message) {
-  ElNotification({
-    title: "Success",
-    message: message,
-    type: "success",
-  });
+    ElNotification({
+        title: "Success",
+        message: message,
+        type: "success",
+    });
 }

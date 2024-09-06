@@ -38,28 +38,27 @@ public class ServiceInstanceController {
     @Autowired
     AsyncTaskComponent asyncTaskComponent;
 
-    @RequestMapping (value = "", method = RequestMethod.POST)
-    JsonResult add(@RequestBody ServiceInstance serviceInstance){
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    JsonResult add(@RequestBody ServiceInstance serviceInstance) {
         serviceInstance.setCreateTime(new Date());
         serviceInstance.setUpdateTime(new Date());
         return ResultUtils.success(serviceInstanceRepository.insert(serviceInstance));
     }
 
 
-
-    @RequestMapping (value = "", method = RequestMethod.GET)
-    JsonResult list(SplitPageDTO splitPageDTO){
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    JsonResult list(SplitPageDTO splitPageDTO) {
         return ResultUtils.success(serviceInstanceRepository.findAll(splitPageDTO.getPageable()));
     }
 
-    @RequestMapping (value = "/{id}", method = RequestMethod.GET)
-    JsonResult get(@PathVariable ("id") String id){
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    JsonResult get(@PathVariable("id") String id) {
         return ResultUtils.success(serviceInstanceRepository.findById(id).orElse(null));
     }
 
-    @RequestMapping (value = "/{id}/invoke", method = RequestMethod.POST)
-    JsonResult invoke(@PathVariable ("id") String id) throws InterruptedException {
-        ServiceInstance instance=serviceInstanceRepository.findById(id).orElseThrow(MyException::noObject);
+    @RequestMapping(value = "/{id}/invoke", method = RequestMethod.POST)
+    JsonResult invoke(@PathVariable("id") String id) throws InterruptedException {
+        ServiceInstance instance = serviceInstanceRepository.findById(id).orElseThrow(MyException::noObject);
         instance.setStatusEnum(StatusEnum.RUN);
         serviceInstanceRepository.save(instance);
         asyncTaskComponent.executeAsyncInstance(instance);
@@ -67,19 +66,19 @@ public class ServiceInstanceController {
     }
 
 
-    @RequestMapping (value = "/listByIds", method = RequestMethod.GET)
-    public JsonResult listByIds(@RequestParam("ids") List<String> ids){
+    @RequestMapping(value = "/listByIds", method = RequestMethod.GET)
+    public JsonResult listByIds(@RequestParam("ids") List<String> ids) {
         return ResultUtils.success(Lists.newArrayList(serviceInstanceRepository.findAllById(ids)));
     }
 
 
-    @RequestMapping (value = "/{id}/getOutputs",method = RequestMethod.GET)
-    JsonResult getInstanceOuputs(@PathVariable ("id") String id){
+    @RequestMapping(value = "/{id}/getOutputs", method = RequestMethod.GET)
+    JsonResult getInstanceOuputs(@PathVariable("id") String id) {
         ServiceInstance instance = serviceInstanceRepository.findById(id).orElseThrow(MyException::noObject);
-        ObjectMapper objectMapper=new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         Object service = instance.getService();
-        List<String> outputs=new ArrayList<>();
-        if(instance.getInstanceEnum().equals(InstanceEnum.MODEL)){
+        List<String> outputs = new ArrayList<>();
+        if (instance.getInstanceEnum().equals(InstanceEnum.MODEL)) {
             ModelService modelService = objectMapper.convertValue(service, ModelService.class);
 //            modelService.getBehavior().getStates().getOutputs().forEach(el-> outputs.add(el.getDataServiceId()));
         }

@@ -43,14 +43,21 @@ public class ModelInstanceController {
 
     //create one project
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public JsonResult create(@RequestBody AddModelInstanceDTO add,@JwtTokenParser(key = "userId") String userId) {
+    public JsonResult create(@RequestBody AddModelInstanceDTO add, @JwtTokenParser(key = "userId") String userId) {
         ModelInstance modelInstance = new ModelInstance();
 
         add.convertTo(modelInstance);
         modelInstance.setExecutorId(userId);
 
-        return ResultUtils.success( modelInstanceRepository.insert(modelInstance));
+        return ResultUtils.success(modelInstanceRepository.insert(modelInstance));
 
+    }
+
+    @RequestMapping(value = "/getByScenarioId/{scenarioId}", method = RequestMethod.GET)
+    public JsonResult getByScenarioId(@PathVariable("scenarioId") String scenarioId) {
+        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioId(scenarioId);
+
+        return ResultUtils.success(modelInstanceList);
     }
 
     @RequestMapping(value = "/inscenario/{scenarioId}/{modelId}/{isReproduced}", method = RequestMethod.GET)
@@ -59,39 +66,40 @@ public class ModelInstanceController {
                                                          @PathVariable("isReproduced") Boolean isReproduced,
                                                          @JwtTokenParser(key = "userId") String userId) {
         List<ModelInstance> modelInstanceList = new ArrayList<>();
-        if(modelId.equals("allInstanceInScenario")){
+        if (modelId.equals("allInstanceInScenario")) {
             modelInstanceList = modelInstanceRepository.findAllByScenarioId(scenarioId);
 
-        }else{
-            modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelIdAndIsReproducedAndExecutorId(scenarioId,modelId,isReproduced,userId);
+        } else {
+            modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelIdAndIsReproducedAndExecutorId(scenarioId, modelId, isReproduced, userId);
         }
         List<JSONObject> objectList = new ArrayList<>();
-        for (ModelInstance modelInstance:modelInstanceList){
+        for (ModelInstance modelInstance : modelInstanceList) {
             if (modelInstance != null) {
-                try{
-                    JSONObject obj =functionUtils.getFullModelInstance(modelInstance);
+                try {
+                    JSONObject obj = functionUtils.getFullModelInstance(modelInstance);
                     objectList.add(obj);
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println(e);
                 }
 
             }
 
         }
-        return ResultUtils.success(objectList) ;
+        return ResultUtils.success(objectList);
     }
+
     @RequestMapping(value = "/inscenario/assessment/{scenarioId}", method = RequestMethod.GET)
-    public JsonResult getAssessmentInstancesByScenarioIdAndModelIs(@PathVariable("scenarioId") String scenarioId,@JwtTokenParser(key = "userId") String userId) {
-        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelIdAndIsReproducedAndExecutorId(scenarioId,"65a0a40a1e8e312ef974d82b",false,userId);
+    public JsonResult getAssessmentInstancesByScenarioIdAndModelIs(@PathVariable("scenarioId") String scenarioId, @JwtTokenParser(key = "userId") String userId) {
+        List<ModelInstance> modelInstanceList = modelInstanceRepository.findAllByScenarioIdAndModelIdAndIsReproducedAndExecutorId(scenarioId, "65a0a40a1e8e312ef974d82b", false, userId);
         List<JSONObject> objectList = new ArrayList<>();
-        for (ModelInstance modelInstance:modelInstanceList){
+        for (ModelInstance modelInstance : modelInstanceList) {
             if (modelInstance != null) {
-                JSONObject obj =functionUtils.getFullModelInstance(modelInstance);
+                JSONObject obj = functionUtils.getFullModelInstance(modelInstance);
                 objectList.add(obj);
             }
 
         }
-        return ResultUtils.success(objectList) ;
+        return ResultUtils.success(objectList);
     }
 
     //新加，用来读取绑定的实例
@@ -102,17 +110,13 @@ public class ModelInstanceController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public JsonResult getInstanceById(@PathVariable("id") String id) {
-        return ResultUtils.success( modelInstanceRepository.findById(id) );
+        return ResultUtils.success(modelInstanceRepository.findById(id));
     }
 
     @RequestMapping(value = "/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
     public JsonResult updateInstanceInfo(@PathVariable("id") String id, @RequestBody UpdateModelInstanceDTO update) {
-        return  ResultUtils.success(modelInstanceService.updateInstance(id,update));
+        return ResultUtils.success(modelInstanceService.updateInstance(id, update));
     }
-
-
-
-
 
 
 }

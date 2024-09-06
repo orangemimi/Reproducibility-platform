@@ -14,6 +14,6 @@ import java.util.List;
 @Data
 @Builder
 public class ForkedScenarios {
-   public List<String> instances;
-   public String executorId;
+    public List<String> instances;
+    public String executorId;
 }

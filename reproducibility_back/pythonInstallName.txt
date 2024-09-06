@@ -1,0 +1,10 @@
+cv2,opencv-python
+opencv,opencv-python
+yaml,pyyaml
+skimage,scikit-image
+PIL,pillow
+sklearn,scikit-learn
+fitz,PyMuPDF
+PIL,pillow
+pdfminer,pdfminer.six
+mpl_toolkits,matplotlib

@@ -33,4 +33,8 @@ public class DataItem extends BaseEntity {
     String fileSize;
     String notes;//数据备注
     List<String> history;//历史数据id
+
+    public String gerId(){
+        return id;
+    }
 }

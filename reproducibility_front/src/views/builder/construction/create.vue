@@ -7,13 +7,22 @@
         </el-form-item>
         <br />
         <br />
-        <el-form-item label="Scenerio Type">
+        <el-form-item label="Scenario Type">
           <el-radio v-model="form.type" label="sequentModels"
             >Sequent models</el-radio
           >
           <el-radio v-model="form.type" label="integrateTask"
             >Integrate task</el-radio
           >
+          <el-radio v-model="form.type" label="dockerScenario"
+            >Docker scenario</el-radio
+          >
+        </el-form-item>
+        <el-form-item v-if="form.type == 'dockerScenario'" label="Environment ">
+          <el-radio v-model="form.env" label="python:3.9">python:3.9</el-radio>
+          <el-radio v-model="form.env" label="python:3.6">python:3.6</el-radio>
+          <el-radio v-model="form.env" label="python:2.7">python:2.7</el-radio>
+          <el-radio v-model="form.env" label="R">R</el-radio>
         </el-form-item>
       </el-form>
       <div class="dialog-footer">
@@ -34,8 +43,10 @@ import {
   getProjectById,
   getModelsByPrivacy,
   updateProject,
+  createContainer,
   // getScenarioById,
   saveScenario,
+  updateContainerId,
 } from "@/api/request";
 export default {
   data() {
@@ -46,13 +57,11 @@ export default {
       form: {
         name: "",
         type: "sequentModels",
+        env: "python:3.9",
       },
-
       modelList: [],
-
       selectedModelsWithId: [],
       currentModelList: [],
-
       total: 0,
       keyword: "",
       isSearching: false,
@@ -96,25 +105,42 @@ export default {
     },
 
     async setScenario() {
+      if (!this.form.name || !this.form.type) {
+        this.$message.error("Please fill in the required fields");
+
+        return;
+      }
+
       $emit(this, "createStatus", "success");
       let data = await saveScenario(
         {
           projectId: this.projectId,
           name: this.form.name,
           type: this.form.type,
+          env: this.form.env,
           resourceCollection: {
             modelList: this.selectedModelsWithId,
           },
         },
         "initial"
       );
+      // 如果是docker场景，就需要添加容器id到场景中
+      if (this.form.type == "dockerScenario") {
+        let ContainerIdFormData = new FormData();
+        ContainerIdFormData.append("scenarioId", data.id);
+        ContainerIdFormData.append("env", this.form.env);
+        let containerId = await createContainer(ContainerIdFormData);
+
+        ContainerIdFormData.append("containerId", containerId);
+        updateContainerId(ContainerIdFormData);
+      }
       this.project.scenarioList.push(data.id);
       await updateProject(this.projectId, this.project);
       if (this.isOverOne) {
         $emit(this, "createStatus", "success");
       } else {
         this.$router.push({
-          path: `/project/${this.projectId}/scenarios`,
+          path: `/project/${this.projectId}/construction`,
         });
       }
     },
@@ -134,7 +160,7 @@ export default {
     ) {
       this.selectedModelsWithId = this.project.resourceCollection.modelList;
     }
-    this.init();
+    // this.init();
     // this.getData();
   },
   emits: ["createStatus"],
@@ -159,7 +185,9 @@ export default {
   }
 }
 .dialog-footer {
-  margin-top: 200px;
+  position: absolute;
+  right: 100px;
+  bottom: 80px;
   float: right;
 }
 .transfer {

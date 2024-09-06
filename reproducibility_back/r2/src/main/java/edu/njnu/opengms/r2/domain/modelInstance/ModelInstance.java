@@ -28,6 +28,7 @@ public class ModelInstance extends BaseEntity {
     Boolean isReproduced;
     Integer status;//running 0, fail, success 2
     RefreshForm refreshForm;
+    String content; //code
 
 
 }

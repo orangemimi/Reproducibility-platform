@@ -22,7 +22,7 @@ public class BaseInfo extends BaseEntity {
     public List<String> tags;
     public List<AgentInfo> agentInfo;
     public String license;
-//    public String details;
+    //    public String details;
     public String snapshot;
     public String contributor;
     public String resourceUrl;

@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <!-- <div class="btnList" v-if="role == 'participant'"> -->
-      <div class="btnList" >
+    <div class="btnList">
       <div v-if="!isAddFolder">
         <div class="btn">
           <el-upload
@@ -20,14 +20,20 @@
           </el-upload>
         </div>
         <div class="btn">
-          <el-button size="default" @click="addFolderShow"> <el-icon><FolderAdd /></el-icon> Add folder</el-button>
+          <el-button size="default" @click="addFolderShow">
+            <el-icon><FolderAdd /></el-icon> Add folder</el-button
+          >
         </div>
       </div>
       <div v-else>
         <el-input v-model="folderName">
           <template #suffix>
-            <el-icon class="el-input__icon" @click="uploadFolder"><Check /></el-icon>
-            <el-icon class="el-input__icon" @click="closeAddFolder"><Close /></el-icon>
+            <el-icon class="el-input__icon" @click="uploadFolder"
+              ><Check
+            /></el-icon>
+            <el-icon class="el-input__icon" @click="closeAddFolder"
+              ><Close
+            /></el-icon>
           </template>
         </el-input>
       </div>
@@ -38,10 +44,8 @@
         :data="folderList"
         :span-method="spanMethod"
         tooltip-effect="dark"
-        style="width: 100%"
-        max-height="800"
+        style="width: 100%; height: 85vh"
         :row-style="{ height: '0' }"
-        :cell-style="{ padding: '4px' }"
         row-key="id"
         :tree-props="{ children: 'children' }"
         border
@@ -72,23 +76,24 @@
         </el-table-column>
         <el-table-column label="Operation" width="120" show-overflow-tooltip>
           <template #default="scope">
-            <el-icon @click="clickEditDialog(scope.row)" style="margin-right: 10px"><Edit /></el-icon>
-            <el-icon @click="downloadFileResource(scope.row.value)"><Download /></el-icon>
-        </template>
+            <el-icon
+              @click="clickEditDialog(scope.row)"
+              style="margin-right: 10px; margin-top: 4px"
+              ><Edit
+            /></el-icon>
+            <el-icon @click="downloadFileResource(scope.row.value)"
+              ><Download
+            /></el-icon>
+          </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog
-      title="form Online"
-      v-model="editDataDialogShow"
-      width="94%"
-    >
+    <el-dialog title="form Online" v-model="editDataDialogShow" width="94%">
       <div class="contentBottom">
-          <formOL :currentRow="currentRow"></formOL>
+        <formOL :currentRow="currentRow"></formOL>
       </div>
     </el-dialog>
   </div>
-
 </template>
 
 <script>
@@ -99,11 +104,11 @@
 //   Edit as ElIconEditOutline,
 //   Download as ElIconDownload,
 // } from '@element-plus/icons-vue'
-import { saveData, addFolder, getFolders } from '@/api/request'
+import { saveData, addFolder, getFolders } from "@/api/request";
 // import dataUpload from './FileUpload'; //dialogcontent
-import { renderSize } from '@/utils/utils'
-import { mapState } from 'vuex'
-import formOL from '../../../components/formOL/luckySheet.vue'
+import { renderSize } from "@/utils/utils";
+import { mapState } from "vuex";
+import formOL from "../../../components/formOL/luckySheet.vue";
 
 export default {
   components: {
@@ -125,13 +130,13 @@ export default {
 
       //add folder
       isAddFolder: false,
-      folderName: '',
-      currentRow: '',
+      folderName: "",
+      currentRow: "",
       // fileItemListDirect: []
 
       fileList: [],
       editDataDialogShow: false,
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -163,83 +168,83 @@ export default {
       }
     },
     clickEditDialog(val) {
-      this.rowClick(val)
-      if(val.suffix == ".csv" || val.suffix == ".xlsx"){
-        this.editDataDialogShow = true
-      }else{
+      this.rowClick(val);
+      if (val.suffix == ".csv" || val.suffix == ".xlsx") {
+        this.editDataDialogShow = true;
+      } else {
         this.$message({
-          type:'warning',
-          message:'Only supports online editing of csv and xlsx files'
-        })
+          type: "warning",
+          message: "Only supports online editing of csv and xlsx files",
+        });
       }
     },
     download(val) {
-      console.log(val)
+      console.log(val);
     },
 
     downloadFileResource(data) {
-      window.open(data)
+      window.open(data);
     },
 
     //get all the data
     async getFolders() {
-      let data = await getFolders()
-      this.folderList = data
+      let data = await getFolders();
+      this.folderList = data;
     },
 
     handleUploadFileChange(file, fileList) {
-      this.fileList = fileList
+      this.fileList = fileList;
     },
 
     // handleCurrentChange(row) {
     //   this.currentRow = row;
     // },
     rowClick(row) {
-      console.log(row)
-      this.currentRow = row
+      console.log(row);
+      this.currentRow = row;
     },
     cancleCurrentRow() {
-      this.currentRow = ''
+      this.currentRow = "";
     },
 
     addFolderShow() {
-      this.folderName = ''
-      this.isAddFolder = true
+      this.folderName = "";
+      this.isAddFolder = true;
     },
     closeAddFolder() {
-      this.isAddFolder = false
+      this.isAddFolder = false;
     },
 
     async uploadFolder() {
-      if(!this.folderName){
+      if (!this.folderName) {
         this.$message({
-          message: 'Please enter a file name', 
-          type: 'warning' 
-        })
-        return
+          message: "Please enter a file name",
+          type: "warning",
+        });
+        return;
       }
       let form = {
         name: this.folderName,
-        parent: '0',
+        parent: "0",
         level: 0,
         children: [],
+      };
+      if (this.currentRow != "") {
+        form.parent = this.currentRow.id;
+        form.level = this.currentRow.level + 1;
       }
-      if (this.currentRow != '') {
-        form.parent = this.currentRow.id
-        form.level = this.currentRow.level + 1
-      }
-      await addFolder(form)
-      this.isAddFolder = false
-      await this.getFolders()
+      await addFolder(form);
+      this.isAddFolder = false;
+      await this.getFolders();
     },
 
     //上传文件到服务器
     async submitFile(fileItem) {
-      if (this.currentRow != '') {
-        let param = fileItem.file
-        let uploadFileForm = new FormData()
-        console.log(fileItem,'fileItem');
-        uploadFileForm.append('file', param)
+      if (this.currentRow != "") {
+        let param = fileItem.file;
+        let uploadFileForm = new FormData();
+        console.log(fileItem, "fileItem");
+        uploadFileForm.append("file", param);
         // console.log( "datddd",uploadFileForm,
         //   renderSize(param.size) ,
         //   this.currentRow.id,)
@@ -248,24 +253,25 @@ export default {
           uploadFileForm,
           renderSize(param.size),
           this.currentRow.id
-        )
-        console.log(data)
+        );
+        console.log(data);
       } else {
-        this.$alert('Please select one folder to upload data', 'Warning', {})
+        this.$alert("Please select one folder to upload data", "Warning", {});
       }
     },
 
     collapseClass(params) {
-      return params.isFolder === true ? 'el-icon-folder' : 'el-icon-document'
+      return params.isFolder === true ? "el-icon-folder" : "el-icon-document";
     },
     cancleRow() {
-      this.currentRow = ''
+      this.currentRow = "";
     },
   },
   async mounted() {
-    await this.getFolders()
+    await this.getFolders();
+    console.log(this.folderList,111);
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -301,7 +307,6 @@ export default {
     width: 80%;
     // line-height: 40px;
     // margin-top: 10px;
-
   }
 }
 </style>

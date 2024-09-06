@@ -26,6 +26,8 @@ public class AddModelInstanceDTO implements ToDomainConverter<ModelInstance> {
     Integer status;//running 0, fail, success 2
     RefreshForm refreshForm;
     Boolean isReproduced;
+    String content; //code
+
 
 }
 

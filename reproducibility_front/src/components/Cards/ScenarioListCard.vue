@@ -3,8 +3,8 @@
     <div class="cardBodyBinded">
       <el-card shadow="hover" class="card_main">
         <div class="card_info">
-          <h4 :title="item.name" class="card_info_name">
-            {{ item.name }}
+          <h4 class="card_info_name">
+            {{ item.env ? item.name + "（" + item.env + "）" : item.name }}
           </h4>
         </div>
       </el-card>
@@ -15,15 +15,15 @@
 <script>
 export default {
   props: {
-    secnarioForm: {
+    scenarioForm: {
       type: Object,
     },
   },
 
   watch: {
-    secnarioForm: {
+    scenarioForm: {
       deep: true,
-
+      immediate: true,
       handler(val) {
         this.item = val;
       },
@@ -32,7 +32,7 @@ export default {
 
   data() {
     return {
-      item: this.secnarioForm,
+      item: this.scenarioForm,
     };
   },
 
@@ -42,7 +42,7 @@ export default {
 
 <style lang="scss" scoped>
 .mainCardConstruction {
-  width: 320px; /*// pointer-events: none;*/ /*//鼠标点击不可修改
+  width: 300px; /*// pointer-events: none;*/ /*//鼠标点击不可修改
 */
   // padding: 5px;/*// background-color: #3067d61c;*/.cardBodyBinded {
   :deep(.el-card__body) {

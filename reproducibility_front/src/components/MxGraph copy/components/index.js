@@ -3,14 +3,14 @@ import mx from "mxgraph";
 //   "mxBasePath": '/mxgraph'
 // })
 const mxgraph = mx({
-  mxImageBasePath: "./../images",
-  mxBasePath: "./../../../../public/mxgraph-base",
-  mxLoadResources: false,
-  mxLoadStylesheets: false, // 当通过commonjs加载时为false, 否则会向页面加载script
-  mxForceIncludes: false,
+    mxImageBasePath: "./../images",
+    mxBasePath: "./../../../../public/mxgraph-base",
+    mxLoadResources: false,
+    mxLoadStylesheets: false, // 当通过commonjs加载时为false, 否则会向页面加载script
+    mxForceIncludes: false,
 });
 Object.keys(mxgraph).forEach((key) => {
-  window[key] = mxgraph[key];
+    window[key] = mxgraph[key];
 });
 
 // decode bug https://github.com/jgraph/mxgraph/issues/49

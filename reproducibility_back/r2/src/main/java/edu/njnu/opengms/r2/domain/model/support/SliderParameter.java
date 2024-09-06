@@ -10,7 +10,7 @@ import lombok.Data;
  * @Version 1.0.0
  */
 @Data
-public class SliderParameter  extends Parameter {
+public class SliderParameter extends Parameter {
     public String max;
     public String min;
     public String step;

@@ -62,7 +62,7 @@ public class PythonExecutionService {
     private static final String UPLOAD_API_URL = "http://112.4.132.6:8083/data";
     private static final String DATA_FOLDER_PATH = "E:/dockerData/works";
 
-    public String executePythonCodeInDocker(String pythonCode , String folderId, String userId) throws Exception {
+    public String executePythonCodeInDocker(String pythonCode, String folderId, String userId) throws Exception {
         // docker镜像名称
         String imageName = "pythonplus:1.0";
 
@@ -70,11 +70,12 @@ public class PythonExecutionService {
         // 创建Docker容器，启动，执行Python代码，获取结果，转移并上传文件，然后停止和删除容器
         String containerId = createAndRunPythonContainer(imageName, pythonCode);
         String result = getContainerLogs(containerId);
-        getContainerFileContent(containerId,folderId,userId,"./works");
+        getContainerFileContent(containerId, folderId, userId, "./works");
         stopAndRemoveContainer(containerId);
 
         return result;
     }
+
     public String createAndRunPythonContainer(String imageName, String pythonCode) throws Exception {
 
         CreateContainerResponse container = dockerClient.createContainerCmd(imageName)
@@ -140,7 +141,7 @@ public class PythonExecutionService {
         }
     }
 
-    public void getContainerFileContent(String containerId, String folderId, String userId,String filePath) throws IOException {
+    public void getContainerFileContent(String containerId, String folderId, String userId, String filePath) throws IOException {
         try {
             Process process = Runtime.getRuntime().exec("docker cp " + containerId + ":" + filePath + " E:\\dockerData");
             // 等待命令执行完成
@@ -148,11 +149,11 @@ public class PythonExecutionService {
             // 等待进程完成
             if (exitCode == 0) {
                 List<Map<String, String>> uploadedFilesInfo = uploadFiles();
-                for(Map<String, String> fileInfo : uploadedFilesInfo){
+                for (Map<String, String> fileInfo : uploadedFilesInfo) {
                     String fileName = fileInfo.get("fileName");
                     String url = fileInfo.get("url");
                     String size = fileInfo.get("size");
-                    updateDataBase(url,folderId,userId,fileName,size);
+                    updateDataBase(url, folderId, userId, fileName, size);
                 }
             }
         } catch (IOException | InterruptedException e) {
@@ -161,7 +162,7 @@ public class PythonExecutionService {
     }
 
     // 读取和捕获数据文件
-    public List<Map<String, String>>  uploadFiles() {
+    public List<Map<String, String>> uploadFiles() {
         File dataFolder = new File(DATA_FOLDER_PATH);
 
         if (!dataFolder.exists()) {
@@ -229,13 +230,13 @@ public class PythonExecutionService {
     }
 
     // 根据数据容器中返回的url，更新本地数据库
-    private void updateDataBase(String url , String storedFolderId ,String userId , String fullName , String fileSize){
+    private void updateDataBase(String url, String storedFolderId, String userId, String fullName, String fileSize) {
 
         //add to dataItem in mongodb
         int lastDotIndex = fullName.lastIndexOf('.');
         String filename;
         String suffix;
-        if(lastDotIndex != -1 && lastDotIndex < fullName.length() - 1) {
+        if (lastDotIndex != -1 && lastDotIndex < fullName.length() - 1) {
             // 获取文件名和拓展名
             filename = fullName.substring(0, lastDotIndex);
             suffix = fullName.substring(lastDotIndex);
@@ -260,33 +261,33 @@ public class PythonExecutionService {
         add.convertTo(dataItem);
         DataItem resultData = dataItemRepository.insert(dataItem);
 
-        Folder returnFolder1 = folderService.updataDataList(storedFolderId,resultData.getId());
-        String scenarioFolder= setScenrioResource(storedFolderId);
+        Folder returnFolder1 = folderService.updataDataList(storedFolderId, resultData.getId());
+        String scenarioFolder = setScenrioResource(storedFolderId);
 
-        Folder folder= folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
-        String tagId= folder.getTagId();
+        Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
+        String tagId = folder.getTagId();
 
         Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
-        ResourceCollection resourceCollectionUpdate =  Optional.ofNullable(scenario)
+        ResourceCollection resourceCollectionUpdate = Optional.ofNullable(scenario)
                 .map(x -> x.getResourceCollection())
                 .map(x -> {
                     List<String> dataIdList = x.getDataList();
                     List<String> modelIdList = x.getModelList();
                     if (dataIdList != null) {
-                        dataIdList.add( resultData.getId());
+                        dataIdList.add(resultData.getId());
                     }
-                    ResourceCollection resourceCollection =  ResourceCollection.builder()
+                    ResourceCollection resourceCollection = ResourceCollection.builder()
                             .modelList(modelIdList)
                             .dataList(dataIdList)
                             .build();
                     return resourceCollection;
                 })
 
-                .orElseGet(() ->  {
-                    List<String> dataIdList =new ArrayList<>();
+                .orElseGet(() -> {
+                    List<String> dataIdList = new ArrayList<>();
                     dataIdList.add(resultData.getId());
 
-                    return  ResourceCollection.builder()
+                    return ResourceCollection.builder()
                             .dataList(dataIdList)
                             .build();
 
@@ -328,12 +329,12 @@ public class PythonExecutionService {
                 }
             }
 
-            return fileSizeInBytes/1024.0/1024.0/1024.0 + "GB"; // 如果文件大小非常大，使用GB
+            return fileSizeInBytes / 1024.0 / 1024.0 / 1024.0 + "GB"; // 如果文件大小非常大，使用GB
         }
     }
 
-    public  String setScenrioResource(String storedFolderId) {
-        Folder folder= folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
+    public String setScenrioResource(String storedFolderId) {
+        Folder folder = folderRepository.findById(storedFolderId).orElseThrow(MyException::noObject);
         String object;
         String tagId = folder.getTagId();
         if (tagId == null) {

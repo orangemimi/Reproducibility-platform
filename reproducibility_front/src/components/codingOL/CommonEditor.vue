@@ -51,8 +51,8 @@ export default {
     },
   },
   created() {
-    if(!this.options){
-        this.options = {}
+    if (!this.options) {
+      this.options = {};
     }
     // this.options = this.options || {};
     var language = this.options.mode || "python";
@@ -74,16 +74,24 @@ export default {
 
     // require styleSelectedText.js
     if (this.options.styleSelectedText) {
-      importPromises.push(import("codemirror/addon/selection/mark-selection.js"));
+      importPromises.push(
+        import("codemirror/addon/selection/mark-selection.js")
+      );
       importPromises.push(import("codemirror/addon/search/searchcursor.js"));
     }
 
     // highlightSelectionMatches
     if (this.options.highlightSelectionMatches) {
-      importPromises.push(import("codemirror/addon/scroll/annotatescrollbar.js"));
-      importPromises.push(import("codemirror/addon/search/matchesonscrollbar.js"));
+      importPromises.push(
+        import("codemirror/addon/scroll/annotatescrollbar.js")
+      );
+      importPromises.push(
+        import("codemirror/addon/search/matchesonscrollbar.js")
+      );
       importPromises.push(import("codemirror/addon/search/searchcursor.js"));
-      importPromises.push(import("codemirror/addon/search/match-highlighter.js"));
+      importPromises.push(
+        import("codemirror/addon/search/match-highlighter.js")
+      );
     }
 
     // require emacs
@@ -99,7 +107,11 @@ export default {
       importPromises.push(import("codemirror/addon/search/searchcursor.js"));
       importPromises.push(import("codemirror/addon/search/search.js"));
       // console.log(this.options.keyMap)
-      importPromises.push(import(/* @vite-ignore */"codemirror/keymap/" + this.options.keyMap + ".js"));
+      importPromises.push(
+        import(
+          /* @vite-ignore */ "codemirror/keymap/" + this.options.keyMap + ".js"
+        )
+      );
     }
 
     // require fold js
@@ -120,18 +132,18 @@ export default {
     // require theme config
     if (!!theme && theme == "solarized light") theme = "solarized";
     if (!!theme && theme != "default")
-    //   importPromises.push(import(/* @vite-ignore */"codemirror/theme/" + theme + ".css"));
+      //   importPromises.push(import(/* @vite-ignore */"codemirror/theme/" + theme + ".css"));
 
-    // 使用 Promise.all 确保所有的 import 完成
-    Promise.all(importPromises)
-      .then(() => {
-        // 所有 import 完成后的处理
-      })
-      .catch((error) => {
-        console.error("Error during dynamic imports:", error);
-      });
+      // 使用 Promise.all 确保所有的 import 完成
+      Promise.all(importPromises)
+        .then(() => {
+          // 所有 import 完成后的处理
+        })
+        .catch((error) => {
+          console.error("Error during dynamic imports:", error);
+        });
   },
-  mounted () {
+  mounted() {
     this.editor = CodeMirror.fromTextArea(this.$el, this.options);
     this.editor.setValue(this.code || this.value || this.content);
     this.editor.on("change", (cm) => {
@@ -174,7 +186,7 @@ export default {
       }
     },
   },
-  emits: ['changed', 'update:value'],
+  emits: ["changed", "update:value"],
 };
 </script>
 
@@ -182,5 +194,8 @@ export default {
 .CodeMirror-code {
   line-height: 1.6em;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.CodeMirror {
+  height: 100%;
 }
 </style>

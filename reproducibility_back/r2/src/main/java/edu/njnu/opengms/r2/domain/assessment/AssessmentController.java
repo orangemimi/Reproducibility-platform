@@ -27,7 +27,7 @@ public class AssessmentController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public JsonResult create(@RequestBody AddAssessmentDTO add, @JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success(assessmentService.create(add,userId));
+        return ResultUtils.success(assessmentService.create(add, userId));
     }
 
     @RequestMapping(value = "/{assessmentId}", method = RequestMethod.GET)

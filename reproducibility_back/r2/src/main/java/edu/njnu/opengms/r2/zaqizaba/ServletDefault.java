@@ -14,7 +14,7 @@ import java.io.IOException;
  * @Date 2019/10/15
  * @Version 1.0.0
  */
-@WebServlet ("/ServletDefault")
+@WebServlet("/ServletDefault")
 public class ServletDefault extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

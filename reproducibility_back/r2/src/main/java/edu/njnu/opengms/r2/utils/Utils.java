@@ -18,37 +18,40 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 public class Utils {
-    public  static JSONObject checkMdlJson(JSONObject mdlJson){
-        try{
+    public static JSONObject checkMdlJson(JSONObject mdlJson) {
+        try {
             //处理mdl格式错误
-            JSONObject modelClass=mdlJson.getJSONArray("ModelClass").getJSONObject(0);
+            JSONObject modelClass = mdlJson.getJSONArray("ModelClass").getJSONObject(0);
             //JSONObject runtime=modelClass.getJSONArray("Runtime").getJSONObject(0);
 
-            String type=modelClass.getStr("type");
-            if(type!=null){
-                modelClass.put("style",type);
+            String type = modelClass.getStr("type");
+            if (type != null) {
+                modelClass.put("style", type);
             }
-            if(modelClass.getJSONArray("Runtime").getJSONObject(0).getJSONArray("SupportiveResources")==null){
-                modelClass.getJSONArray("Runtime").getJSONObject(0).put("SupportiveResources","");
+            if (modelClass.getJSONArray("Runtime").getJSONObject(0).getJSONArray("SupportiveResources") == null) {
+                modelClass.getJSONArray("Runtime").getJSONObject(0).put("SupportiveResources", "");
             }
 
             return modelClass;
-        }catch (Exception e){
+        } catch (Exception e) {
             return new JSONObject();
         }
 
     }
-    public static JSONObject documentToJSONObject(String xml){
+
+    public static JSONObject documentToJSONObject(String xml) {
         return elementToJSONObject(strToDocument(xml).getRootElement());
     }
-    public static Document strToDocument(String xml){
+
+    public static Document strToDocument(String xml) {
         try {
             //加上xml标签是为了获取最外层的标签，如果不需要可以去掉
-            return DocumentHelper.parseText("<xml>"+xml+"</xml>");
+            return DocumentHelper.parseText("<xml>" + xml + "</xml>");
         } catch (DocumentException e) {
             return null;
         }
     }
+
     public static JSONObject elementToJSONObject(Element node) {
         JSONObject result = new JSONObject();
         // 当前节点的名称、文本内容和属性
@@ -72,7 +75,7 @@ public class Utils {
         return result;
     }
 
-    public static JSONObject convertMdl(JSONObject data){
+    public static JSONObject convertMdl(JSONObject data) {
         if (!data.containsKey("mdlJson")) {
             return null;
         }
@@ -90,107 +93,107 @@ public class Utils {
 
         JSONArray states = new JSONArray();
         JSONArray jsonStates = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("StateGroup").getJSONObject(0).getJSONArray("States").getJSONObject(0).getJSONArray("State");
-            JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
+        JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
 
-            for (int j = 0; j < jsonStates.size(); j++) {
-                JSONObject stateJson = new JSONObject();
-                stateJson.put("stateId", jsonStates.getJSONObject(j).getStr("id"));
-                stateJson.put("name", jsonStates.getJSONObject(j).getStr("name"));
-                stateJson.put("description", jsonStates.getJSONObject(j).getStr("description"));
-                stateJson.put("inputs", new JSONArray());
-                stateJson.put("outputs", new JSONArray());
-                stateJson.put("parameters", new JSONArray());
+        for (int j = 0; j < jsonStates.size(); j++) {
+            JSONObject stateJson = new JSONObject();
+            stateJson.put("stateId", jsonStates.getJSONObject(j).getStr("id"));
+            stateJson.put("name", jsonStates.getJSONObject(j).getStr("name"));
+            stateJson.put("description", jsonStates.getJSONObject(j).getStr("description"));
+            stateJson.put("inputs", new JSONArray());
+            stateJson.put("outputs", new JSONArray());
+            stateJson.put("parameters", new JSONArray());
 
-                for (int i = 0; i < jsonStates.getJSONObject(j).getJSONArray("Event").size(); i++) {
-                    JSONObject temp = new JSONObject();
-                    JSONObject event = (JSONObject) jsonStates.getJSONObject(j).getJSONArray("Event").get(i);
+            for (int i = 0; i < jsonStates.getJSONObject(j).getJSONArray("Event").size(); i++) {
+                JSONObject temp = new JSONObject();
+                JSONObject event = (JSONObject) jsonStates.getJSONObject(j).getJSONArray("Event").get(i);
 
-                    temp.put("eventId", UUID.randomUUID().toString());
-                    temp.put("name", event.getStr("name"));
-                    temp.put("description", event.getStr("description"));
+                temp.put("eventId", UUID.randomUUID().toString());
+                temp.put("name", event.getStr("name"));
+                temp.put("description", event.getStr("description"));
 //                    temp.put("optional", event.getStr("optional"));
-                    if (!event.containsKey("optional")) {
+                if (!event.containsKey("optional")) {
+                    temp.put("isOptional", true);
+                } else {
+                    if (event.getStr("optional").equals("False") || event.getStr("optional").equals(false)) {
+                        temp.put("isOptional", false);
+                    }
+                    if (event.getStr("optional").equals("True") || event.getStr("optional").equals(true)) {
                         temp.put("isOptional", true);
-                    }else{
-                        if (event.getStr("optional").equals("False") || event.getStr("optional").equals(false)) {
-                            temp.put("isOptional", false);
-                        }
-                        if (event.getStr("optional").equals("True") || event.getStr("optional").equals(true)) {
-                            temp.put("isOptional", true);
-                        }
-                    }
-
-
-                    if (event.containsKey("ResponseParameter")) {
-                        String datasetReference = ((JSONObject) event.getJSONArray("ResponseParameter").get(0)).getStr("datasetReference");
-                        for (int a = 0; a < datasetItem.size(); a++) {
-                            JSONObject item = (JSONObject) datasetItem.get(a);
-                            //新增是否为参数or文件
-                            item = Utils.judgeIsParam2(item);
-                            if (item.getStr("name").equals(datasetReference)) {
-                                event.put("datasetItem", item);
-                            }
-                        }
-                    }
-
-                    if (event.containsKey("DispatchParameter")) {
-                        String datasetReference = ((JSONObject) event.getJSONArray("DispatchParameter").get(0)).getStr("datasetReference");
-                        for (int a = 0; a < datasetItem.size(); a++) {
-                            JSONObject item = (JSONObject) datasetItem.get(a);
-                            if (item.getStr("name").equals(datasetReference)) {
-                                event.put("datasetItem", item);
-                            }
-                        }
-                    }
-
-                    if (event.containsKey("ControlParameter")) {
-                        String datasetReference = ((JSONObject) event.getJSONArray("ControlParameter").get(0)).getStr("datasetReference");
-                        for (int a = 0; a < datasetItem.size(); a++) {
-                            JSONObject item = (JSONObject) datasetItem.get(a);
-                            //新增是否为参数or文件
-                            item = Utils.judgeIsParam2(item);
-                            if (item.getStr("name").equals(datasetReference)) {
-                                event.put("datasetItem", item);
-                            }
-                        }
-                    }
-
-
-                    if (event.getStr("type").equals("response")) {
-                        if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
-                            temp.put("tooltip", event.getJSONObject("datasetItem").getStr("datasetReference"));
-                            temp.put("datasetItem", event.get("datasetItem"));
-                            stateJson.getJSONArray("parameters").add(temp);//judge input
-                        } else {
-                            temp.put("datasetItem", event.get("datasetItem"));
-                            stateJson.getJSONArray("inputs").add(temp);//judge input
-                        }
-                    }
-
-                    if (event.getStr("type").equals("noresponse")) {
-                        temp.put("datasetItem", event.get("datasetItem"));
-                        stateJson.getJSONArray("outputs").add(temp);//judge parameter
                     }
                 }
 
-                states.add(stateJson);
+
+                if (event.containsKey("ResponseParameter")) {
+                    String datasetReference = ((JSONObject) event.getJSONArray("ResponseParameter").get(0)).getStr("datasetReference");
+                    for (int a = 0; a < datasetItem.size(); a++) {
+                        JSONObject item = (JSONObject) datasetItem.get(a);
+                        //新增是否为参数or文件
+                        item = Utils.judgeIsParam2(item);
+                        if (item.getStr("name").equals(datasetReference)) {
+                            event.put("datasetItem", item);
+                        }
+                    }
+                }
+
+                if (event.containsKey("DispatchParameter")) {
+                    String datasetReference = ((JSONObject) event.getJSONArray("DispatchParameter").get(0)).getStr("datasetReference");
+                    for (int a = 0; a < datasetItem.size(); a++) {
+                        JSONObject item = (JSONObject) datasetItem.get(a);
+                        if (item.getStr("name").equals(datasetReference)) {
+                            event.put("datasetItem", item);
+                        }
+                    }
+                }
+
+                if (event.containsKey("ControlParameter")) {
+                    String datasetReference = ((JSONObject) event.getJSONArray("ControlParameter").get(0)).getStr("datasetReference");
+                    for (int a = 0; a < datasetItem.size(); a++) {
+                        JSONObject item = (JSONObject) datasetItem.get(a);
+                        //新增是否为参数or文件
+                        item = Utils.judgeIsParam2(item);
+                        if (item.getStr("name").equals(datasetReference)) {
+                            event.put("datasetItem", item);
+                        }
+                    }
+                }
+
+
+                if (event.getStr("type").equals("response")) {
+                    if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
+                        temp.put("tooltip", event.getJSONObject("datasetItem").getStr("datasetReference"));
+                        temp.put("datasetItem", event.get("datasetItem"));
+                        stateJson.getJSONArray("parameters").add(temp);//judge input
+                    } else {
+                        temp.put("datasetItem", event.get("datasetItem"));
+                        stateJson.getJSONArray("inputs").add(temp);//judge input
+                    }
+                }
+
+                if (event.getStr("type").equals("noresponse")) {
+                    temp.put("datasetItem", event.get("datasetItem"));
+                    stateJson.getJSONArray("outputs").add(temp);//judge parameter
+                }
             }
-            result.put("behavior",states);
+
+            states.add(stateJson);
+        }
+        result.put("behavior", states);
 
 //            result.getJSONObject("behavior").put(states);
-            return result;
+        return result;
 
 
     }
 
-    public static JSONObject convertMdlNew(JSONObject data){
+    public static JSONObject convertMdlNew(JSONObject data) {
         JSONObject jsonObject = data.getJSONObject("mdlJson");
 
         JSONObject result = new JSONObject();
 //        Model modelResult = new ;
         result.put("name", data.getStr("name"));
-        result.put("md5",data.getStr("md5"));
-        result.put("description",data.getStr("overview"));
+        result.put("md5", data.getStr("md5"));
+        result.put("description", data.getStr("overview"));
         result.put("behavior", new ModelBehavior());
 
 
@@ -205,9 +208,9 @@ public class Utils {
         JSONArray datasetItem = jsonObject.getJSONArray("ModelClass").getJSONObject(0).getJSONArray("Behavior").getJSONObject(0).getJSONArray("RelatedDatasets").getJSONObject(0).getJSONArray("DatasetItem");
         for (int j = 0; j < jsonStates.size(); j++) {
             State stateJson = new State();
-            stateJson.setStateId( jsonStates.getJSONObject(j).getStr("id"));
-            stateJson.setName( jsonStates.getJSONObject(j).getStr("name"));
-            stateJson.setDescription( jsonStates.getJSONObject(j).getStr("description"));
+            stateJson.setStateId(jsonStates.getJSONObject(j).getStr("id"));
+            stateJson.setName(jsonStates.getJSONObject(j).getStr("name"));
+            stateJson.setDescription(jsonStates.getJSONObject(j).getStr("description"));
 //            stateJson.setInputs();
 
 
@@ -235,7 +238,6 @@ public class Utils {
                 if (event.getStr("optional").equals("True") || event.getStr("optional").equals(true)) {
                     temp.put("optional", true);
                 }
-
 
 
                 if (event.containsKey("ResponseParameter")) {
@@ -272,14 +274,14 @@ public class Utils {
 
 
                 if (event.getStr("type").equals("response")) {
-                    if(event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")){
+                    if (event.containsKey("datasetItem") && event.getJSONObject("datasetItem").getStr("isParams").equals("true")) {
                         parameterEvent.setEventId(UUID.randomUUID().toString());
                         parameterEvent.setDescription(event.getStr("description"));
                         parameterEvent.setName(event.getStr("name"));
                         parameterEvent.setIsOptional(temp.getBool("optional"));
                         parameterEvent.setTooltip(event.getJSONObject("datasetItem").getStr("datasetReference"));
 
-                    }else{
+                    } else {
                         inputEvent.setEventId(UUID.randomUUID().toString());
                         inputEvent.setDescription(event.getStr("description"));
                         inputEvent.setName(event.getStr("name"));
@@ -314,7 +316,7 @@ public class Utils {
     }
 
 
-//    public static JSONObject judgeIsParam(JSONObject datasetItem){
+    //    public static JSONObject judgeIsParam(JSONObject datasetItem){
 //        boolean flag = datasetItem.containsKey("UdxDeclaration");
 //        if(flag) {
 //            datasetItem.put("isParams", "true");
@@ -323,52 +325,50 @@ public class Utils {
 //        }
 //        return datasetItem;
 //    }
-    public static JSONObject judgeIsParam(JSONObject datasetItem){
+    public static JSONObject judgeIsParam(JSONObject datasetItem) {
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONArray UdxDeclarationNew = new JSONArray();
         JSONObject tempUDX = new JSONObject();
-        if(flag) {
+        if (flag) {
             JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
-            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode").toString()!="" ){
+            if (test != null && test.get("UdxNode") != null && test.get("UdxNode").toString() != "") {
                 JSONObject test2 = (JSONObject) test.getJSONArray("UdxNode").get(0);
-                if(test2!=null && test2.get("UdxNode")!=null&& test2.get("UdxNode").toString()!="" ){
-                    if(test2.containsKey("type")){
-                        tempUDX.put("name",test2.getStr("name"));
-                        tempUDX.put("type",test2.getStr("type"));
-                        tempUDX.put("description",test2.getStr("description"));
-                        if(test2.getStr("type").equals("DTKT_ANY")){
+                if (test2 != null && test2.get("UdxNode") != null && test2.get("UdxNode").toString() != "") {
+                    if (test2.containsKey("type")) {
+                        tempUDX.put("name", test2.getStr("name"));
+                        tempUDX.put("type", test2.getStr("type"));
+                        tempUDX.put("description", test2.getStr("description"));
+                        if (test2.getStr("type").equals("DTKT_ANY")) {
                             datasetItem.put("isParams", "false");
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         } else {
                             datasetItem.put("isParams", "true");
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         }
-                    }else{
+                    } else {
                         JSONObject test3 = (JSONObject) test2.getJSONArray("UdxNode").get(0);
-                        if (!test3.containsKey("type")){
+                        if (!test3.containsKey("type")) {
                             datasetItem.put("isParams", "false");
-                        }
-                        else if(test3.getStr("type").equals("DTKT_ANY")){
+                        } else if (test3.getStr("type").equals("DTKT_ANY")) {
                             datasetItem.put("isParams", "false");
-                            tempUDX.put("name",test3.getStr("name"));
-                            tempUDX.put("type",test3.getStr("type"));
-                            tempUDX.put("description",test3.getStr("description"));
+                            tempUDX.put("name", test3.getStr("name"));
+                            tempUDX.put("type", test3.getStr("type"));
+                            tempUDX.put("description", test3.getStr("description"));
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
-                        }
-                        else{
+                        } else {
                             datasetItem.put("isParams", "true");
-                            tempUDX.put("name",test3.getStr("name"));
-                            tempUDX.put("type",test3.getStr("type"));
-                            tempUDX.put("description",test3.getStr("description"));
+                            tempUDX.put("name", test3.getStr("name"));
+                            tempUDX.put("type", test3.getStr("type"));
+                            tempUDX.put("description", test3.getStr("description"));
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         }
                     }
-                }else {
+                } else {
                     datasetItem.put("isParams", "false");
                     datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                 }
 
-            }else {
+            } else {
                 datasetItem.put("isParams", "false");
                 datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
             }
@@ -380,54 +380,52 @@ public class Utils {
         return datasetItem;
     }
 
-    public static JSONObject judgeIsParam3(JSONObject datasetItem){
+    public static JSONObject judgeIsParam3(JSONObject datasetItem) {
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONArray UdxDeclarationNew = new JSONArray();
         JSONObject tempUDX = new JSONObject();
-        if(flag) {
+        if (flag) {
 
             JSONObject test = (JSONObject) datasetItem.getJSONArray("UdxDeclaration").get(0);
 
-            if( test!=null && test.get("UdxNode")!=null&& test.get("UdxNode").toString()!="" ){
+            if (test != null && test.get("UdxNode") != null && test.get("UdxNode").toString() != "") {
                 JSONObject test2 = (JSONObject) test.getJSONArray("UdxNode").get(0);
-                if(test2!=null && test2.get("UdxNode")!=null&& test2.get("UdxNode").toString()!="" ){
-                    if(test2.containsKey("type")){
-                        tempUDX.put("name",test2.getStr("name"));
-                        tempUDX.put("type",test2.getStr("type"));
-                        tempUDX.put("description",test2.getStr("description"));
-                        if(test2.getStr("type").equals("DTKT_ANY")){
+                if (test2 != null && test2.get("UdxNode") != null && test2.get("UdxNode").toString() != "") {
+                    if (test2.containsKey("type")) {
+                        tempUDX.put("name", test2.getStr("name"));
+                        tempUDX.put("type", test2.getStr("type"));
+                        tempUDX.put("description", test2.getStr("description"));
+                        if (test2.getStr("type").equals("DTKT_ANY")) {
                             datasetItem.put("isParams", "false");
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         } else {
                             datasetItem.put("isParams", "true");
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         }
-                    }else{
+                    } else {
                         JSONObject test3 = (JSONObject) test2.getJSONArray("UdxNode").get(0);
-                        if (!test3.containsKey("type")){
+                        if (!test3.containsKey("type")) {
                             datasetItem.put("isParams", "false");
-                        }
-                        else if(test3.getStr("type").equals("DTKT_ANY")){
+                        } else if (test3.getStr("type").equals("DTKT_ANY")) {
                             datasetItem.put("isParams", "false");
-                            tempUDX.put("name",test3.getStr("name"));
-                            tempUDX.put("type",test3.getStr("type"));
-                            tempUDX.put("description",test3.getStr("description"));
+                            tempUDX.put("name", test3.getStr("name"));
+                            tempUDX.put("type", test3.getStr("type"));
+                            tempUDX.put("description", test3.getStr("description"));
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
-                        }
-                        else{
+                        } else {
                             datasetItem.put("isParams", "true");
-                            tempUDX.put("name",test3.getStr("name"));
-                            tempUDX.put("type",test3.getStr("type"));
-                            tempUDX.put("description",test3.getStr("description"));
+                            tempUDX.put("name", test3.getStr("name"));
+                            tempUDX.put("type", test3.getStr("type"));
+                            tempUDX.put("description", test3.getStr("description"));
                             datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                         }
                     }
-                }else {
+                } else {
                     datasetItem.put("isParams", "false");
                     datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
                 }
 
-            }else {
+            } else {
                 datasetItem.put("isParams", "false");
                 datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
             }
@@ -439,17 +437,17 @@ public class Utils {
         return datasetItem;
     }
 
-    public static JSONObject judgeIsParam2(JSONObject datasetItem){
+    public static JSONObject judgeIsParam2(JSONObject datasetItem) {
         boolean flag = datasetItem.containsKey("UdxDeclaration");
-        JSONArray UdxDeclarationNew=new JSONArray();
+        JSONArray UdxDeclarationNew = new JSONArray();
         JSONObject tempUDX = new JSONObject();
-        if(flag) {
+        if (flag) {
             JSONArray testArray = datasetItem.getJSONArray("UdxDeclaration");
             if (testArray != null && testArray.toString() != "") {
                 for (int i = 0; i < testArray.size(); i++) {
                     JSONObject test2Arr = (JSONObject) testArray.get(i);
                     if (test2Arr != null && test2Arr.toString() != "") {
-                        if (test2Arr.containsKey("type") ){
+                        if (test2Arr.containsKey("type")) {
                             tempUDX.put("name", test2Arr.getStr("name"));
                             tempUDX.put("type", test2Arr.getStr("type"));
                             tempUDX.put("description", test2Arr.getStr("description"));
@@ -459,106 +457,99 @@ public class Utils {
                                 datasetItem.put("isParams", "true");
                             }
                             UdxDeclarationNew.add(tempUDX);
-                        }
-                        else{
+                        } else {
                             if (test2Arr.containsKey("UdxNode") && test2Arr.get("UdxNode") != null && test2Arr.get("UdxNode").toString() != "") {
-                                    for (int j = 0; j < test2Arr.getJSONArray("UdxNode").size(); j++) {
-                                        JSONObject test3Arr = (JSONObject) test2Arr.getJSONArray("UdxNode").get(j);
-                                        if (test3Arr != null && test3Arr.toString() != "") {
-                                            if (test3Arr.containsKey("type") ){
-                                                tempUDX.put("name", test3Arr.getStr("name"));
-                                                tempUDX.put("type", test3Arr.getStr("type"));
-                                                tempUDX.put("description", test3Arr.getStr("description"));
-                                                if (test3Arr.getStr("type").equals("DTKT_ANY")) {
-                                                    datasetItem.put("isParams", "false");
-                                                } else {
-                                                    datasetItem.put("isParams", "true");
-                                                }
-                                                UdxDeclarationNew.add(tempUDX);
-                                            } else{
-                                                if (test3Arr.containsKey("UdxNode") && test3Arr.get("UdxNode") != null && test3Arr.get("UdxNode").toString() != "") {
-                                                        for (int k = 0; k < test3Arr.getJSONArray("UdxNode").size(); k++) {
-                                                            JSONObject test4Arr = (JSONObject) test3Arr.getJSONArray("UdxNode").get(k);
-                                                            if (test4Arr != null && test4Arr.toString() != "") {
-                                                                if (test4Arr.containsKey("type") ){
-                                                                    tempUDX.put("name", test4Arr.getStr("name"));
-                                                                    tempUDX.put("type", test4Arr.getStr("type"));
-                                                                    tempUDX.put("description", test4Arr.getStr("description"));
-                                                                    if (test4Arr.getStr("type").equals("DTKT_ANY")) {
-                                                                        datasetItem.put("isParams", "false");
-                                                                    } else {
-                                                                        datasetItem.put("isParams", "true");
-                                                                    }
-                                                                    UdxDeclarationNew.add(tempUDX);
-                                                                } else {
-                                                                    if (test4Arr.containsKey("UdxNode") && test4Arr.get("UdxNode") != null && test4Arr.get("UdxNode").toString() != "") {
-                                                                        for (int s = 0; s < test4Arr.getJSONArray("UdxNode").size(); s++) {
-                                                                            JSONObject test5Arr = (JSONObject) test4Arr.getJSONArray("UdxNode").get(k);
-                                                                            if (test4Arr != null && test4Arr.toString() != "") {
-                                                                                if (test5Arr.containsKey("type")) {
-                                                                                    tempUDX.put("name", test5Arr.getStr("name"));
-                                                                                    tempUDX.put("type", test5Arr.getStr("type"));
-                                                                                    tempUDX.put("description", test5Arr.getStr("description"));
-                                                                                    if (test3Arr.getStr("type").equals("DTKT_ANY")) {
-                                                                                        datasetItem.put("isParams", "false");
-                                                                                    } else {
-                                                                                        datasetItem.put("isParams", "true");
-                                                                                    }
-                                                                                    UdxDeclarationNew.add(tempUDX);
-                                                                                }else{
-                                                                                    datasetItem.put("isParams", "false");
-                                                                                }
-                                                                            }else{
+                                for (int j = 0; j < test2Arr.getJSONArray("UdxNode").size(); j++) {
+                                    JSONObject test3Arr = (JSONObject) test2Arr.getJSONArray("UdxNode").get(j);
+                                    if (test3Arr != null && test3Arr.toString() != "") {
+                                        if (test3Arr.containsKey("type")) {
+                                            tempUDX.put("name", test3Arr.getStr("name"));
+                                            tempUDX.put("type", test3Arr.getStr("type"));
+                                            tempUDX.put("description", test3Arr.getStr("description"));
+                                            if (test3Arr.getStr("type").equals("DTKT_ANY")) {
+                                                datasetItem.put("isParams", "false");
+                                            } else {
+                                                datasetItem.put("isParams", "true");
+                                            }
+                                            UdxDeclarationNew.add(tempUDX);
+                                        } else {
+                                            if (test3Arr.containsKey("UdxNode") && test3Arr.get("UdxNode") != null && test3Arr.get("UdxNode").toString() != "") {
+                                                for (int k = 0; k < test3Arr.getJSONArray("UdxNode").size(); k++) {
+                                                    JSONObject test4Arr = (JSONObject) test3Arr.getJSONArray("UdxNode").get(k);
+                                                    if (test4Arr != null && test4Arr.toString() != "") {
+                                                        if (test4Arr.containsKey("type")) {
+                                                            tempUDX.put("name", test4Arr.getStr("name"));
+                                                            tempUDX.put("type", test4Arr.getStr("type"));
+                                                            tempUDX.put("description", test4Arr.getStr("description"));
+                                                            if (test4Arr.getStr("type").equals("DTKT_ANY")) {
+                                                                datasetItem.put("isParams", "false");
+                                                            } else {
+                                                                datasetItem.put("isParams", "true");
+                                                            }
+                                                            UdxDeclarationNew.add(tempUDX);
+                                                        } else {
+                                                            if (test4Arr.containsKey("UdxNode") && test4Arr.get("UdxNode") != null && test4Arr.get("UdxNode").toString() != "") {
+                                                                for (int s = 0; s < test4Arr.getJSONArray("UdxNode").size(); s++) {
+                                                                    JSONObject test5Arr = (JSONObject) test4Arr.getJSONArray("UdxNode").get(k);
+                                                                    if (test4Arr != null && test4Arr.toString() != "") {
+                                                                        if (test5Arr.containsKey("type")) {
+                                                                            tempUDX.put("name", test5Arr.getStr("name"));
+                                                                            tempUDX.put("type", test5Arr.getStr("type"));
+                                                                            tempUDX.put("description", test5Arr.getStr("description"));
+                                                                            if (test3Arr.getStr("type").equals("DTKT_ANY")) {
                                                                                 datasetItem.put("isParams", "false");
+                                                                            } else {
+                                                                                datasetItem.put("isParams", "true");
                                                                             }
+                                                                            UdxDeclarationNew.add(tempUDX);
+                                                                        } else {
+                                                                            datasetItem.put("isParams", "false");
                                                                         }
-                                                                    }
-                                                                    else{
+                                                                    } else {
                                                                         datasetItem.put("isParams", "false");
                                                                     }
                                                                 }
-                                                            }else{
+                                                            } else {
                                                                 datasetItem.put("isParams", "false");
                                                             }
                                                         }
-
-                                                }else{
-                                                    datasetItem.put("isParams", "false");
+                                                    } else {
+                                                        datasetItem.put("isParams", "false");
+                                                    }
                                                 }
+
+                                            } else {
+                                                datasetItem.put("isParams", "false");
                                             }
-
-                                        }else{
-                                            datasetItem.put("isParams", "false");
                                         }
-                                    }
 
-                            }else{
+                                    } else {
+                                        datasetItem.put("isParams", "false");
+                                    }
+                                }
+
+                            } else {
                                 datasetItem.put("isParams", "false");
                             }
                         }
 
-                    }else{
+                    } else {
                         datasetItem.put("isParams", "false");
                     }
                 }
-            }else{
+            } else {
                 datasetItem.put("isParams", "false");
             }
 
-        } else{
+        } else {
             datasetItem.put("isParams", "false");
         }
-        datasetItem.put("UdxDeclarationNew",UdxDeclarationNew);
+        datasetItem.put("UdxDeclarationNew", UdxDeclarationNew);
         return datasetItem;
     }
 
 
-
-
-
-
-
-        public static JSONArray filterUserInfo(List<User> users) {
+    public static JSONArray filterUserInfo(List<User> users) {
         JSONArray userList = new JSONArray();
         for (User user : users) {
             JSONObject jsonObject = new JSONObject();
@@ -583,7 +574,7 @@ public class Utils {
         for (Project project : projectList.getContent()) {
             JSONObject newProject = new JSONObject();
             newProject.put("creatorId", project.getCreatorId());
-            newProject.put("memberList",project.getMemberList());
+            newProject.put("memberList", project.getMemberList());
             newProject.put("id", project.getId());
             newProject.put("name", project.getName());
             newProject.put("description", project.getDescription());
@@ -646,10 +637,10 @@ public class Utils {
     }
 
     /**
-    * @Description: 修改数据库IntegrateTaskInstance中的taskContent
-    * @Author: Yiming
-    * @Date: 2021/11/3
-    */
+     * @Description: 修改数据库IntegrateTaskInstance中的taskContent
+     * @Author: Yiming
+     * @Date: 2021/11/3
+     */
 
 //    public static void changeStatusOfCell(IntegrateTaskInstance integrateTaskInstance, List<Map<String, String>> completedValue, List<Map<String, String>> failedValue) {
 //        List<Process> modelFailed = integrateTaskInstance.getTaskInfo().getModelActionList().getFailed();
@@ -710,46 +701,46 @@ public class Utils {
 //    }
 
     /**
-    * @Description:对checkTask接口返回数据进行处理，获取output的（id，value）键值对
-    * @Author: Yiming
-    * @Date: 2021/11/3
-    */
+     * @Description:对checkTask接口返回数据进行处理，获取output的（id，value）键值对
+     * @Author: Yiming
+     * @Date: 2021/11/3
+     */
 
     public static List<Map<String, String>> getValueList(JSONObject data, String type) {
         List<Map<String, String>> list = new ArrayList<>();
-        if(type.equals("completed")) {
+        if (type.equals("completed")) {
             JSONArray modelCompleted = data.getJSONObject("taskInfo").getJSONObject("modelActionList").getJSONArray("completed");
-            for(int i = 0;i < modelCompleted.size();i++) {
+            for (int i = 0; i < modelCompleted.size(); i++) {
                 JSONArray outputs = modelCompleted.get(i, JSONObject.class).getJSONObject("outputData").getJSONArray("outputs");
-                for(int j = 0;j < outputs.size();j++) {
+                for (int j = 0; j < outputs.size(); j++) {
                     Map<String, String> temp = new HashMap<>();
                     temp.put(outputs.get(j, JSONObject.class).getStr("dataId"), outputs.get(j, JSONObject.class).getJSONObject("dataContent").getStr("value"));
                     list.add(temp);
                 }
             }
             JSONArray dataServiceCompleted = data.getJSONObject("taskInfo").getJSONObject("dataProcessingList").getJSONArray("completed");
-            for(int i = 0;i < dataServiceCompleted.size();i++) {
+            for (int i = 0; i < dataServiceCompleted.size(); i++) {
                 JSONArray outputs = dataServiceCompleted.get(i, JSONObject.class).getJSONObject("outputData").getJSONArray("outputs");
-                for(int j = 0;j < outputs.size();j++) {
+                for (int j = 0; j < outputs.size(); j++) {
                     Map<String, String> temp = new HashMap<>();
                     temp.put(outputs.get(j, JSONObject.class).getStr("dataId"), outputs.get(j, JSONObject.class).getJSONObject("dataContent").getStr("value"));
                     list.add(temp);
                 }
             }
-        } else if(type.equals("failed")) {
+        } else if (type.equals("failed")) {
             JSONArray modelFailed = data.getJSONObject("taskInfo").getJSONObject("modelActionList").getJSONArray("failed");
-            for(int i = 0;i < modelFailed.size();i++) {
+            for (int i = 0; i < modelFailed.size(); i++) {
                 JSONArray outputs = modelFailed.get(i, JSONObject.class).getJSONObject("outputData").getJSONArray("outputs");
-                for(int j = 0;j < outputs.size();j++) {
+                for (int j = 0; j < outputs.size(); j++) {
                     Map<String, String> temp = new HashMap<>();
                     temp.put(outputs.get(j, JSONObject.class).getStr("dataId"), outputs.get(j, JSONObject.class).getJSONObject("dataContent").getStr("value"));
                     list.add(temp);
                 }
             }
             JSONArray dataServiceFailed = data.getJSONObject("taskInfo").getJSONObject("dataProcessingList").getJSONArray("failed");
-            for(int i = 0;i < dataServiceFailed.size();i++) {
+            for (int i = 0; i < dataServiceFailed.size(); i++) {
                 JSONArray outputs = dataServiceFailed.get(i, JSONObject.class).getJSONObject("outputData").getJSONArray("outputs");
-                for(int j = 0;j < outputs.size();j++) {
+                for (int j = 0; j < outputs.size(); j++) {
                     Map<String, String> temp = new HashMap<>();
                     temp.put(outputs.get(j, JSONObject.class).getStr("dataId"), outputs.get(j, JSONObject.class).getJSONObject("dataContent").getStr("value"));
                     list.add(temp);
@@ -760,10 +751,10 @@ public class Utils {
     }
 
     /**
-    * @Description:文件的大小以特定格式输出
-    * @Author: Yiming
-    * @Date: 2021/11/23
-    */
+     * @Description:文件的大小以特定格式输出
+     * @Author: Yiming
+     * @Date: 2021/11/23
+     */
     public static String getPrintSize(long size) {
         // 如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
         double value = (double) size;
@@ -788,8 +779,6 @@ public class Utils {
             return String.valueOf(value) + "GB";
         }
     }
-
-
 
 
 }

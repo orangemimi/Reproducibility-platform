@@ -12,8 +12,7 @@ import lombok.Data;
  * @Version 1.0.0
  */
 @Data
-public class EvaluationInfo extends BaseInfo
-{
+public class EvaluationInfo extends BaseInfo {
     EvaluationTypeEnum evaluationTypeEnum;
     EvaluationBehavior behavior;
 }

@@ -46,15 +46,28 @@
           :key="key"
           @click="chooseScenario(item)"
         >
-          <scenario-card :secnarioForm="item"></scenario-card>
+          <scenario-card
+            :scenarioForm="item"
+            style="width: 300px; margin: 10px 10px"
+          ></scenario-card>
         </div>
       </div>
-      <div v-else>
+      <div
+        v-else-if="
+          !scenariosToolBarShow && chosenScenario.type != 'dockerScenario'
+        "
+      >
         <resource-toolbar
           :chosenScenario="chosenScenario"
           @selectModel="selectModel"
           @codingOl="codingOl"
         ></resource-toolbar>
+      </div>
+      <div v-else>
+        <envsSelector
+          :scenario="chosenScenario"
+          @codeType="selectModel"
+        ></envsSelector>
       </div>
     </el-row>
     <div class="createScenario">
@@ -82,10 +95,11 @@ import {
   getScenariosByProjectId,
 } from "@/api/request";
 
-import scenarioCard from '_com/Cards/ScenarioListCard.vue'
-import createScenario from '../create.vue'
+import scenarioCard from "_com/Cards/ScenarioListCard.vue";
+import createScenario from "../create.vue";
 // 场景和数据选择工具
 import resourceToolbar from "./ResourceToolbar.vue";
+import envsSelector from "../envyConfig/envySet.vue";
 export default {
   data() {
     return {
@@ -105,6 +119,7 @@ export default {
     scenarioCard,
     resourceToolbar,
     createScenario,
+    envsSelector,
     // SelectedScenario
   },
   watch: {},
@@ -121,7 +136,7 @@ export default {
     },
 
     async chooseScenario(item) {
-      this.scenariosToolBarShow = false;
+      // console.log(item, "item");
       let data = await getScenarioById(item.id);
       this.chosenScenario = data;
       this.scenariosToolBarShow = false;
@@ -139,7 +154,7 @@ export default {
       this.$emit("codingOl", val, this.chosenScenario.id);
     },
     createStatus(val) {
-      console.log(val, "10101");
+      // console.log(val, "10101");
       if (val == "success") {
         this.createScenarioDialog = false;
         this.init();

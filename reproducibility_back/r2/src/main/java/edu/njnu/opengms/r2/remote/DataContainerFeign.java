@@ -24,13 +24,12 @@ public interface DataContainerFeign {
 //    @RequestMapping(value = ":8081/dataitem/addByStorage",method = RequestMethod.POST)
 //    JSONObject addData(@RequestBody MultiValueMap<String, Object> form);
 
-    @RequestMapping(value = "data/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "data/{id}", method = RequestMethod.GET)
     JSONObject download(@RequestBody String urlStr);
 
 
-    @RequestMapping(value = "/data",method = RequestMethod.POST)
+    @RequestMapping(value = "/data", method = RequestMethod.POST)
     JSONObject upload(@RequestBody MultiValueMap<String, Object> form);
-
 
 
     @Component

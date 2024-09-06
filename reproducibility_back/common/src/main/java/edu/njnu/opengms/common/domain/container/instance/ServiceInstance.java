@@ -25,7 +25,7 @@ public class ServiceInstance<T> extends BaseEntity {
     InstanceEnum instanceEnum;
     String creator;
     Boolean isReproduced;
-//    String type;
+    //    String type;
     T service;
     String type;
     String dependency;

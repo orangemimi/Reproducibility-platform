@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User  extends BaseEntity {
+public class User extends BaseEntity {
     @Id
     String id;  //除了和server交互之外，都是利用这个id
     String name;

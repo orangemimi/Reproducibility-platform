@@ -6,6 +6,7 @@ import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.scenario.dto.AddScenarioDTO;
+import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioContainerIdDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioDTO;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceResourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +26,19 @@ public class ScenarioController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public JsonResult getScenarioInfoBId(@PathVariable("id") String id) {
-        return ResultUtils.success( scenarioService.getScenario(id) );
+        return ResultUtils.success(scenarioService.getScenario(id));
     }
+
     @RequestMapping(value = "/r/{scenarioId}", method = RequestMethod.GET)
     public JsonResult getScenarioInfoByInitialScenarioId(@PathVariable("scenarioId") String scenarioId) {
 
-        return ResultUtils.success( scenarioService.getScenarioByInitialScenarioId(scenarioId) );
+        return ResultUtils.success(scenarioService.getScenarioByInitialScenarioId(scenarioId));
     }
-
-
 
 
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.GET)
     public JsonResult getAllScenariosByProjectId(@PathVariable("projectId") String projectId) {
-        return ResultUtils.success( scenarioService.getScenariosByProjectId(projectId) );
+        return ResultUtils.success(scenarioService.getScenariosByProjectId(projectId));
     }
 
     @RequestMapping(value = "/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
@@ -51,14 +51,14 @@ public class ScenarioController {
 //    }
 
     @RequestMapping(value = "/instance/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)
-    public JsonResult updateScenarioInstance(  @JwtTokenParser(key="userId") String userId,@PathVariable("id") String id, @RequestBody UpdateScenarioInstanceResourceDTO update) {
+    public JsonResult updateScenarioInstance(@JwtTokenParser(key = "userId") String userId, @PathVariable("id") String id, @RequestBody UpdateScenarioInstanceResourceDTO update) {
 
         return ResultUtils.success(scenarioService.updateScenarioInstance(id, update));
     }
 
     @RequestMapping(value = "/{initialScenatioId}", method = RequestMethod.POST)
-    public JsonResult saveScenarioInfo(@RequestBody AddScenarioDTO add, @JwtTokenParser(key="userId") String userId,@PathVariable("initialScenatioId") String initialScenatioId) {
-        return ResultUtils.success(scenarioService.saveScenario(add,userId,initialScenatioId));
+    public JsonResult saveScenarioInfo(@RequestBody AddScenarioDTO add, @JwtTokenParser(key = "userId") String userId, @PathVariable("initialScenatioId") String initialScenatioId) {
+        return ResultUtils.success(scenarioService.saveScenario(add, userId, initialScenatioId));
     }
 
     @RequestMapping(value = "/resources/{id}", method = RequestMethod.PATCH)
@@ -66,5 +66,11 @@ public class ScenarioController {
                                                @JwtTokenParser(key = "userId") String userId,
                                                @RequestBody JSONObject update) {
         return ResultUtils.success(scenarioService.updateresourceCollection(id, userId, update));
+    }
+
+    @RequestMapping(value = "/containerId", method = RequestMethod.POST)
+    public JsonResult updateContainerId(@RequestParam("scenarioId") String scenarioId,@RequestParam("containerId") String containerId) {
+        UpdateScenarioContainerIdDTO updateScenarioContainerIdDTO =new UpdateScenarioContainerIdDTO(containerId);
+        return ResultUtils.success(scenarioService.updateScenarioContainerId(scenarioId, updateScenarioContainerIdDTO));
     }
 }

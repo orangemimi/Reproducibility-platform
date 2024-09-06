@@ -12,7 +12,7 @@ import lombok.Getter;
  * @Version 1.0.0
  */
 @Getter
-public class MyException extends RuntimeException{
+public class MyException extends RuntimeException {
     private Integer code;
 
     /**

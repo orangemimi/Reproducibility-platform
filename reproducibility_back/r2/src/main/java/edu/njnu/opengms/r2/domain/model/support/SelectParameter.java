@@ -12,7 +12,7 @@ import java.util.Map;
  * @Version 1.0.0
  */
 @Data
-public class SelectParameter  extends Parameter{
-    public Map<String,String> keyValue;
+public class SelectParameter extends Parameter {
+    public Map<String, String> keyValue;
     public String defaultValue;
 }

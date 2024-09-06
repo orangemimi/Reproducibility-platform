@@ -9,7 +9,7 @@
         <el-divider direction="vertical"></el-divider>
 
         <el-dropdown trigger="click" @command="zoom">
-          <el-button type="primary" link size="default" style="margin-top:2px;">
+          <el-button type="primary" link size="default" style="margin-top: 2px">
             {{ size }}%
             <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
           </el-button>
@@ -23,11 +23,17 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-button @click="importGraphDialog = true" type="primary" link size="default"
+        <el-button
+          @click="importGraphDialog = true"
+          type="primary"
+          link
+          size="default"
           >Import</el-button
         >
 
-        <el-button @click="saveMx" type="primary" link size="default">Save</el-button>
+        <el-button @click="saveMx" type="primary" link size="default"
+          >Save</el-button
+        >
         <el-button
           @click="graphLayout(true, 'hierarchicalLayout')"
           type="primary"
@@ -63,8 +69,8 @@
         </el-input>
         <div style="display: flex; justify-content: flex-end">
           <el-button type="primary" @click="importGraph" style="margin: 20px"
-          >Save</el-button
-        >
+            >Save</el-button
+          >
         </div>
       </el-dialog>
     </div>
@@ -76,7 +82,7 @@ import { ArrowDown as ElIconArrowDown } from "@element-plus/icons-vue";
 import { $on, $emit } from "../../../../utils/gogocodeTransfer";
 import bus from "./bus";
 import mxgraph from "_com/MxGraph/index";
-import { genGraph } from "_com/MxGraph/initMx.js";
+import { genGraph } from "_com/MxGraph/components/initMx.js";
 // import VueScroll from 'vue-scroll';
 
 const {
@@ -181,7 +187,7 @@ export default {
       this.graph.zoomTo(this.size / 100);
     },
     importGraph() {
-      this.importGraphDialog=false;
+      this.importGraphDialog = false;
       this.graph.importGraph(this.importGraphText);
     },
 
@@ -217,13 +223,13 @@ export default {
           mxHierarchicalLayout.prototype.fineTuning = false;
           mxHierarchicalLayout.prototype.traverseAncestors = true;
           mxHierarchicalLayout.prototype.resizeParent = true;
-          console.log('1201');
+          console.log("1201");
 
           // 无关系实体之间的间距
           mxHierarchicalLayout.prototype.interHierarchySpacing = 50;
           // 层级之间的距离
           mxHierarchicalLayout.prototype.interRankCellSpacing = 50;
-          console.log(mxHierarchicalLayout.prototype,'101');
+          console.log(mxHierarchicalLayout.prototype, "101");
 
           // eslint-disable-next-line new-cap
           var hierarchicallayout = new mxHierarchicalLayout(
@@ -557,7 +563,7 @@ export default {
       let dataItemList = this.dataItemList;
       let modelItemList = this.modelListInGraph;
       let linkList = this.linkEdgeList;
-      console.log(dataItemList,dataItemList,linkList,'104');
+      console.log(dataItemList, dataItemList, linkList, "104");
       // let content = this.mxContent;
       modelItemList.forEach((data) => {
         this.mxContent += ` <mxCell id= "${data.id}" style="${data.style}" parent="1" vertex="1" name="${data.name}" value="${data.name}" type="model">

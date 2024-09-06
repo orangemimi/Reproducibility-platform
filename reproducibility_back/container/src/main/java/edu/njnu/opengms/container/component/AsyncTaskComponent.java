@@ -21,21 +21,20 @@ import java.util.LinkedHashMap;
 @Component
 public class AsyncTaskComponent {
 
-    @Value ("${web.upload-path}")
+    @Value("${web.upload-path}")
     String storePath;
-
-
 
 
     @Async
     public void executeAsyncInstance(ServiceInstance instance) throws InterruptedException {
         System.out.println("实例运行");
-        String service_id = (String) ((LinkedHashMap) instance.getService()).get("id");;
+        String service_id = (String) ((LinkedHashMap) instance.getService()).get("id");
+        ;
         Path path;
-        if(instance.getInstanceEnum().equals(InstanceEnum.MODEL)){
-            path= Paths.get(storePath,"service_entity","model",service_id);
-        }else {
-            path= Paths.get(storePath,"service_entity","process",service_id);
+        if (instance.getInstanceEnum().equals(InstanceEnum.MODEL)) {
+            path = Paths.get(storePath, "service_entity", "model", service_id);
+        } else {
+            path = Paths.get(storePath, "service_entity", "process", service_id);
         }
         Process exec = RuntimeUtil.exec(null, path.toFile(), "java -Dfile.encoding=utf-8 -jar main.jar localhost 7999 " + instance.getId());
         RuntimeUtil.getResult(exec);

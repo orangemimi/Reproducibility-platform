@@ -28,22 +28,22 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Aspect
 @Component
-@Order (2)
+@Order(2)
 public class NeedAuthAspect {
     private static final String TOKEN_PREFIX = "Bearer";
     private static final String NAME = "name";
     private static final String PASSWORD = "password";
 
-//    @Autowired
+    //    @Autowired
 //    CreatorService creatorService;
     @Autowired
     UserRepository userRepository;
 
-    @Pointcut ("@annotation(edu.njnu.opengms.r2.annotation.NeedAuth)")
+    @Pointcut("@annotation(edu.njnu.opengms.r2.annotation.NeedAuth)")
     public void point() {
     }
 
-    @Before ("point()")
+    @Before("point()")
     public void doBeforePoint() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();

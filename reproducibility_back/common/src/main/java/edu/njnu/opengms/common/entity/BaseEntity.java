@@ -14,25 +14,25 @@ import java.util.Date;
  */
 @Data
 public class BaseEntity {
-    @JsonFormat (pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-    @JsonFormat (pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
 
     @BeforeInsert
-    public void beforeInsert(){
-        Date date=new Date();
-        if(createTime==null){
-            createTime=date;
+    public void beforeInsert() {
+        Date date = new Date();
+        if (createTime == null) {
+            createTime = date;
         }
-        if(updateTime==null){
-            updateTime=date;
+        if (updateTime == null) {
+            updateTime = date;
         }
     }
 
     @BeforeUpdate
-    public void beforeUpdate(){
-        updateTime=new Date();
+    public void beforeUpdate() {
+        updateTime = new Date();
     }
 }

@@ -67,33 +67,34 @@ public class RemoteManagerServerController {
 //    String wzpIpAndPort;
 
     @RequestMapping(value = "/getServiceTask/{pid}", method = RequestMethod.GET)
-        JsonResult getServiceTask(@PathVariable String pid){
+    JsonResult getServiceTask(@PathVariable String pid) {
         System.out.println("-------------");
         return ResultUtils.success(managerServerFeign.getServiceTask(pid));
     }
 
-    @RequestMapping(value = "/initTask", method = RequestMethod.POST)//step 1
-    JsonResult createTask(@RequestBody JSONObject serviceJson){
+    @RequestMapping(value = "/initTask", method = RequestMethod.POST)
+//step 1
+    JsonResult createTask(@RequestBody JSONObject serviceJson) {
 //        ip port pid username
         return ResultUtils.success(managerServerFeign.createTask(serviceJson));
     }
 
     @RequestMapping(value = "/invoke", method = RequestMethod.POST)
-    JsonResult getServiceTask(@RequestBody JSONObject obj){
+    JsonResult getServiceTask(@RequestBody JSONObject obj) {
         return ResultUtils.success(managerServerFeign.invoke(obj));
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
-    ModelInstance refresh(@RequestBody JSONObject instanceInitial,@JwtTokenParser(key = "userId") String userId){
+    ModelInstance refresh(@RequestBody JSONObject instanceInitial, @JwtTokenParser(key = "userId") String userId) {
         ModelInstance modelInstance = new ModelInstance();
-        if(!instanceInitial.get("status").equals(2)){
+        if (!instanceInitial.get("status").equals(2)) {
             JSONObject object = managerServerFeign.refresh((JSONObject) instanceInitial.get("refreshForm"));
             List<JSONObject> statesInit = (List) instanceInitial.get("behavior");
-            JSONObject refreshData= (JSONObject) object.get("data");
+            JSONObject refreshData = (JSONObject) object.get("data");
             String assType = "";
-            String value="";
-            Double doubleValue=0.00;
-            if(instanceInitial.get("modelName").equals("StatisticsCalculation")){
+            String value = "";
+            Double doubleValue = 0.00;
+            if (instanceInitial.get("modelName").equals("StatisticsCalculation")) {
                 JSONObject assessTypeObj = (JSONObject) statesInit.get(0).getJSONArray("parameters").get(4);
                 JSONObject udx = (JSONObject) assessTypeObj.getJSONObject("datasetItem").getJSONArray("UdxDeclarationNew").get(0);
                 assType = udx.getStr("parameterValue");
@@ -101,18 +102,17 @@ public class RemoteManagerServerController {
             }
 
 
-
             List<JSONObject> outList = (List<JSONObject>) refreshData.get("outputs");
-            Boolean isOutEmpty=true;
+            Boolean isOutEmpty = true;
             //IF status are different, update the instance
-            if(!instanceInitial.get("status").equals(refreshData.get("status"))){
-                for(JSONObject out: outList){
+            if (!instanceInitial.get("status").equals(refreshData.get("status"))) {
+                for (JSONObject out : outList) {
 
                     DataItem resultDataItem = new DataItem();
-                    if((!out.get("url").equals(null))&&(!out.get("url").equals(""))){
+                    if ((!out.get("url").equals(null)) && (!out.get("url").equals(""))) {
 
 
-                        isOutEmpty=false;
+                        isOutEmpty = false;
                         AddDataItemDTO add = AddDataItemDTO.builder()
                                 .contributorId(userId)
                                 .name((String) out.get("event"))
@@ -126,32 +126,32 @@ public class RemoteManagerServerController {
                                 .build();
                         DataItem dataItem = new DataItem();
                         add.convertTo(dataItem);
-                        resultDataItem  = dataItemRepository.insert(dataItem);
-                        refreshData.put("dataItem",resultDataItem);
-                    } else{
+                        resultDataItem = dataItemRepository.insert(dataItem);
+                        refreshData.put("dataItem", resultDataItem);
+                    } else {
                         isOutEmpty = true;
                     }
 
-                    for (JSONObject state:  statesInit){
+                    for (JSONObject state : statesInit) {
                         //如果output有值，塞入instance，并更新
-                        if(state.get("name").equals(out.get("statename"))){
+                        if (state.get("name").equals(out.get("statename"))) {
                             List<JSONObject> outInstanceList = (List<JSONObject>) state.get("outputs");
-                            for(JSONObject outInstance :outInstanceList){
-                                if(outInstance.get("name").equals(out.get("event"))){
-                                    outInstance.put("value",out.get("url"));
-                                    outInstance.put("dataId",resultDataItem.getId());
+                            for (JSONObject outInstance : outInstanceList) {
+                                if (outInstance.get("name").equals(out.get("event"))) {
+                                    outInstance.put("value", out.get("url"));
+                                    outInstance.put("dataId", resultDataItem.getId());
 
                                     //IF assessment, get the content of txt,
-                                    String assessment="";
-                                    if(instanceInitial.get("modelName").equals("StatisticsCalculation")){
+                                    String assessment = "";
+                                    if (instanceInitial.get("modelName").equals("StatisticsCalculation")) {
                                         SecureRandom secureRandom = new SecureRandom();
                                         byte[] seed = secureRandom.generateSeed(16);
 
                                         UUID uuid = UUID.nameUUIDFromBytes(seed);
 
-                                        functionUtils.downloadFileFromUrl((String) out.get("url"),"D:\\Downloads\\Platform\\" + uuid +".txt");
-                                        assessment =  functionUtils.readFile("D:\\Downloads\\Platform\\"+ uuid+".txt");
-                                        if(assType.equals("Pearson")){
+                                        functionUtils.downloadFileFromUrl((String) out.get("url"), "D:\\Downloads\\Platform\\" + uuid + ".txt");
+                                        assessment = functionUtils.readFile("D:\\Downloads\\Platform\\" + uuid + ".txt");
+                                        if (assType.equals("Pearson")) {
                                             value = assessment.substring(1, assessment.indexOf(","));
                                             doubleValue = Double.parseDouble(value);
 
@@ -160,8 +160,8 @@ public class RemoteManagerServerController {
                                         }
 
                                         String.format("%.2f", doubleValue);
-                                        JSONObject outAssessmentParam  = (JSONObject) outInstance.getJSONObject("datasetItem");
-                                        outAssessmentParam.put("assessmentValue",String.format("%.2f", doubleValue));
+                                        JSONObject outAssessmentParam = (JSONObject) outInstance.getJSONObject("datasetItem");
+                                        outAssessmentParam.put("assessmentValue", String.format("%.2f", doubleValue));
                                     }
 
 
@@ -172,16 +172,16 @@ public class RemoteManagerServerController {
 
                 }
                 //update model instance
-                List<State> bmsqList = (List<State>)(List)statesInit;
-                UpdateModelInstanceDTO updataInstance= UpdateModelInstanceDTO.builder()
+                List<State> bmsqList = (List<State>) (List) statesInit;
+                UpdateModelInstanceDTO updataInstance = UpdateModelInstanceDTO.builder()
                         .behavior(bmsqList)
                         .status((Integer) refreshData.get("status"))//new status
                         .build();
-                if(isOutEmpty){
+                if (isOutEmpty) {
                     //set the status = -1
                     updataInstance.setStatus(1);
                 }
-                modelInstance=  modelInstanceService.updateInstance(instanceInitial.getStr("id"),updataInstance);
+                modelInstance = modelInstanceService.updateInstance(instanceInitial.getStr("id"), updataInstance);
 
             }
         }
@@ -193,20 +193,20 @@ public class RemoteManagerServerController {
 
     @SneakyThrows
     @RequestMapping(value = "/runtask", method = RequestMethod.POST)
-    JsonResult runTask(@RequestParam("file") MultipartFile file,@JwtTokenParser(key="name") String name){
+    JsonResult runTask(@RequestParam("file") MultipartFile file, @JwtTokenParser(key = "name") String name) {
 //       return ResultUtils.success(managerServerFeign.runtask(file, "111"));
 //        String userId="123";
-        String suffix="."+ FilenameUtils.getExtension(file.getOriginalFilename());
-        File temp= File.createTempFile("temp",suffix);
+        String suffix = "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        File temp = File.createTempFile("temp", suffix);
         file.transferTo(temp);
         FileSystemResource resource = new FileSystemResource(temp);
 
         RestTemplate restTemplate = new RestTemplate();
-        String urlStr ="http://172.21.213.245:8084/GeoModeling/task/runTask";
+        String urlStr = "http://172.21.213.245:8084/GeoModeling/task/runTask";
 //        JSONObject form = new JSONObject();
         MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
         param.add("file", resource);
-        param.add("userName",name);
+        param.add("userName", name);
         HttpHeaders headers = new HttpHeaders();
         headers.add("User-Agent", "Mozilla/5.0");
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(param, headers);
@@ -218,12 +218,11 @@ public class RemoteManagerServerController {
             }
             String result = jsonObjectResponseEntity.getBody().getStr("data");
             return ResultUtils.success(result);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             throw new MyException(ResultEnum.REMOTE_SERVICE_ERROR);
         }
     }
-
 
 
 }

@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @Date 2019/7/17
  * @Version 1.0.0
  */
-@ServerEndpoint ("/websocket/{sid}")
+@ServerEndpoint("/websocket/{sid}")
 @Component
 public class WebSocketServer {
     private static int onlineCount = 0;
@@ -44,7 +44,7 @@ public class WebSocketServer {
     }
 
     @OnOpen
-    public void onOpen(Session session, @PathParam ("sid") String sid) {
+    public void onOpen(Session session, @PathParam("sid") String sid) {
         this.session = session;
         webSocketSet.add(this);
         addOnlineCount();           //在线数加1
@@ -63,7 +63,6 @@ public class WebSocketServer {
     private void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
-
 
 
     @OnClose

@@ -43,11 +43,10 @@ public class ExceptionControllerAdvice {
      * 因为Spring Boot 中, 当用户访问了一个不存在的链接时, Spring 默认会将页面重定向到   /error 上, 而不会抛出异常
      *
      * @param e 未找到资源
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.NOT_FOUND)
-    @ExceptionHandler ({NoHandlerFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({NoHandlerFoundException.class})
     public JsonResult handleNoHandlerFoundException(NoHandlerFoundException e) {
         return ResultUtils.error(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
@@ -56,11 +55,10 @@ public class ExceptionControllerAdvice {
      * 400 HttpStatus.BAD_REQUEST
      *
      * @param e 参数验证失败
-     *
      * @return 注意这里BindingResult的验证错误可能有多个，这里默认返回了第一个错误。
      */
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    @ExceptionHandler ({MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     public JsonResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), bindingResult.getFieldError().getDefaultMessage());
@@ -70,11 +68,10 @@ public class ExceptionControllerAdvice {
      * 400 HttpStatus.BAD_REQUEST
      *
      * @param e 缺少PathVariable
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    @ExceptionHandler ({MissingPathVariableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MissingPathVariableException.class})
     public JsonResult handleMissingPathVariableException(MissingPathVariableException e) {
         return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
@@ -83,11 +80,10 @@ public class ExceptionControllerAdvice {
      * 400 HttpStatus.BAD_REQUEST
      *
      * @param e 缺少RequestParameter
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    @ExceptionHandler ({MissingServletRequestParameterException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MissingServletRequestParameterException.class})
     public JsonResult handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
@@ -97,11 +93,10 @@ public class ExceptionControllerAdvice {
      * 400 HttpStatus.BAD_REQUEST
      *
      * @param e 参数解析失败
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    @ExceptionHandler ({HttpMessageNotReadableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({HttpMessageNotReadableException.class})
     public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
@@ -110,11 +105,10 @@ public class ExceptionControllerAdvice {
      * 400 HttpStatus.BAD_REQUEST
      *
      * @param e 参数绑定失败
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    @ExceptionHandler ({BindException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({BindException.class})
     public JsonResult handleBindException(BindException e) {
         return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
@@ -124,11 +118,10 @@ public class ExceptionControllerAdvice {
      * 405
      *
      * @param e
-     *
      * @return
      */
-    @ResponseStatus (HttpStatus.METHOD_NOT_ALLOWED)
-    @ExceptionHandler ({HttpRequestMethodNotSupportedException.class})
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public JsonResult handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         return ResultUtils.error(HttpStatus.METHOD_NOT_ALLOWED.value(), e.getMessage());
     }
@@ -138,10 +131,9 @@ public class ExceptionControllerAdvice {
      * 自定义的异常 或者服务器内部异常500
      *
      * @param e
-     *
      * @return 当是自定义异常时，其状态码是200，若是服务器内部异常，其状态码为500
      */
-    @ExceptionHandler (value = Exception.class)
+    @ExceptionHandler(value = Exception.class)
     public ResponseEntity<JsonResult> defaultErrorHandler(Exception e) {
         //自定义的异常
         if (e instanceof MyException) {

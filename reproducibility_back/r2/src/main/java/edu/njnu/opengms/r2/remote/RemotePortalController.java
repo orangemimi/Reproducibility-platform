@@ -16,19 +16,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/portal")
 public class RemotePortalController {
     @Autowired
-   RemotePortalService remotePortalService;
+    RemotePortalService remotePortalService;
 
 
-
-
-    @RequestMapping(value = "/modelBehavior/{id}",method = RequestMethod.GET)
-    JsonResult getModel(@PathVariable(value = "id") String id){
+    @RequestMapping(value = "/modelBehavior/{id}", method = RequestMethod.GET)
+    JsonResult getModel(@PathVariable(value = "id") String id) {
         return ResultUtils.success(remotePortalService.getModelInfo(id));
     }
 
-    @RequestMapping(value = "/getUnitList/{currentPage}/{pagesize}",method = RequestMethod.GET)
-    JsonResult getModel( @PathVariable("currentPage") int currentPage, @PathVariable("pagesize") int pagesize){
-        return ResultUtils.success(remotePortalService.getUnitList(currentPage,pagesize));
+    @RequestMapping(value = "/getUnitList/{currentPage}/{pagesize}", method = RequestMethod.GET)
+    JsonResult getModel(@PathVariable("currentPage") int currentPage, @PathVariable("pagesize") int pagesize) {
+        return ResultUtils.success(remotePortalService.getUnitList(currentPage, pagesize));
     }
 
     @RequestMapping(value = "/getModelList", method = RequestMethod.GET)

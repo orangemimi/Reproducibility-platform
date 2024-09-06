@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+
 @RestController
 public class PythonExecutionController {
 
@@ -30,7 +31,7 @@ public class PythonExecutionController {
         String folderId = requestBody.get("folderId");
         try {
             // 使用Docker容器执行Python代码
-            String result = pythonExecutionService.executePythonCodeInDocker(pythonCode,folderId,userId);
+            String result = pythonExecutionService.executePythonCodeInDocker(pythonCode, folderId, userId);
             return ResultUtils.success(result);
         } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("执行Python代码时出错");
