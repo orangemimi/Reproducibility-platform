@@ -58,6 +58,7 @@ export default {
     ...mapActions(['handleLogOut', 'handleLogIn']),
     async handleClick() {
       try {
+
         await this.handleLogOut()
 
         if (this.tab == 'register') {
@@ -67,6 +68,7 @@ export default {
           form.append('password', md5(this.formItem.password))
           await post(`/users/${this.tab}`, form)
         } else {
+          
           await this.$store.dispatch('user/handleLogIn', this.formItem)
         }
 

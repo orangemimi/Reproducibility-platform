@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     public WebSocketConfig(DockerClient dockerClient) {
         this.dockerClient = dockerClient;
-        System.out.println("DockerClient has been injected: " + (dockerClient != null));
+//        System.out.println("DockerClient has been injected: " + (dockerClient != null));
     }
 
 //    @Bean
