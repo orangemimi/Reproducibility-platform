@@ -25,6 +25,5 @@ public class Scenario extends BaseEntity {
     String initialScenarioId;// if this scenario is created by others
     String env;
     String containerId;
-//    List<ForkedScenarios> forkedScenarios;
-
+    String flowData;
 }

@@ -166,29 +166,27 @@ public class ScenarioService {
 
         Scenario newScenario = scenarioRepository.insert(scenario);
 
-        Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
-
-        //create folderScenario
-        AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
-                .level(1)
-                .tagId(newScenario.getId())
-                .name(newScenario.getName() + " --folder")
-                .parent(parentFolder.getId())
-                .build();
-
-        Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
-
-//        Folder childFolder = folderRepository.insert(folder);
-        List<String> parentFolderChildren = new ArrayList<String>();
-        String id = newScenarioFolder.getId();
-        parentFolderChildren.add(id);
-
-        UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
-                .children(parentFolderChildren)
-                .build();
+//        Folder parentFolder = folderRepository.findByCreatorIdAndParent(userId, "0");
+//        //create folderScenario
+//        AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
+//                .level(1)
+//                .tagId(newScenario.getId())
+//                .name(newScenario.getName() + " --folder")
+//                .parent(parentFolder.getId())
+//                .build();
+//        Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
 
 
-        folderService.updateFolderChildren(parentFolder.getId(), updateProjectFolderChildrenDTO, userId);
+//        List<String> parentFolderChildren = new ArrayList<String>();
+//        String id = newScenarioFolder.getId();
+//        parentFolderChildren.add(id);
+
+//        UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+//                .children(parentFolderChildren)
+//                .build();
+
+
+//        folderService.updateFolderChildren(parentFolder.getId(), updateProjectFolderChildrenDTO, userId);
 
         //todo
 

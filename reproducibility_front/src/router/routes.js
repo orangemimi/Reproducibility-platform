@@ -52,12 +52,13 @@ export default [
     // ],
   },
   {
-    path: "/py38",
+    path: "/test",
     name: "py38",
     meta: {
       title: "envy",
     },
-    component: () => import("@/views/project/envyConfig/envs/python38.vue"),
+    component: () =>
+      import("@/views/builder/construction/ConstructionMain.vue"),
   },
   {
     path: "/upload",
@@ -154,9 +155,10 @@ export default [
             },
           },
           {
-            path: "AIAssistant",
-            name: "AIAssistant",
-            component: () => import("@/views/builder/AIAssistant/AIHome.vue"),
+            path: "AIConstruction",
+            name: "AIConstruction",
+            component: () =>
+              import("@/views/builder/construction/ConstructionMain.vue"),
             meta: {
               requireAuth: true,
             },

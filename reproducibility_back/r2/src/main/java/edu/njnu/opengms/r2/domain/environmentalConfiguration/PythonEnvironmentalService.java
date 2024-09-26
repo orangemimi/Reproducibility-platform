@@ -416,7 +416,6 @@ public class PythonEnvironmentalService {
             // 如果路径不存在，则不需要删除
             return;
         }
-
         if (Files.isDirectory(path)) {
             // 如果是目录，则获取目录中的所有条目
             Files.list(path).forEach(child -> {
@@ -428,7 +427,6 @@ public class PythonEnvironmentalService {
                 }
             });
         }
-
         // 删除当前文件或目录（此时它应该是空的）
         if (!path.equals(Paths.get(WORKING_DIRECTORY))&&!path.equals(Paths.get(WORKING_DIRECTORY+"\\data"))) {
             Files.delete(path);

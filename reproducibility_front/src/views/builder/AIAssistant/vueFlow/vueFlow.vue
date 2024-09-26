@@ -65,9 +65,7 @@ watch(
   { deep: true }
 );
 
-onMounted(() => {
-  console.log(nodes.value, edges.value);
-});
+onMounted(() => {});
 </script>
 
 <template>

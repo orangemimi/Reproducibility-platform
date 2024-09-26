@@ -98,20 +98,21 @@ public class ProjectService {
         add.convertTo(project);
         try{
             Project proj = projectRepository.insert(project);
-
-            //create scenario
-            Scenario exampleScenario = new Scenario();
-            exampleScenario.setName("Example scenario");
-            exampleScenario.setType("sequentModels");
-            exampleScenario.setProjectId(proj.getId());
-            exampleScenario.setCreator(userId);
-            Scenario newScenario = scenarioRepository.insert(exampleScenario);
-
-            List<String> temp = new ArrayList<>();
-            temp.add(newScenario.getId());
-
-            proj.setScenarioList(temp);
+            proj.setScenarioList(new ArrayList<>());
             Project result = projectRepository.save(proj);
+              //create example scenario
+//            Scenario exampleScenario = new Scenario();
+//            exampleScenario.setName("Example scenario");
+//            exampleScenario.setType("sequentModels");
+//            exampleScenario.setProjectId(proj.getId());
+//            exampleScenario.setCreator(userId);
+//            Scenario newScenario = scenarioRepository.insert(exampleScenario);
+
+              //add example scenario to project
+//            List<String> temp = new ArrayList<>();
+//            temp.add(newScenario.getId());
+//            proj.setScenarioList(temp);
+//            Project result = projectRepository.save(proj);
 
             //create project folder
             Folder mainFolder = folderRepository.findByCreatorIdAndName(userId, "Main");
@@ -123,11 +124,12 @@ public class ProjectService {
                     .build();
 
             Folder newProjectFolder = folderService.create(addFolderDTO, userId);
-//        Folder childFolder = folderRepository.insert(folder);
+//            folderRepository.insert(newProjectFolder);
+
+            // 将新创建的项目文件夹添加到文件夹系统中
             List<String> mainFolderChildren = new ArrayList<String>();
             if (mainFolder.getChildren() == (null)) {
-                String id = newProjectFolder.getId();
-                mainFolderChildren.add(id);
+                mainFolderChildren.add(newProjectFolder.getId());
             } else {
                 mainFolderChildren = mainFolder.getChildren();
                 mainFolderChildren.add(newProjectFolder.getId());
@@ -140,38 +142,35 @@ public class ProjectService {
 
 
             //create folderScenario
-            AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
-                    .level(2)
-                    .tagId(newScenario.getId())
-                    .name("Example scenario --folder")
-                    .parent(newProjectFolder.getId())
-                    .build();
+//            AddFolderDTO addScenarioFolderDTO = AddFolderDTO.builder()
+//                    .level(2)
+//                    .tagId(newScenario.getId())
+//                    .name("Example scenario --folder")
+//                    .parent(newProjectFolder.getId())
+//                    .build();
+//            Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
 
-            Folder newScenarioFolder = folderService.create(addScenarioFolderDTO, userId);
-//        Folder childFolder = folderRepository.insert(folder);
-            List<String> parentFolderChildren = new ArrayList<String>();
-            String id = newScenarioFolder.getId();
-            parentFolderChildren.add(id);
-
-            UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
-                    .children(parentFolderChildren)
-                    .build();
-
-
-            folderService.updateFolderChildren(newProjectFolder.getId(), updateProjectFolderChildrenDTO, userId);
+            // 更新项目文件夹的子文件夹列表
+//            List<String> parentFolderChildren = new ArrayList<String>();
+//            String id = newScenarioFolder.getId();
+//            parentFolderChildren.add(id);
+//            UpdateFolderChildrenDTO updateProjectFolderChildrenDTO = UpdateFolderChildrenDTO.builder()
+//                    .children(parentFolderChildren)
+//                    .build();
+//            folderService.updateFolderChildren(newProjectFolder.getId(), updateProjectFolderChildrenDTO, userId);
 
             User user = userRepository.findById(userId).orElseThrow(MyException::noObject);
             if (user.getCreatedProjects() == null) {
                 List<String> newProjects = new ArrayList<>();
-                newProjects.add(result.getId());
+                newProjects.add(proj.getId());
                 user.setCreatedProjects(newProjects);
             } else {
-                user.getCreatedProjects().add(result.getId());
+                user.getCreatedProjects().add(proj.getId());
             }
 
             userService.update(user);
 
-            return result;
+            return proj;
         }catch(Exception e ){
             System.out.println(e.getMessage());
             return null;

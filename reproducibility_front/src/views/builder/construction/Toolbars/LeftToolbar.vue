@@ -128,6 +128,8 @@ export default {
     async init() {
       this.project = await getProjectById(this.projectId);
       this.allScenarioList = await getScenariosByProjectId(this.projectId);
+      this.chooseScenario(this.allScenarioList[0]);
+
       // this.allScenarioList.forEach((element) => {
       //   if (this.project.scenarioList.include(element.id)) {
       //     element.isBinded = true;
@@ -136,10 +138,10 @@ export default {
     },
 
     async chooseScenario(item) {
-      // console.log(item, "item");
       let data = await getScenarioById(item.id);
       this.chosenScenario = data;
       this.scenariosToolBarShow = false;
+      this.getScenario();
     },
 
     createNewScenario() {
@@ -153,6 +155,9 @@ export default {
     codingOl(val) {
       this.$emit("codingOl", val, this.chosenScenario.id);
     },
+    getScenario() {
+      this.$emit("getScenario", this.chosenScenario);
+    },
     createStatus(val) {
       // console.log(val, "10101");
       if (val == "success") {
@@ -163,8 +168,10 @@ export default {
   },
   mounted() {
     this.init();
+    // this.scenariosToolBarShow = false;
+    // this.chosenScenario = this.allScenarioList[0];
   },
-  emits: ["selectModel", "codingOl"],
+  emits: ["selectModel", "codingOl", "getScenario"],
 };
 </script>
 

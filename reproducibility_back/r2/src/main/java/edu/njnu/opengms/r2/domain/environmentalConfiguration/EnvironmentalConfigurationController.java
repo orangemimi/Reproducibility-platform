@@ -60,9 +60,12 @@ public class EnvironmentalConfigurationController {
         // 生成容器，并绑定卷挂载目录
         try {
             CreateContainerResponse container = dockerClient.createContainerCmd(image)
+                    // 容器持久化运行，这样可以多次使用某个容器调用不同的python脚本
                     .withCmd("tail", "-f", "/dev/null")
+                    // 卷挂载，将宿主机文件夹与容器文件夹绑定起来
                     .withHostConfig(new HostConfig().withBinds(new Bind(fullDirectoryPath, new Volume("/app"))))
                     .exec();
+            // 启动容器
             dockerClient.startContainerCmd(container.getId()).exec();
             return ResultUtils.success(container.getId());
         }catch(DockerException | DockerClientException e){

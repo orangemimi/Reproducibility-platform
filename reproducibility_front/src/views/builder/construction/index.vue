@@ -1,12 +1,16 @@
 <template>
-  <div class="main">
+  <div v-if="scenario.type == 'integrateTask'" class="main">
+    <integrateTasks />
+  </div>
+
+  <div v-else class="main">
     <div>
       <LeftToolbar
         @selectModel="selectModel"
         @codingOl="codingOl"
+        @getScenario="getScenario"
       ></LeftToolbar>
     </div>
-
     <div>
       <RightToolbar
         :currentModel="currentModel"
@@ -20,17 +24,20 @@
 <script>
 import LeftToolbar from "./Toolbars/LeftToolbar.vue";
 import RightToolbar from "./Toolbars/RightToolbar.vue";
+import integrateTasks from "./integrateScenario/integrateTasks.vue";
 // import SelectedScenario from "_com/Cards/SelectedScenario.vue";
 export default {
   components: {
     LeftToolbar,
     RightToolbar,
+    integrateTasks,
   },
   watch: {},
 
   computed: {},
   data() {
     return {
+      scenario: {},
       currentModel: {},
       scenarioId: "",
       codingOlShow: false,
@@ -43,6 +50,7 @@ export default {
         this.codingOl(true, scenarioId, val);
       } else {
         this.currentModel = val;
+
         this.scenarioId = scenarioId;
         this.codingOlShow = false;
       }
@@ -58,7 +66,18 @@ export default {
         this.currentModel = {};
       }
     },
+    getScenario(scenario) {
+      this.scenario = scenario;
+    },
   },
   mounted() {},
 };
 </script>
+
+<style>
+.main {
+  width: 100%;
+  height: 100%;
+  padding: 5px 10px;
+}
+</style>

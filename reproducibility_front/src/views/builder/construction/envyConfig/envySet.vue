@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from "vue";
+import { defineEmits, onMounted } from "vue";
 
 const props = defineProps(["scenario"]);
 
@@ -56,6 +56,10 @@ const selectEnvy = () => {
 
   emit("codeType", data);
 };
+
+onMounted(() => {
+  selectEnvy();
+});
 </script>
 
 

@@ -295,7 +295,6 @@ export default {
     async init() {
       //get my models
       this.allModelsWithUser = await getMyModels();
-      console.log("this.allModelsWithUser", this.allModelsWithUser);
     },
   },
   async mounted() {

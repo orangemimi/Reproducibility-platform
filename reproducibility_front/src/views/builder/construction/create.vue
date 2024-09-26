@@ -107,10 +107,8 @@ export default {
     async setScenario() {
       if (!this.form.name || !this.form.type) {
         this.$message.error("Please fill in the required fields");
-
         return;
       }
-
       $emit(this, "createStatus", "success");
       let data = await saveScenario(
         {

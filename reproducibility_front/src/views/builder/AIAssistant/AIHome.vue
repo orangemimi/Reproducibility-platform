@@ -348,7 +348,7 @@ const queryForResource = async (
   if (typeof result === "string") {
     // @ts-ignore
     const jsonString = result.replace(/'/g, '"').replace(/None/g, "null");
-    console.log(jsonString, "jsonString");
+    // console.log(jsonString, "jsonString");
 
     const newJson = JSON.parse(jsonString);
     let newModelInfo: modelInfo = {
@@ -444,7 +444,7 @@ const parseMermaidToJson = (mermaidText: string) => {
     nodes: nodes,
     links: links,
   };
-  console.log(reproduceDoc, "reproduceDoc");
+  // console.log(reproduceDoc, "reproduceDoc");
 
   // 输出JSON格式的数据
   return reproduceDoc;
@@ -486,7 +486,7 @@ const submitFile = (file: any) => {
 
     pdfContent.value = words;
   });
-  console.log(file, "submitFile");
+  // console.log(file, "submitFile");
 };
 
 // 超出了就提醒一下，确定是否替换
@@ -531,17 +531,21 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
       box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.3);
       border-radius: 10px;
       .uploader {
-        padding: 2vh 5vh;
-        height: 120px;
+        padding: 2% 5%;
+        height: 12%;
       }
-      .pdfContainer {
-        width: 90%;
-        height: calc(96vh - 300px);
-        box-shadow: 5px 5px 12px 0 rgba(0, 0, 0, 0.3);
+      #pdf {
+        height: 100%;
+        .pdfContainer {
+          width: 90%;
+          // height: calc(96vh - 300px);
+          height: 80% !important;
+          box-shadow: 5px 5px 12px 0 rgba(0, 0, 0, 0.3);
 
-        margin-left: 5%;
+          margin-left: 5%;
 
-        border-radius: 10px;
+          border-radius: 10px;
+        }
       }
     }
     .mermaidController {

@@ -141,6 +141,7 @@ public class PythonExecutionService {
         }
     }
 
+    // 将容器中的文件内容复制到宿主机上
     public void getContainerFileContent(String containerId, String folderId, String userId, String filePath) throws IOException {
         try {
             Process process = Runtime.getRuntime().exec("docker cp " + containerId + ":" + filePath + " E:\\dockerData");

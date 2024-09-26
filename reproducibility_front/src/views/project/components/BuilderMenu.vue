@@ -20,11 +20,11 @@
             </div> -->
       <div
         class="construction1 menu-item"
-        @click="handleClick('AIAssistant')"
+        @click="handleClick('AIConstruction')"
         :class="{ isActive: isAIActive }"
       >
         <el-icon><InfoFilled /></el-icon>
-        AI Assistant
+        AI Construction
       </div>
       <div
         class="construction1 menu-item"
@@ -99,7 +99,7 @@ export default {
           this.isWorkFlowActive =
           this.isAIActive =
             false;
-      } else if (type == "AIAssistant") {
+      } else if (type == "AIConstruction") {
         this.isAIActive = true;
         this.isInfoActive =
           this.isConstructionActive =
@@ -175,7 +175,7 @@ export default {
               false;
           break;
         }
-        case "AIAssistant": {
+        case "AIConstruction": {
           this.isAIActive = true;
           this.isInfoActive =
             this.isConstructionActive =
