@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 // @ts-ignore
-import { getPython38DockerFile } from "@/api/request.js";
+// import { getPython38DockerFile } from "@/api/request.js";
 
 const envySelection = () => {
   alert("test");
@@ -31,7 +31,7 @@ const envySelection = () => {
 const router = useRouter();
 const goTo = (page: string) => {
   // 生成dockerfile
-  getPython38DockerFile();
+  // getPython38DockerFile();
 
   // 如果想要拼凑ip：端口/#/envy/page就用这样的，但是路由没写好
   // let route = "/envy/" + page;

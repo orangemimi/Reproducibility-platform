@@ -192,6 +192,8 @@ public class FunctionUtils {
         scenarioNew.put("resourceCollection", scenario.getResourceCollection());
         scenarioNew.put("resourceCollectionObjects", obj);
         scenarioNew.put("initialScenarioId", scenario.getInitialScenarioId());
+        scenarioNew.put("flowData", scenario.getFlowData());
+
 
         return scenarioNew;
 

@@ -64,7 +64,7 @@
       >
         <template v-slot:empty> Please upload a file </template>
 
-        <el-table-column label="Name" show-overflow-tooltip width="200">
+        <el-table-column label="Name" show-overflow-tooltip>
           <template #default="scope">
             <i class="collapse" :class="collapseClass(scope.row)"></i>
             {{ scope.row.name }}

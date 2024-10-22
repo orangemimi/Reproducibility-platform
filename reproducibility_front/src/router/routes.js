@@ -15,14 +15,7 @@ export default [
     },
     component: () => import("@/views/error-page/404.vue"),
   },
-  {
-    path: "/card1",
-    name: "testPage1",
-    meta: {
-      title: "testPage1",
-    },
-    component: () => import("@/views/builder/AIAssistant/vueFlow/test.vue"),
-  },
+
   {
     path: "/card2",
     name: "testPage2",

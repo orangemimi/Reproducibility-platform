@@ -12,6 +12,8 @@ import edu.njnu.opengms.r2.domain.scenario.dto.UpdateScenarioInstanceResourceDTO
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Author ：Zhiyi
  * @Date ：2021/4/13 14:15
@@ -39,6 +41,13 @@ public class ScenarioController {
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.GET)
     public JsonResult getAllScenariosByProjectId(@PathVariable("projectId") String projectId) {
         return ResultUtils.success(scenarioService.getScenariosByProjectId(projectId));
+    }
+
+    // 保存integrateTask的flowData
+    @RequestMapping(value = "/updateWorkflowInfo/{projectId}", method = RequestMethod.POST)
+    public JsonResult updateWorkflowInfo(@PathVariable("projectId") String projectId,@RequestParam("flowData") String flowData) {
+        Scenario integrateTaskScenario = scenarioService.updateScenarioFlowData(projectId,flowData);
+        return ResultUtils.success(integrateTaskScenario);
     }
 
     @RequestMapping(value = "/{id}", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.PATCH)

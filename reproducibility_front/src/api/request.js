@@ -181,6 +181,10 @@ export async function saveScenario(postJson, initialScenatioId) {
   return await post(`/scenario/${initialScenatioId}`, postJson);
 }
 
+export async function updateWorkflowInfo(projectId, flowData) {
+  return await post(`/scenario/updateWorkflowInfo/${projectId}`, flowData);
+}
+
 export async function bindScenario(id, postJson) {
   return await patch(`/scenario/instance/${id}`, postJson);
 }

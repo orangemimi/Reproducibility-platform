@@ -244,4 +244,21 @@ public class ScenarioService {
         update.updateTo(scenario);
         return scenarioRepository.save(scenario);
     }
+
+    public Scenario updateScenarioFlowData(String projectId, String flowData){
+        List<Scenario> scenarioList =  scenarioRepository.findAllByProjectId(projectId);
+        // 找到第一个type为integrateTask的scenario
+        Scenario integrateTaskScenario = scenarioList.stream()
+                .filter(scenario -> "integrateTask".equals(scenario.getType()))
+                .findFirst()
+                .orElse(null);
+        if (integrateTaskScenario != null) {
+            // 设置flowData属性
+            integrateTaskScenario.setFlowData(flowData);
+
+            // 保存修改后的scenario
+            scenarioRepository.save(integrateTaskScenario);
+        }
+        return  integrateTaskScenario;
+    }
 }

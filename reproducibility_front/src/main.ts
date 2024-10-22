@@ -22,12 +22,19 @@ import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import eventBus from 'vue3-eventbus'
 import rate from 'vue-rate'
 import 'vue-rate/dist/vue-rate.css'
+// 导入 Font Awesome 图标库
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+import { fab } from "@fortawesome/free-brands-svg-icons";
 
 
 // import mxgraph from './mxgraph';
 // import './assets/variable.scss';
 // import  VueScrollTo  from 'vuescroll';
 import x2js from 'x2js';
+library.add(fas, far, fab);
 
 const app = createApp(App);
 
@@ -40,6 +47,8 @@ app.use(mavonEditor);
 app.use(PerfectScrollbar);
 app.use(eventBus);
 app.use(rate);
+
+app.component('font-awesome-icon', FontAwesomeIcon);
 
 
 // app.use(VueScrollTo);
