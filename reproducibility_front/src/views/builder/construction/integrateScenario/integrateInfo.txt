@@ -1,0 +1,25 @@
+/**
+ * data：2024/11
+ * author：Ren guangjin
+ * description： Functional Logic Description Documentation
+ */
+
+// 1、关于code model的运行逻辑
+// 1、关于code model的运行逻辑
+// 1、关于code model的运行逻辑
+  - 进入项目生成一个容器（基于ProjectId）
+  - 开始节点声明和代码编辑引用
+    - input、parameter、output声明
+    - input和parameter的代码引用方式：@("声明名称")
+    - output的代码引用方式：@("声明名称", "输出名称")
+  - 代码执行
+    - 编辑(安装与删除)依赖（***没有校验机制，没有做流数据反馈）
+      - 读取依赖：页面初始化时读取依赖
+      - 安装依赖：包名、版本，同步更新表格
+      - 删除依赖，同步更新表格
+    - 代码替换，将引用的特殊格式数据替换成docker能够识别的相对路径
+    - 根据input的声明，将输入数据挂载到docker容器中
+    - 执行代码
+      - 执行错误，将错误信息返回给前端（使用http协议还是ws协议？最好是ws）
+      - 执行成功，将控制台信息返回给前端
+    - 根据output的声明，将输入输入上传到数据容器中，并将元数据存储到数据库中。

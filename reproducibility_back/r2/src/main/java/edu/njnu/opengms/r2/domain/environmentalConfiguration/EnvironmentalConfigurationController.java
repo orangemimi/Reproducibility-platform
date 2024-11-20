@@ -9,6 +9,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
+import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
@@ -146,34 +147,57 @@ public class EnvironmentalConfigurationController {
         }
     }
 
-    // 分布式做法7、允许用户多次使用该容器，并依次执行用户指定的脚本代码
     @PostMapping("/executeScript")
-    public JsonResult executeScript(@RequestParam("containerId") String containerId,@RequestParam("scriptName") String scriptName,@RequestParam("scenarioId") String scenarioId) throws IOException {
+    public JsonResult executeScript(@RequestParam("containerId") String containerId,
+                                    @RequestParam("scriptName") String scriptName,
+                                    @RequestParam("scenarioId") String scenarioId) throws IOException {
         try {
+            // 创建执行命令
             ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
                     .withCmd("python", "/app/" + scriptName)
                     .withAttachStdout(true)
                     .withAttachStderr(true)
                     .exec();
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            // 定义输出流
+            ByteArrayOutputStream stdoutStream = new ByteArrayOutputStream();
+            ByteArrayOutputStream stderrStream = new ByteArrayOutputStream();
+
+            // 执行命令并捕获输出
             dockerClient.execStartCmd(execCreateCmdResponse.getId())
-                    .exec(new ExecStartResultCallback(outputStream, System.err))
+                    .exec(new ExecStartResultCallback(stdoutStream, stderrStream))
                     .awaitCompletion();
 
-            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY+"//"+scenarioId);
-            Map<String,Object> dataMap = new HashMap<>();
-            dataMap.put("output",outputStream.toString());
-            dataMap.put("directoryList",directoryList);
-            dataMap.put("state",200);
+            // 获取目录列表
+            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY + "//" + scenarioId);
+
+            // 分析 stderr 是否有错误
+            String stdout = stdoutStream.toString();
+            String stderr = stderrStream.toString();
+
+            // 准备返回数据
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("output", stdout);
+            dataMap.put("directoryList", directoryList);
+
+            if (!stderr.isEmpty()) {
+                // 如果有错误输出，返回错误信息
+                dataMap.put("error", stderr);
+                dataMap.put("state", 40000);
+            } else {
+                // 正常情况下
+                dataMap.put("state", 200);
+            }
+
             return ResultUtils.success(dataMap);
         } catch (InterruptedException | IOException e) {
+            // 捕获异常
             e.printStackTrace();
-            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY+"//"+scenarioId);
-            Map<String,Object> dataMap = new HashMap<>();
-            dataMap.put("output",e.getMessage());
-            dataMap.put("directoryList",directoryList);
-            dataMap.put("state",40000);
+            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY + "//" + scenarioId);
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("output", e.getMessage());
+            dataMap.put("directoryList", directoryList);
+            dataMap.put("state", 50000); // 返回更明确的错误状态
             return ResultUtils.success(dataMap);
         }
     }
@@ -231,4 +255,100 @@ public class EnvironmentalConfigurationController {
         response.put("dataList", allDataItems); // 假设我们把列表命名为"dataList"
         return ResultUtils.success(response);
     }
+
+    // 灵活接口，安装单个包
+    @PostMapping("/installSinglePackage")
+    public JsonResult installSinglePackage(@RequestParam("containerId") String containerId , @RequestParam("packageInfo") String packageInfo){
+        try {
+            ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
+                    .withCmd("pip", "install", packageInfo)
+                    .withAttachStdout(true)
+                    .withAttachStderr(true)
+                    .exec();
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            dockerClient.execStartCmd(execCreateCmdResponse.getId())
+                    .exec(new ExecStartResultCallback(outputStream, System.err))
+                    .awaitCompletion();
+
+            System.out.println("success");
+            System.out.println(outputStream.toString());
+
+            return ResultUtils.success(outputStream.toString());
+        } catch (Exception e) {
+            System.out.println("error");
+            System.out.println(e.getMessage());
+
+            e.printStackTrace();
+            return ResultUtils.error("Error installing dependencies: " + e.getMessage());
+        }
+    }
+
+    // 将urlList中对应的文件，上传到对应的服务器文件夹中，通过卷挂载同步到容器内
+    @PostMapping("/downloadFilesToVolume")
+    public JsonResult downloadFilesToVolume(@RequestParam String scenarioId, @RequestBody List<Map<String, String>> urlList){
+        for (Map<String, String> fileInfo : urlList){
+            String fileUrl = fileInfo.get("url");
+            String fileName = fileInfo.get("fileName");
+            try {
+                pythonEnvironmentalService.downloadFile(fileUrl,scenarioId,fileName);
+            } catch (Exception e) {
+                return ResultUtils.error("Error downloading file: " + fileName + " from URL: " + fileUrl);
+            }
+        }
+        return ResultUtils.success("Files downloaded successfully for container: " + scenarioId);
+    }
+
+    // 传入code内容，创建python脚本文件并保存到对应的路径
+    @PostMapping("/savePythonCode")
+    public JsonResult savePythonCode(@RequestParam("scenarioId") String scenarioId, @RequestParam("fileName") String fileName, @RequestParam("code") String code) {
+        try {
+            String filePath = pythonEnvironmentalService.savePythonFile(scenarioId, fileName, code);
+            return ResultUtils.success("Python file saved successfully at: " + filePath);
+        } catch (IOException e) {
+            return ResultUtils.error("Failed to save Python file: " + e.getMessage());
+        }
+    }
+
+    // 接收一个本地路径列表，将对应的文件全部上传到数据容器，并添加到数据库
+    @PostMapping("/uploadFilesToDataContainer")
+    public JsonResult uploadFilesToDataContainer(@JwtTokenParser(key = "userId") String userId,@RequestBody Map<String, Object> requestData ) {
+        List<String> filePaths = (List<String>) requestData.get("fileNames");
+        String folderId = (String) requestData.get("folderId");
+        String scenarioId = (String) requestData.get("scenarioId");
+        List<Map<String, String>> results = new ArrayList<>();
+
+        for (String filePath : filePaths) {
+            Map<String, String> resultData = new HashMap<>();
+            resultData.put("filePath", filePath);
+
+            String fullPath = WORKING_DIRECTORY + File.separator + scenarioId + File.separator +"data" +File.separator+ filePath;
+            File file = new File(fullPath);
+
+            if (!file.exists()) {
+                resultData.put("status", "failure");
+                resultData.put("message", "File not found: " + fullPath);
+                results.add(resultData);
+                continue;
+            }
+
+            try {
+                String fileSize = pythonEnvironmentalService.formatFileSize(file);
+                JsonResult result = pythonEnvironmentalService.uploadFile(file, userId, folderId, fileSize);
+                resultData.put("status", "success");
+                String url = ((Map<String, String>)result.getData()).get("url");
+                resultData.put("message", url );
+            } catch (IOException e) {
+                resultData.put("status", "failure");
+                resultData.put("message", "Failed to upload file: " + e.getMessage());
+                e.printStackTrace();
+            } catch (MyException e) {
+                resultData.put("status", "failure");
+                resultData.put("message", "Error during file upload: " + e.getMessage());
+            }
+            results.add(resultData);
+        }
+        return ResultUtils.success(results);
+    }
+
 }

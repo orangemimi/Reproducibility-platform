@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -530,7 +531,6 @@ public class PythonEnvironmentalService {
         if (file == null) {
             return "0B"; // 如果文件为null，返回0字节
         }
-
         long size = file.length(); // 获取文件大小，单位为字节
         if (size <= 0) return "0Bytes";
         if (size < 1024) return size + "Bytes";
@@ -574,7 +574,7 @@ public class PythonEnvironmentalService {
 
         // 获取上传数据的URL
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");
-        dataInfo.put("url",url);
+        dataInfo.put("url","http://" + dataContainer + ":8083/data/"+url);
         if (folderId.equals("intermediate")) {
             return ResultUtils.success("http://112.4.132.6:8083/data/" + url);
         } else {
@@ -601,7 +601,7 @@ public class PythonEnvironmentalService {
             Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
             String tagId = folder.getTagId();
 
-            Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
+            Scenario scenario = scenarioRepository.findByProjectId(tagId);
             ResourceCollection resourceCollectionUpdate = Optional.ofNullable(scenario)
                     .map(x -> x.getResourceCollection())
                     .map(x -> {
@@ -635,8 +635,39 @@ public class PythonEnvironmentalService {
         }
     }
 
+    public void downloadFile(String fileUrl,String scenarioId,String fileName) throws IOException {
 
+        String downloadDirectory =WORKING_DIRECTORY + scenarioId + "\\data";
 
+        // 创建下载目录（如果不存在）
+        File directory = new File(downloadDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
 
+        // 下载文件并保存到指定目录
+        Path targetPath = Paths.get(downloadDirectory, fileName);
+        try (InputStream in = new URL(fileUrl).openStream()) {
+            Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    public String savePythonFile(String scenarioId, String fileName, String code) throws IOException {
+        // 构造文件保存路径
+        String saveDirectory = Paths.get(WORKING_DIRECTORY, scenarioId).toString();
+        File directory = new File(saveDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();  // 创建路径
+        }
+
+        // 创建 .py 文件并覆盖已有内容
+        File pythonFile = new File(saveDirectory, fileName + ".py");
+        try (FileWriter writer = new FileWriter(pythonFile, false)) {  // false 表示覆盖文件内容
+            writer.write(code);  // 将代码写入文件
+        }
+
+        // 返回文件的保存路径
+        return pythonFile.getPath();
+    }
 
 }

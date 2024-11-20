@@ -88,10 +88,14 @@ function onConnection(params) {
 }
 
 .label {
+  height: 30px;
+  width: 100px;
   display: flex;
+  /* word-break: break-all; */
   color: #000;
   font-size: 10px;
   justify-content: center;
   align-items: center;
+  /* overflow: visible; */
 }
 </style>

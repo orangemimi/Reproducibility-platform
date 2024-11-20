@@ -177,8 +177,10 @@ export default {
       });
     },
     async setScenario(project) {
-      if (this.form.scenarioType != "dockerScenario") {
+      if (this.form.scenarioType == "sequentModels") {
         this.form.env = null;
+      } else if (this.form.scenarioType == "integrateTask") {
+        this.form.env = "python:3.9";
       }
       let data = await saveScenario(
         {
@@ -193,7 +195,11 @@ export default {
         "initial"
       );
       // 如果是docker场景，就需要添加容器id到场景中
-      if (this.form.scenarioType == "dockerScenario") {
+      // 如果是integrateTask，就需要创建一个python3.8的容器，并添加容器id到场景中
+      if (
+        this.form.scenarioType == "dockerScenario" ||
+        this.form.scenarioType == "integrateTask"
+      ) {
         let ContainerIdFormData = new FormData();
         ContainerIdFormData.append("scenarioId", data.id);
         ContainerIdFormData.append("env", this.form.env);

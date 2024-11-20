@@ -1,6 +1,7 @@
 package edu.njnu.opengms.r2.config;
 
 import edu.njnu.opengms.r2.domain.environmentalConfiguration.InstallRequiresWebSocketHandler;
+import edu.njnu.opengms.r2.domain.environmentalConfiguration.InstallSinglePackageWebSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -43,6 +44,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new InstallRequiresWebSocketHandler(dockerClient), "/installRequires")
                 .setAllowedOrigins("*");
-//                .withSockJS();
+        registry.addHandler(new InstallSinglePackageWebSocketHandler(dockerClient), "/installSinglePackage")
+                .setAllowedOrigins("*");
     }
 }

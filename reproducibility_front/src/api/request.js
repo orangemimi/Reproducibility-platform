@@ -441,6 +441,28 @@ export async function installDependencies(formData) {
 export async function executeScript(formData) {
   return await post(`/envs/executeScript`, formData);
 }
+
+// 安装单个包
+export async function installSinglePackage(formData) {
+  return await post(`/envs/installSinglePackage`, formData);
+}
+
+// 下载文件到容器卷挂载的文件夹中
+export async function downloadFilesToVolume(scenarioId, formData) {
+  return await post(
+    `/envs/downloadFilesToVolume?scenarioId=${scenarioId}`,
+    formData
+  );
+}
+
+// 传递containerId, fileName, code，在指定位置生成一个python脚本
+export async function savePythonCode(formData) {
+  return await post(`/envs/savePythonCode`, formData);
+}
+// 根据输出文件的路径列表，以此上传到数据容器，并存储到本地服务器中
+export async function uploadFilesToDataContainer(formData) {
+  return await post(`/envs/uploadFilesToDataContainer`, formData);
+}
 ////===============================Ai Assistant=================================================
 
 // 获取pdf解析结果

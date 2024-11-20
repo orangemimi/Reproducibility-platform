@@ -49,6 +49,7 @@ const bgColor = computed(() => {
 }
 
 .label {
+  word-wrap: break-word;
   display: flex;
   color: #000;
   font-size: 10px;

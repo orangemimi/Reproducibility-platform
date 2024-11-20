@@ -176,7 +176,7 @@ public class DataItemController {
             Folder folder = folderRepository.findById(scenarioFolder).orElseThrow(MyException::noObject);
             String tagId = folder.getTagId();
 
-            Scenario scenario = scenarioRepository.findById(tagId).orElse(null);
+            Scenario scenario = scenarioRepository.findByProjectId(tagId);
             ResourceCollection resourceCollectionUpdate = Optional.ofNullable(scenario)
                     .map(x -> x.getResourceCollection())
                     .map(x -> {

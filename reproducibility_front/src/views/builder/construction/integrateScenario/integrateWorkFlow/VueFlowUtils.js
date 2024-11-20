@@ -25,7 +25,10 @@ export function getAllInputDataNodes(nodes) {
 // 返回nodes中所有的model/method
 export function getAllTasks(nodes) {
   let taskNodes = nodes.filter(
-    (node) => node.type === "model" || node.type === "method"
+    (node) =>
+      node.type === "model" ||
+      node.type === "method" ||
+      node.type === "codeModel"
   );
   return taskNodes;
 }

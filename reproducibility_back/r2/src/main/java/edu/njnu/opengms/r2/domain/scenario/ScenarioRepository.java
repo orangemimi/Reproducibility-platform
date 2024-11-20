@@ -15,7 +15,13 @@ public interface ScenarioRepository extends MongoRepository<Scenario, String> {
     //    Scenario findById(String id);
     List<Scenario> findAllByProjectId(String projectId);
 
+    // 现在一个project只有一个scenario了，上面那个作废
+    Scenario findByProjectId(String projectId);
+
+
     Optional<Scenario> findById(String id);
 
     Scenario findByInitialScenarioId(String id);
+
+
 }

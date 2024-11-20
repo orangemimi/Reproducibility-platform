@@ -1,5 +1,5 @@
 <template>
-  <textarea></textarea>
+  <textarea style="height: 100%"></textarea>
 </template>
 
 <script>

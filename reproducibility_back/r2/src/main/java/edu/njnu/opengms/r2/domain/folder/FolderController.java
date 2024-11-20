@@ -35,10 +35,12 @@ public class FolderController {
     }
 
 
-    @RequestMapping(value = "/{scenarioId}", method = RequestMethod.GET)
-    public JsonResult getByScenarioId(@PathVariable("scenarioId") String scenarioId, String userId) {
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+    public JsonResult getByScenarioId(@PathVariable("projectId") String scenarioId) {
         return ResultUtils.success(folderService.getFolderByScenarioId(scenarioId));
     }
+
+
 
     @RequestMapping(value = "", method = RequestMethod.PATCH)
     public JsonResult update(@RequestBody AddFolderDTO add, @JwtTokenParser(key = "userId") String userId) {

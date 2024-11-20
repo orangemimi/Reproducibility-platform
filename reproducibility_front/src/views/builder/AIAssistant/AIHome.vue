@@ -567,4 +567,8 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
     }
   }
 }
+
+:deep(.pdf-app .toolbar) {
+  z-index: 100 !important;
+}
 </style>
