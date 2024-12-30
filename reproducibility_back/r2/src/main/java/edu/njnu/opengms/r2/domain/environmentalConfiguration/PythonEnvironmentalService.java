@@ -1,6 +1,13 @@
 package edu.njnu.opengms.r2.domain.environmentalConfiguration;
 
 import cn.hutool.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.ExecCreateCmdResponse;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 import edu.njnu.opengms.common.enums.ResultEnum;
 import edu.njnu.opengms.common.exception.MyException;
 import edu.njnu.opengms.common.utils.JsonResult;
@@ -17,6 +24,7 @@ import edu.njnu.opengms.r2.domain.scenario.Scenario;
 import edu.njnu.opengms.r2.domain.scenario.ScenarioRepository;
 import edu.njnu.opengms.r2.domain.scenario.dto.UpdateResourceScenarioDTO;
 import edu.njnu.opengms.r2.remote.DataContainerService;
+import edu.njnu.opengms.r2.remote.ManagerServerFeign;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +34,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URL;
@@ -40,6 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -50,12 +59,19 @@ public class PythonEnvironmentalService {
     // 定义静态常量来存储工作目录的路径
     private static final String WORKING_DIRECTORY = "E:\\code\\docker\\workDirectory\\";
 
+
+
     @Value("${storages.local.path}")
     String pathString;
 
     @Value("${dataContainer}")
     private String dataContainer;
 
+    @Autowired
+    private ObjectMapper objectMapper;// 用于解析和生成 JSON
+
+    @Autowired
+    DockerClient dockerClient;
 
     @Autowired
     DataContainerService remoteDataContainerService;
@@ -74,6 +90,9 @@ public class PythonEnvironmentalService {
 
     @Autowired
     DataItemService dataItemService;
+
+    @Autowired
+    ManagerServerFeign managerServerFeign;
 
     // 提取Python脚本的依赖项
     public Set<String> extractPythonDependencies(String scenarioId){
@@ -668,6 +687,628 @@ public class PythonEnvironmentalService {
 
         // 返回文件的保存路径
         return pythonFile.getPath();
+    }
+
+    public Map<String, Object> executeScript(String containerId, String scriptName, String scenarioId) throws IOException, InterruptedException {
+        // 创建执行命令
+        ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
+                .withCmd("python", "/app/" + scriptName)
+                .withAttachStdout(true)
+                .withAttachStderr(true)
+                .exec();
+
+        // 定义输出流
+        ByteArrayOutputStream stdoutStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderrStream = new ByteArrayOutputStream();
+
+        // 执行命令并捕获输出
+        dockerClient.execStartCmd(execCreateCmdResponse.getId())
+                .exec(new ExecStartResultCallback(stdoutStream, stderrStream))
+                .awaitCompletion();
+
+        // 获取目录列表
+        List<FileItem> directoryList = listDirectory(WORKING_DIRECTORY + "//" + scenarioId);
+
+        // 分析 stderr 是否有错误
+        String stdout = stdoutStream.toString();
+        String stderr = stderrStream.toString();
+        boolean hasErrors = false;
+
+
+        for (String line : stderr.split("\\n")) {
+            if (line.startsWith("ERROR:")) {
+                hasErrors = true;
+            }
+        }
+
+        // 准备返回数据
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("output", stdout);
+        dataMap.put("directoryList", directoryList);
+        dataMap.put("error", stderr);
+
+
+        if (hasErrors) {
+            // 如果有错误输出，返回错误信息
+            dataMap.put("state", 40000);
+        } else {
+            // 正常情况下
+            dataMap.put("state", 200);
+        }
+
+        return dataMap;
+    }
+
+
+    public String startTask(String userId,String scenarioId,String folderId, List<Map<String, Object>> modelNodes) {
+        Optional<Scenario> optionalScenario = scenarioRepository.findById(scenarioId);
+        Scenario scenario = optionalScenario.orElse(new Scenario());
+        try {
+            // 解析 flowData
+            ObjectNode flowDataNode = scenario.getFlowData() == null
+                    ? objectMapper.createObjectNode()
+                    : (ObjectNode) objectMapper.readTree(scenario.getFlowData());
+
+            // 获取或初始化 task 节点
+            ObjectNode taskNode = (ObjectNode) flowDataNode.get("task");
+            if (taskNode != null && "running".equals(taskNode.get("state").asText())) {
+                taskNode.put("state", "init");
+                String previousLog = taskNode.get("modelExecutionInfo").asText();
+                taskNode.put("modelExecutionInfo", previousLog + "任务已终止，重新开始执行。\n");
+            } else {
+                taskNode = objectMapper.createObjectNode();
+                taskNode.put("state", "running");
+                taskNode.put("modelExecutionInfo", "-----已开始执行工作流任务，请稍后-----\n");
+            }
+
+            // 立即保存状态到数据库,否则怎么查询都是init
+            flowDataNode.set("task", taskNode);
+            scenario.setFlowData(flowDataNode.toString());
+            scenarioRepository.save(scenario);
+
+            // 模拟按顺序执行节点
+            for (Map<String, Object> modelNode : modelNodes) {
+                String nodeId = (String) modelNode.get("id");
+                String nodeType = (String) modelNode.get("type");
+                JsonNode dataNode = objectMapper.convertValue(modelNode.get("data"), JsonNode.class);
+                String nodeName = dataNode.get("label").asText();
+
+                // 记录节点开始执行的日志
+                String currentLog = taskNode.get("modelExecutionInfo").asText() +
+                        "已开始执行节点：" + nodeName + " 类型：" + nodeType + "\n";
+
+                // 假设模型执行
+                Map<String, Object> executionResult;
+                switch (nodeType) {
+                    case "model":
+                        Thread.sleep(3000); // 模拟执行延迟
+                        executionResult = new HashMap<>();
+                        boolean result = executeModelNode(userId, modelNode, scenario, modelNodes);
+                        if (result) {
+                            executionResult.put("success", true);
+                            executionResult.put("message", "模型运行成功，请在数据管理模块查看输出数据\n");
+                        } else {
+                            executionResult.put("success", false);
+                            executionResult.put("message", "模型服务出错，请检查您传入的数据格式是否正确，有疑问请联系模型发布者或网站管理员\n");
+                        }
+                        break;
+                    case "codeModel":
+                        executionResult = executeCodeModelNode(folderId, modelNode, scenario, flowDataNode,modelNodes);
+                        break;
+                    default:
+                        executionResult = new HashMap<>();
+                        executionResult.put("success", false);
+                        executionResult.put("message", "未知节点类型: " + nodeType);
+                }
+
+
+                if (!(Boolean) executionResult.get("success")) {
+                    taskNode.put("state", "error");
+                    taskNode.put("modelExecutionInfo", currentLog + "节点执行失败："+ executionResult.get("message") +"任务终止。\n");
+                    flowDataNode.set("task", taskNode);
+                    scenario.setFlowData(flowDataNode.toString());
+                    scenarioRepository.save(scenario);
+                    return "Task execution stopped due to error.";
+                }
+
+                // 记录成功日志
+                currentLog += "节点：" + nodeName + " 执行成功。\n";
+                taskNode.put("modelExecutionInfo", currentLog+"节点输出内容为："+executionResult.get("message") +"\n");
+
+                // 保存当前状态到数据库
+                flowDataNode.set("task", taskNode);
+                scenario.setFlowData(flowDataNode.toString());
+                scenarioRepository.save(scenario);
+            }
+
+            // 所有模型执行完成
+            taskNode.put("state", "success");
+            taskNode.put("modelExecutionInfo",
+                    taskNode.get("modelExecutionInfo").asText() + "流程图所有模型均已执行完成。\n");
+
+            // 更新 flowData 并保存
+            flowDataNode.set("task", taskNode);
+            scenario.setFlowData(flowDataNode.toString());
+            scenarioRepository.save(scenario);
+
+            return "Task execution completed successfully.";
+
+        } catch (Exception e) {
+            return "Error during task execution: " + e.getMessage();
+        }
+    }
+
+
+    // 处理 model 类型节点
+    private boolean executeModelNode(String userId,Map<String, Object> taskNode, Scenario scenario,List<Map<String, Object>> modelNodes) {
+        try {
+            System.out.println("开始执行 model 类型节点: " + taskNode.get("id"));
+
+            // 1、先拿到模型的数据
+            Map<String, Object> dataMap = (Map<String, Object>) taskNode.get("data");
+            Map<String, Object> behaviorMap = (Map<String, Object>) dataMap.get("behavior");
+            String md5 = (String)dataMap.get("md5");
+
+            // 2、调用initTask，获取ip和port
+            JSONObject modelInfo = managerServerFeign.getServiceTask(md5);
+            JSONObject data = modelInfo.getJSONObject("data");
+            // 获取 port 和 host
+            String port = data.getStr("port");
+            String host = data.getStr("host");
+//            String pid = data.getStr("id");
+            if (port == null || host == null) {
+                throw new IllegalArgumentException("Missing critical fields: post or host");
+            }
+
+            // 3、包装param？？
+
+            // 4、清洗参数，获取invokeForm
+            // 4.1、填充inputs和outputs
+            Map<String, Object> invokeForm = extractModelArguments(behaviorMap);
+            // 4.2、填充port和host
+            invokeForm.put("port", port);
+            invokeForm.put("ip", host);
+            invokeForm.put("username", userId);
+            invokeForm.put("pid", md5);
+
+
+            JSONObject invokeForm2 = new JSONObject(invokeForm);
+
+            // 调用单个模型，开始invoke
+            JSONObject invokeResponse = managerServerFeign.invoke(invokeForm2);
+            String taskId = invokeResponse.getJSONObject("data").getStr("tid");
+            if (taskId == null) {
+                throw new IllegalArgumentException("Task ID is null");
+            }
+            Map<String, Object> refreshForm = Collections.unmodifiableMap(new HashMap<String, Object>() {{
+                put("tid", taskId);
+                put("ip", host);
+                put("port", port);
+            }});
+
+            // 开始轮询，查询执行状态，当执行完成或者错误时结束
+            long startTime = System.currentTimeMillis();
+            long maxWaitTime = 60 * 60 * 1000; // 最大等待时间为 60 分钟
+            while (true) {
+                // 每隔一定时间轮询状态
+                Thread.sleep(2000); // 轮询间隔 2 秒
+
+                JSONObject refreshResponse = managerServerFeign.refresh(new JSONObject(refreshForm));
+                Integer status = refreshResponse.getJSONObject("data").getInt("status");;
+
+                if (status == null) {
+                    throw new IllegalArgumentException("Status is null in response");
+                }
+
+                // 状态为 2 表示成功，-1 表示失败
+                if (status == 2) {
+                    System.out.println("模型运行成功: " + taskNode.get("id"));
+                    // 提取并处理最终结果（可根据需求封装返回结果）
+                    List<Map<String, Object>> outputsArray = (List<Map<String, Object>>) refreshResponse.getJSONObject("data").get("outputs");
+                    List<Map<String, Object>> behaviorOutputs = (List<Map<String, Object>>) behaviorMap.get("outputs");
+                    // 遍历 outputsArray
+                    for (Map<String, Object> response : outputsArray) {
+                        String event = (String) response.get("event");
+                        String url = (String) response.get("url");
+                        // 遍历 behaviorMap.outputs 并更新 value
+                        for (Map<String, Object> output : behaviorOutputs) {
+                            if (event.equals(output.get("name"))) {
+                                output.put("value", url);
+                                break; // 已找到匹配项，结束当前循环
+                            }
+                        }
+                    }
+                    updateOutputValuesToInputs(behaviorOutputs, modelNodes);
+                    return true;
+                } else if (status == -1) {
+                    System.err.println("模型运行失败: " + taskNode.get("id"));
+                    return false;
+                }
+
+                // 检查是否超时
+                if (System.currentTimeMillis() - startTime > maxWaitTime) {
+                    System.err.println("模型运行超时: " + taskNode.get("id"));
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("执行 model 节点时出错: " + e.getMessage()+"错误原因：");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 清洗参数，返回 invokeForm
+    Map<String, Object> extractModelArguments(Map<String, Object> behaviorMap) {
+        // 初始化 invokeForm
+        Map<String, Object> invokeForm = new HashMap<>();
+        List<Map<String, Object>> inputs = new ArrayList<>();
+        List<Map<String, Object>> outputs = new ArrayList<>();
+
+        // 获取 inputs 和 parameters
+        List<Map<String, Object>> inputsAndParameters = new ArrayList<>();
+        if (behaviorMap.containsKey("inputs")) {
+            inputsAndParameters.addAll((List<Map<String, Object>>) behaviorMap.get("inputs"));
+        }
+        if (behaviorMap.containsKey("parameters")) {
+            inputsAndParameters.addAll((List<Map<String, Object>>) behaviorMap.get("parameters"));
+        }
+
+        // 清洗 inputs 和 parameters
+        for (Map<String, Object> item : inputsAndParameters) {
+            Map<String, Object> dataRelation = (Map<String, Object>) item.get("dataRelation");
+            if (dataRelation != null && !String.valueOf(dataRelation.get("value")).isEmpty()) {
+                Map<String, Object> detail = new HashMap<>();
+                detail.put("statename", behaviorMap.get("name"));
+                detail.put("event", item.get("name"));
+                detail.put("tag", item.get("name"));
+                detail.put("url", dataRelation.get("value"));
+                inputs.add(detail);
+            }
+        }
+
+        // 获取 outputs
+        List<Map<String, Object>> outputList = (List<Map<String, Object>>) behaviorMap.get("outputs");
+        for (Map<String, Object> item : outputList) {
+            Map<String, Object> detail = new HashMap<>();
+            detail.put("statename", behaviorMap.get("name"));
+            detail.put("event", item.get("name"));
+
+            // 处理 template
+            Map<String, Object> template = new HashMap<>();
+            Map<String, Object> datasetItem = (Map<String, Object>) item.get("datasetItem");
+            if ("external".equals(datasetItem.get("type"))) {
+                template.put("type", "id");
+                template.put("value", datasetItem.get("externalId") != null ? datasetItem.get("externalId") : "");
+            } else {
+                template.put("type", "none");
+                template.put("value", "");
+            }
+            detail.put("template", template);
+            outputs.add(detail);
+        }
+
+        // 将 inputs 和 outputs 放入 invokeForm
+        invokeForm.put("inputs", inputs);
+        invokeForm.put("outputs", outputs);
+
+        return invokeForm;
+    }
+
+    // 处理 codeModel 类型节点
+    public Map<String, Object> executeCodeModelNode(String folderId,Map<String, Object> taskNode,
+                                                    Scenario scenario,ObjectNode flowDataNode,List<Map<String, Object>> modelNodes) {
+        Map<String, Object> executionResult = new HashMap<>();
+        try {
+            System.out.println("开始执行 codeModel 类型节点: " + taskNode.get("id"));
+            // 1. 初始化输出数据列表
+            List<Map<String, String>> currentModelOutputs = new ArrayList<>();
+
+            // 2. 解析代码，将引用的数据替换为真实数据相对路径
+            Map<String, Object> dataMap = (Map<String, Object>) taskNode.get("data");
+            Map<String, Object> behaviorMap = (Map<String, Object>) dataMap.get("behavior");
+
+            String originCode = (String) behaviorMap.get("code");
+            String replacedCode = processCode(originCode, taskNode, currentModelOutputs);
+
+            // 3. 保存替换后的 Python 脚本到 Docker 容器工作目录
+            String scriptFileName = dataMap.get("label") + "";
+            String filePath = savePythonFile(scenario.getId(), scriptFileName, replacedCode);
+
+            // 4. 根据输入声明，将输入数据挂载到 Docker 容器中
+            // 先获取已经上传的文件列表
+            List<Map<String, String>> containerFiles = getScenarioContainerFiles(flowDataNode);
+            // 初始化一个空的文件下载列表
+            List<Map<String, String>> urlList = new ArrayList<>();
+            // 遍历任务节点的输入，检查文件是否已经存在于容器中
+            List<Map<String, Object>> inputs = (List<Map<String, Object>>) behaviorMap.get("inputs");
+            for (Map<String, Object> input : inputs) {
+                // 获取文件的名称和 URL
+                Map<String, String> dataRelation = (Map<String, String>) input.get("dataRelation");
+                String fileName =  dataRelation.get("label");
+                String url =  dataRelation.get("value");
+
+                // 检查文件是否已经存在于 containerFiles 中
+                boolean urlExists = containerFiles.stream().anyMatch(file -> file.get("url").equals(url));
+                if (!urlExists) {
+                    // 如果文件不存在，则将其添加到下载列表
+                    Map<String, String> fileEntry = new HashMap<>();
+                    fileEntry.put("fileName", fileName);
+                    fileEntry.put("url", url);
+                    urlList.add(fileEntry);
+                }
+            }
+            // 如果有新增输入文件，就下载文件到容器工作目录
+            for (Map<String, String> fileInfo : urlList){
+                String fileUrl = fileInfo.get("url");
+                String fileName = fileInfo.get("fileName");
+                try {
+                    downloadFile(fileUrl,scenario.getId(),fileName);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error downloading file: " + fileName + " from URL: " + fileUrl);
+                }
+            }
+
+            if (urlList != null && !urlList.isEmpty()) {
+                // 将新上传的文件添加到containerFiles中。
+                containerFiles.addAll(urlList);
+                // 将更新后的 containerFiles 写回 flowDataNode
+                ObjectMapper objectMapper = new ObjectMapper();
+                ArrayNode updatedContainerFiles = objectMapper.valueToTree(containerFiles);
+                ObjectNode flowDataNodeNew = (ObjectNode) objectMapper.readTree(scenario.getFlowData());
+                flowDataNode.set("containerFiles", updatedContainerFiles);
+
+                // 将更新后的 flowDataNode 保存到 scenario 中
+                scenario.setFlowData(flowDataNodeNew.toString());
+                scenarioRepository.save(scenario);
+            }
+
+            // 5. 执行 Docker 容器，获得打印内容
+            Map<String, Object> ContainExecutionResult = executeScript(scenario.getContainerId(), scriptFileName+".py",scenario.getId());
+            System.out.println("docker容器执行的输出内容："+ ContainExecutionResult);
+            String state = String.valueOf(ContainExecutionResult.get("state"));
+            String dockerOutput="";
+
+            String error = (String) ContainExecutionResult.get("error");
+            // 这里有问题，就是警告也会放到错误流里面返回，但是警告不会造成错误
+            if ("200".equals(state)) {
+                dockerOutput = (String) ContainExecutionResult.get("output");
+                // 如果有警告内容，也加到输出里面
+                if (error != null && !error.isEmpty()) {
+                    dockerOutput += "\n" + error;
+                }
+            } else if ("40000".equals(state)) {
+
+                executionResult.put("success", false);
+                executionResult.put("message", error);
+                return executionResult;
+            }
+
+
+            // 6. 上传结果文件到数据容器
+            List<Map<String, String>> upLoadOutputsResults = new ArrayList<>();
+            List<String> outputsNames = currentModelOutputs.stream()
+                .map(output -> output.get("name"))
+                .collect(Collectors.toList());
+
+            for (String outputName : outputsNames) {
+                Map<String, String> resultData = new HashMap<>();
+                resultData.put("filePath", outputName);
+
+                String fullPath = WORKING_DIRECTORY + File.separator + scenario.getId() + File.separator + "data" + File.separator + outputName;
+                File file = new File(fullPath);
+
+                if (!file.exists()) {
+                    resultData.put("status", "failure");
+                    resultData.put("message", "File not found: " + fullPath);
+                    upLoadOutputsResults.add(resultData);
+                    continue;
+                }
+
+                try {
+                    String fileSize = formatFileSize(file);
+                    JsonResult uploadFileResult = uploadFile(file, scenario.getId(), folderId, fileSize);
+                    resultData.put("status", "success");
+                    String url = ((Map<String, String>) uploadFileResult.getData()).get("url");
+                    resultData.put("message", url);
+                    // 将输出数据的 URL 绑定到对应 output
+                    Map<String, Object> taskNodeData = (Map<String, Object>) taskNode.get("data");
+                    Map<String, Object> taskNodeDataBehavior = (Map<String, Object>) taskNodeData.get("behavior");
+                    List<Map<String, Object>> taskNodeOutputs = (List<Map<String, Object>>) taskNodeDataBehavior.get("outputs");
+                    for (Map<String, Object> output : taskNodeOutputs) {
+                        String outputNameInNode = (String) output.get("name");
+                        String fileNameWithoutExtension = FilenameUtils.removeExtension(outputName);
+                        if (fileNameWithoutExtension.equals(outputNameInNode)) {
+                            output.put("value", url); // 绑定上传的 URL
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
+                    resultData.put("status", "failure");
+                    resultData.put("message", "Failed to upload file: " + e.getMessage());
+                    e.printStackTrace();
+                } catch (MyException e) {
+                    resultData.put("status", "failure");
+                    resultData.put("message", "Error during file upload: " + e.getMessage());
+                }
+                upLoadOutputsResults.add(resultData);
+            }
+
+            // 7. 更新节点信息，传递到下一个节点的输入
+            Map<String, Object> taskNodeData = (Map<String, Object>) taskNode.get("data");
+            Map<String, Object> taskNodeDataBehavior = (Map<String, Object>) taskNodeData.get("behavior");
+            List<Map<String, Object>> taskNodeOutputs = (List<Map<String, Object>>) taskNodeDataBehavior.get("outputs");
+
+            updateOutputValuesToInputs(taskNodeOutputs, modelNodes);
+
+            executionResult.put("success", true);
+            executionResult.put("message", dockerOutput);
+            return executionResult; // 执行成功
+        } catch (Exception e) {
+            System.err.println("执行 codeModel 节点时出错: " + e.getMessage());
+
+            executionResult.put("success", false);
+            executionResult.put("message", "");
+            return executionResult;
+        }
+    }
+
+    // 解析代码并替换特殊标记
+    private String processCode(String code, Map<String, Object> node, List<Map<String, String>> currentModelOutputs) {
+        // 定义正则表达式
+        Pattern inputPattern = Pattern.compile("@\\(\\s*\"([^\"]*?)\"\\s*\\)");
+        Pattern outputPattern = Pattern.compile("@\\(\\s*\"([^\"]*?)\"\\s*,\\s*\"([^\"]*?)\"\\s*\\)");
+
+        // 用 StringBuffer 构造替换后的代码
+        Matcher inputMatcher = inputPattern.matcher(code);
+        StringBuffer intermediateCode = new StringBuffer();
+
+        while (inputMatcher.find()) {
+            String inputName = inputMatcher.group(1);
+            String replacement = replaceInputMarker(inputName, node);
+            inputMatcher.appendReplacement(intermediateCode, Matcher.quoteReplacement(replacement));
+        }
+        inputMatcher.appendTail(intermediateCode);
+
+        Matcher outputMatcher = outputPattern.matcher(intermediateCode.toString());
+        StringBuffer finalCode = new StringBuffer();
+
+        while (outputMatcher.find()) {
+            String outputLabel = outputMatcher.group(1);
+            String fileName = outputMatcher.group(2);
+            String replacement = replaceOutputMarker(outputLabel, fileName, currentModelOutputs);
+            outputMatcher.appendReplacement(finalCode, Matcher.quoteReplacement(replacement));
+        }
+        outputMatcher.appendTail(finalCode);
+
+        return finalCode.toString();
+    }
+
+    // 替换输入和参数标记
+    private String replaceInputMarker(String inputName, Map<String, Object> node) {
+        Map<String, Object> data = (Map<String, Object>) node.get("data");
+        Map<String, Object> behavior = (Map<String, Object>) data.get("behavior");
+
+        // 处理inputs
+        List<Map<String, Object>> inputs = (List<Map<String, Object>>) behavior.get("inputs");
+        for (Map<String, Object> input : inputs) {
+            if (inputName.equals(input.get("name"))) {
+                Map<String, Object> dataRelation = (Map<String, Object>) input.get("dataRelation");
+                return "\"app/data/" + dataRelation.get("label") + "\"";
+            }
+        }
+
+        // 处理parameters
+        List<Map<String, Object>> parameters = (List<Map<String, Object>>) behavior.get("parameters");
+        for (Map<String, Object> parameter : parameters) {
+            if (inputName.equals(parameter.get("name"))) {
+                Map<String, Object> dataRelation = (Map<String, Object>) parameter.get("dataRelation");
+                return "\"" + dataRelation.get("value") + "\"";
+            }
+        }
+
+        throw new IllegalArgumentException("输入标记未找到: " + inputName);
+    }
+
+    // 替换输出标记
+    private String replaceOutputMarker(String outputLabel, String fileName, List<Map<String, String>> currentModelOutputs) {
+        Map<String, String> outputInfo = new HashMap<>();
+        outputInfo.put("label", outputLabel);
+        outputInfo.put("name", fileName);
+        currentModelOutputs.add(outputInfo);
+        return "\"app/data/" + fileName + "\"";
+    }
+
+    // 将输出数据绑定到对应的输入数据中
+    private void updateOutputValuesToInputs(List<Map<String, Object>> taskNodeOutputs, List<Map<String, Object>> modelNodes) {
+        for (Map<String, Object> output : taskNodeOutputs) {
+            String outputUrl = (String) output.get("value");
+            List<String> equalData = (List<String>) output.get("equalData");
+
+            if (equalData != null && outputUrl != null) {
+                for (String inputId : equalData) {
+                    for (Map<String, Object> targetNode : modelNodes) {
+                        Map<String, Object> targetData = (Map<String, Object>) targetNode.get("data");
+                        Map<String, Object> targetBehavior = (Map<String, Object>) targetData.get("behavior");
+                        List<Map<String, Object>> equalInputs = (List<Map<String, Object>>) targetBehavior.get("inputs");
+
+                        for (Map<String, Object> input : equalInputs) {
+                            if (inputId.equals(input.get("id"))) {
+                                Map<String, Object> dataRelation = (Map<String, Object>) input.get("dataRelation");
+                                dataRelation.put("value", outputUrl);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 获取scenario的容器文件信息
+    private List<Map<String, String>> getScenarioContainerFiles(ObjectNode flowDataNode) {
+        // 检查flowDataNode是否包含"containerFiles"键，并且对应的值是一个数组
+        if (flowDataNode.has("containerFiles") && flowDataNode.get("containerFiles").isArray()) {
+            ArrayNode containerFilesArray = (ArrayNode) flowDataNode.get("containerFiles");
+            List<Map<String, String>> containerFiles = new ArrayList<>();
+
+            // 遍历数组中的每个元素
+            for (JsonNode fileNode : containerFilesArray) {
+                // 将JsonNode转换为Map<String, String>
+                Map<String, String> fileMap = new HashMap<>();
+                Iterator<String> fieldNames = fileNode.fieldNames();
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    JsonNode valueNode = fileNode.get(fieldName);
+                    // 确保值是字符串类型
+                    if (valueNode.isTextual()) {
+                        fileMap.put(fieldName, valueNode.asText());
+                    } else {
+                        // 如果值不是字符串类型，可以转换为字符串，或者选择跳过
+                        fileMap.put(fieldName, valueNode.toString());
+                    }
+                }
+                // 将转换后的Map添加到列表中
+                containerFiles.add(fileMap);
+            }
+
+            return containerFiles;
+        }
+        // 如果"containerFiles"键不存在或不是数组，则返回空列表
+        return new ArrayList<>();
+    }
+
+    // 检查task运行的状态信息
+    public Map<String, String> checkRunningFlow(String scenarioId) {
+        Optional<Scenario> optionalScenario = scenarioRepository.findById(scenarioId);
+        Scenario scenario = optionalScenario.orElse(new Scenario());
+        if (scenario == null || scenario.getFlowData() == null) {
+            Map<String, String> result = new HashMap<>();
+            result.put("state", "init");
+            result.put("modelExecutionInfo", null);
+            return result;
+        }
+        try {
+            JsonNode flowDataNode = objectMapper.readTree(scenario.getFlowData());
+            JsonNode taskNode = flowDataNode.get("task");
+            if (taskNode == null || !taskNode.isObject()) {
+                Map<String, String> result = new HashMap<>();
+                result.put("state", "init");
+                result.put("modelExecutionInfo", null);
+                return result;
+            }
+            String state = taskNode.get("state").asText("init");
+            String modelExecutionInfo = taskNode.has("modelExecutionInfo") ? taskNode.get("modelExecutionInfo").asText(null) : null;
+            Map<String, String> result = new HashMap<>();
+            result.put("state", state);
+            result.put("modelExecutionInfo", modelExecutionInfo);
+            return result;
+        } catch (Exception e) {
+            System.out.println("Error parsing flowData: " + e.getMessage());
+            Map<String, String> result = new HashMap<>();
+            result.put("state", "init");
+            result.put("modelExecutionInfo", null);
+            return result;
+        }
     }
 
 }

@@ -133,7 +133,7 @@
                         <el-icon circle><Download /></el-icon
                       ></el-button>
                     </div>
-                    <div v-else>
+                    <div v-else @click="console.log(scope.row)">
                       <SelectTree
                         :treeEvent="scope.row"
                         :initialScenarioId="initialScenarioId"

@@ -124,8 +124,14 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20210307</version> <!-- 请使用最新的版本号 -->
+            <version>20230227</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.16</version> <!-- 请使用最新的版本号 -->
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

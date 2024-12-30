@@ -1,6 +1,7 @@
 <template>
   <div style="height: 100%; width: 100%; display: flex" @drop="handleDrop">
     <Sidebar
+      style="width: 25%; height: 100%"
       v-if="!nodeEdit"
       :scenarioId="currentScenario.id"
       :containerId="currentScenario.containerId"
@@ -55,7 +56,7 @@
         </div>
         <div class="topBarItem" @click="printInfo" style="border-right: none">
           <font-awesome-icon icon="play" />
-          <span style="margin-left: 5px">Console</span>
+          <span style="margin-left: 5px">Query</span>
         </div>
       </div>
       <div
@@ -133,6 +134,8 @@ import {
   executeScript,
   uploadFilesToDataContainer,
   getFoldersByScenarioId,
+  startToRunFlow,
+  checkRunningFlow,
 } from "@/api/request.js";
 import { VueFlow, useVueFlow } from "@vue-flow/core";
 import { Background } from "@vue-flow/background";
@@ -250,6 +253,8 @@ const nodeEdited = async (operation, data) => {
     ElMessage.success("Save model configuration successfully");
   } else if (operation == "generateNodes") {
     // 此时data是modelNode
+    console.log(data, 156);
+
     bindToNode(data);
   } else if (operation == "saveDependencies") {
     await saveWorkFlowInfo("silent");
@@ -286,7 +291,7 @@ const bindToNode = (modelNode) => {
   // 生成输入节点
   modelNode.data.behavior.inputs.forEach((input, index) => {
     const inputNodeId = `${nodeId}_input_${index}`;
-
+    input.id = inputNodeId;
     nodes.value.push({
       id: inputNodeId,
       data: {
@@ -326,6 +331,7 @@ const bindToNode = (modelNode) => {
   modelNode.data.behavior.parameters.forEach((parameter, index) => {
     const parameterNodeId = `${nodeId}_parameter_${index}`;
 
+    parameter.id = parameterNodeId;
     nodes.value.push({
       id: parameterNodeId,
       data: {
@@ -364,6 +370,8 @@ const bindToNode = (modelNode) => {
   // 生成输出节点
   modelNode.data.behavior.outputs.forEach((output, index) => {
     const outputNodeId = `${nodeId}_output_${index}`;
+
+    output.id = outputNodeId;
     nodes.value.push({
       id: outputNodeId,
       data: {
@@ -495,7 +503,10 @@ const clear = () => {
 };
 
 // 打印节点和边的信息
-const printInfo = () => {
+const printInfo = async () => {
+  let result = await checkRunningFlow(currentScenario.value.id);
+  emit("addInfo", result.modelExecutionInfo);
+
   console.log("nodes.value", nodes.value);
   console.log("edges.value", edges.value);
   console.log("dependencies.value", dependencies.value);
@@ -576,12 +587,12 @@ const initVerifyError = () => {
   if (flag) {
     emit(
       "addInfo",
-      `Workflow initialization test failed : Please check that the data binding of the ${errorNode} node is complete`
+      `Workflow initialization failed : Please check that the data binding of the ${errorNode} node is complete`
     );
     return false;
   }
 
-  emit("addInfo", "Workflow initialization test passed");
+  emit("addInfo", "Workflow initialization passed");
   return true;
 };
 
@@ -613,7 +624,7 @@ const runWorkFlow = async () => {
   // 得到所有待运行节点
   let todoTasks = getAllTasks(nodes.value);
 
-  // 找到第一个运行节点，开始运行
+  // 所有的可运行model节点
   let affiliationNodes = startNodes.value.map((node) => {
     return nodes.value.find((node2) => node2.id === node.data.affiliation);
   });
@@ -632,42 +643,62 @@ const runWorkFlow = async () => {
   });
   // 初始化已完成任务数组
   let doneTasks = [];
+
   await executedOperation(firstTask, todoTasks, doneTasks);
 };
 
 // 执行模型任务
 const executedOperation = async (currentTask, todoTasks, doneTasks) => {
-  let result = await modelExecution(currentTask);
-  if (result == "error") {
-    return;
-  }
+  // let result = await modelExecution(currentTask);
+  // if (result == "error") {
+  //   return;
+  // }
 
   // 将当前任务加入已完成任务队列,并且从待执行任务队列中移除
-  doneTasks.push(currentTask.id);
+  doneTasks.push(currentTask);
   todoTasks = todoTasks.filter((task) => task.id !== currentTask.id);
+  // console.log("1", currentTask, todoTasks, doneTasks);
 
   // 所有任务都完成，自动退出
   if (!todoTasks.length) {
-    emit("addInfo", "All tasks of the round have been successfully completed");
+    emit(
+      "addInfo",
+      "The workflow has been wrapped into a task and started executing, you can click Query later to get an update on the status of the execution."
+    );
     saveWorkFlowInfo("silent");
-    console.log("该轮次所有任务已经全部顺利执行完毕");
+    console.log(
+      "该轮次所有任务已经梳理完毕",
+      doneTasks,
+      JSON.stringify(doneTasks, null, 2)
+    );
+    let result = await startToRunFlow(
+      currentScenario.value.id,
+      currentFolder.value[0].id,
+      doneTasks
+    );
     return;
   }
+  // console.log("3", doneTasks);
 
   // 遍历待执行任务，找到符合条件的下一个任务
   for (let i = 0; i < todoTasks.length; i++) {
     let task = todoTasks[i];
     let canExecute;
+
     if (task.data.precondition) {
-      canExecute = task.data.precondition.every((preId) =>
-        doneTasks.includes(preId)
-      );
+      // console.log(task.data.precondition, doneTasks, "in");
+
+      canExecute = task.data.precondition.every((preId) => {
+        return doneTasks.some((task) => task.id == preId);
+      });
     } else {
       canExecute = true;
     }
 
     if (canExecute) {
       // 递归执行下一个任务
+      // console.log("3", task);
+
       await executedOperation(task, todoTasks, doneTasks);
       break;
     }
@@ -676,7 +707,7 @@ const executedOperation = async (currentTask, todoTasks, doneTasks) => {
 
 // 临时用，模拟运行
 const modelExecution = async (currentTask) => {
-  // 传递过来的就已经不是引用了，需要重新获取
+  // 形参传递过来的就已经不是引用了，需要重新获取
   currentTask = nodes.value.find((node) => node.id === currentTask.id);
   // 现在已经有了模型的元数据，剩下的就是如何执行了
   console.log("--------------------------------------------");

@@ -14,6 +14,7 @@ import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executor;
 
 
 @RestController
@@ -29,6 +31,10 @@ public class EnvironmentalConfigurationController {
 
     @Autowired
     PythonEnvironmentalService pythonEnvironmentalService;
+
+    @Qualifier("customTaskExecutor") // 指定自定义 Executor
+    @Autowired
+    private Executor taskExecutor;
 
     // 定义静态常量来存储工作目录的路径
     private static final String WORKING_DIRECTORY = "E:\\code\\docker\\workDirectory";
@@ -109,7 +115,7 @@ public class EnvironmentalConfigurationController {
         return ResultUtils.success(directoryList);
     }
 
-    // 分步式做法4（可选）、编辑工作目录中的文件：数据、代码、依赖等文本文件，先获取文本内容
+    // 分步式做法4（可选）、本编辑工作目录中的文件：数据、代码、依赖等文本文件，先获取文内容
     @PostMapping("/editUploadedFile")
     public JsonResult editUploadedFile(@RequestParam("filePath") String lastFilePath , @RequestParam("scenarioId") String scenarioId){
         String content = pythonEnvironmentalService.editUploadedFile("\\"+scenarioId+lastFilePath);
@@ -152,53 +158,13 @@ public class EnvironmentalConfigurationController {
                                     @RequestParam("scriptName") String scriptName,
                                     @RequestParam("scenarioId") String scenarioId) throws IOException {
         try {
-            // 创建执行命令
-            ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
-                    .withCmd("python", "/app/" + scriptName)
-                    .withAttachStdout(true)
-                    .withAttachStderr(true)
-                    .exec();
-
-            // 定义输出流
-            ByteArrayOutputStream stdoutStream = new ByteArrayOutputStream();
-            ByteArrayOutputStream stderrStream = new ByteArrayOutputStream();
-
-            // 执行命令并捕获输出
-            dockerClient.execStartCmd(execCreateCmdResponse.getId())
-                    .exec(new ExecStartResultCallback(stdoutStream, stderrStream))
-                    .awaitCompletion();
-
-            // 获取目录列表
-            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY + "//" + scenarioId);
-
-            // 分析 stderr 是否有错误
-            String stdout = stdoutStream.toString();
-            String stderr = stderrStream.toString();
-
-            // 准备返回数据
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("output", stdout);
-            dataMap.put("directoryList", directoryList);
-
-            if (!stderr.isEmpty()) {
-                // 如果有错误输出，返回错误信息
-                dataMap.put("error", stderr);
-                dataMap.put("state", 40000);
-            } else {
-                // 正常情况下
-                dataMap.put("state", 200);
-            }
-
-            return ResultUtils.success(dataMap);
-        } catch (InterruptedException | IOException e) {
-            // 捕获异常
+            // 调用 service 方法执行脚本
+            Map<String, Object> result = pythonEnvironmentalService.executeScript(containerId, scriptName, scenarioId);
+            return ResultUtils.success(result);
+        } catch (Exception e) {
+            // 捕获异常并返回错误信息
             e.printStackTrace();
-            List<FileItem> directoryList = pythonEnvironmentalService.listDirectory(WORKING_DIRECTORY + "//" + scenarioId);
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("output", e.getMessage());
-            dataMap.put("directoryList", directoryList);
-            dataMap.put("state", 50000); // 返回更明确的错误状态
-            return ResultUtils.success(dataMap);
+            return ResultUtils.error(50000, e.getMessage());
         }
     }
 
@@ -351,4 +317,17 @@ public class EnvironmentalConfigurationController {
         return ResultUtils.success(results);
     }
 
+    // workflow任务启动接口
+    @PostMapping("/{scenarioId}/{folderId}/startToRunFlow")
+    public JsonResult startToRunFlow(@JwtTokenParser(key = "userId") String userId,@PathVariable String scenarioId,@PathVariable String folderId, @RequestBody List<Map<String, Object>> nodes ) {
+        taskExecutor.execute(() -> pythonEnvironmentalService.startTask(userId,scenarioId,folderId, nodes));
+        return ResultUtils.success("Task started.");
+    }
+
+    // workflow任务状态查询
+    @GetMapping("/{scenarioId}/checkRunningFlow")
+    public JsonResult checkRunningFlow(@PathVariable String scenarioId) {
+        Map<String, String> info = pythonEnvironmentalService.checkRunningFlow(scenarioId);
+        return ResultUtils.success(info);
+    }
 }

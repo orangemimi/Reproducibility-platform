@@ -50,7 +50,14 @@ public interface ManagerServerFeign {
 
         @Override
         public JSONObject invoke(JSONObject invokeJson) {
-            return null;
+            System.err.println("Fallback for invoke: " + invokeJson);
+
+            // 返回一个带有错误信息的 JSONObject
+            JSONObject fallbackResponse = new JSONObject();
+            fallbackResponse.put("status", "error");
+            fallbackResponse.put("message", "Invoke service is unavailable");
+            fallbackResponse.put("input", invokeJson);
+            return fallbackResponse;
         }
 
         @Override

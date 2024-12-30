@@ -5,7 +5,7 @@
     </div>
     <div class="executionInfo">
       <div class="consoler">
-        console
+        consoles
         <el-button type="warning" round @click="clearConsoler">Clear</el-button>
       </div>
       <div class="consoleContent">
@@ -22,14 +22,14 @@
 import workFlow from "./integrateFlow.vue";
 import { ref } from "vue";
 
-const messages = ref(["The relevant information will be printed here."]);
+const messages = ref(["--The relevant information will be printed here."]);
 
 const addInfo = (info) => {
   messages.value.push(info);
 };
 
 const clearConsoler = () => {
-  messages.value = ["The relevant information will be printed here."];
+  messages.value = ["--The relevant information will be printed here."];
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <aside style="width: 25%; height: 100%">
+  <aside style="width: 25%">
     <el-collapse v-model="activeName" accordion>
       <el-collapse-item title="Model List" name="1">
         <div class="modelList">
@@ -199,9 +199,10 @@ onMounted(async () => {
 
 .modelList {
   width: 100%;
-  height: 100%;
+
+  // height: calc((100vh - 260px) * 0.9);
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(
@@ -215,7 +216,7 @@ onMounted(async () => {
   background-size: 30px 30px;
   .modelNode {
     width: 70%;
-    aspect-ratio: 5;
+    aspect-ratio: 5; //设置宽高比
     background-color: white;
     margin: 10px;
     border-radius: 5px;

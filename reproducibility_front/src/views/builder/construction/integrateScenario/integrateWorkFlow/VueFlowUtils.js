@@ -65,6 +65,13 @@ export function getInputNodes(node, nodes) {
 
 // 找到模型的调用顺序
 export function getExecutionOrder(nodes, edges) {
+  // 先初始化precondition
+  nodes.forEach((node) => {
+    if (node.data.precondition) {
+      node.data.precondition = [];
+    }
+  });
+
   let startNodes = getStartNodes(nodes, edges);
   let lastExecutedNodeId = null;
   startNodes.forEach((startNode) => {
@@ -81,9 +88,9 @@ function findOutgoingEdges(nodeId, edges) {
 // 递归遍历路径
 function traversePaths(nodeId, edges, nodes, lastExecutedNodeId) {
   let currentNode = nodes.find((node) => node.id === nodeId);
-  if (currentNode.type === "model" || currentNode.type === "method") {
+  if (currentNode.type === "model" || currentNode.type === "codeModel") {
     if (lastExecutedNodeId !== null) {
-      // 如果 precondition 是空的，初始化它
+      // 如果 precondition 不存在，初始化它
       if (!currentNode.data.precondition) {
         currentNode.data.precondition = [];
       }

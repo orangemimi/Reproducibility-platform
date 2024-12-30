@@ -152,13 +152,16 @@ export default {
       );
       if (this.invokingType == "construction") {
         folderData = await getFolders();
+
         dataFolderList = folderData[0].children.filter(
           (item) => item.tagId == this.projectId
         );
-        dataInitial = dataFolderList[0].children.filter(
-          (item) => item.tagId == this.initialScenarioId
-        );
-        this.dataFolderList = [...dataInitial, ...intermediateInitial];
+
+        // dataInitial = dataFolderList[0].children.filter(
+        //   (item) => item.tagId == this.initialScenarioId
+        // );
+
+        this.dataFolderList = [...dataFolderList, ...intermediateInitial];
       }
       if (this.invokingType == "reproduction") {
         intermediateReproduced = await this.getIntermediateData(

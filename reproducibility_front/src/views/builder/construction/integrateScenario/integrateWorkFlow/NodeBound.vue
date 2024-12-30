@@ -430,6 +430,7 @@ watch(
     background-color: rgba(255, 255, 255, 0.5); // 半透明的白色
     overflow: auto;
     .modelName {
+      width: 300px;
       word-wrap: break-word;
       font-size: 24px;
       font-weight: bolder;

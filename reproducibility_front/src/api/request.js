@@ -459,10 +459,22 @@ export async function downloadFilesToVolume(scenarioId, formData) {
 export async function savePythonCode(formData) {
   return await post(`/envs/savePythonCode`, formData);
 }
+
 // 根据输出文件的路径列表，以此上传到数据容器，并存储到本地服务器中
 export async function uploadFilesToDataContainer(formData) {
   return await post(`/envs/uploadFilesToDataContainer`, formData);
 }
+
+// workflow任务启动接口
+export async function startToRunFlow(scenarioId, folderId, nodes) {
+  return await post(`/envs/${scenarioId}/${folderId}/startToRunFlow`, nodes);
+}
+
+// workflow任务状态查询
+export async function checkRunningFlow(scenarioId) {
+  return await get(`/envs/${scenarioId}/checkRunningFlow`);
+}
+
 ////===============================Ai Assistant=================================================
 
 // 获取pdf解析结果
