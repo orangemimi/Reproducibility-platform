@@ -535,11 +535,13 @@ export default {
           });
         }
       });
-
+      // console.log(resourceCollection.dataList, 15915);
       let update = {
         instances: this.boundInstances,
         resourceCollection: resourceCollection,
       };
+      // console.log(update, 1519);
+
       await bindScenario(this.judgeIsReproducedScenarioId(), update);
       //update the resourceCollection
     },

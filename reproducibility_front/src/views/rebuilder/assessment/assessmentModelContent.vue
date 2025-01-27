@@ -5,13 +5,13 @@
         style="
           position: absolute;
           float: top;
-          margin: -75% 0px 0px 91%;
+          margin: -3% 0px 0px 91%;
           z-index: 999;
         "
       >
         <el-button
           type="primary"
-          size="default"
+          size="normal"
           :disabled="!canInvoke"
           @click="initInvoke(invokingType)"
         >
@@ -20,7 +20,7 @@
       </div>
       <el-row class="table">
         <el-col>
-          <div v-for="(state, index) in modelItem?.behavior" :key="index">
+          <div v-for="(state, index) in modelItem.behavior" :key="index">
             <el-row>
               <el-col :span="24">
                 <state-description :stateItem="state"></state-description>
@@ -139,13 +139,13 @@
     </el-dialog>
   </el-container>
 </template>
-
-<script>
+  
+  <script>
 import ResourceTable from "@/views/builder/construction/Toolbars/DataTable.vue";
 import StateDescription from "_com/Cards/StateDescription.vue";
 import SelectTree from "_com/SelectTree/tree.vue";
-import assessOutputTreeVue from "./components/assessOutputTree.vue";
-import modelInstance from "./components/ModelInstance.vue";
+import assessOutputTreeVue from "../../../components/ModelContent/components/assessOutputTree.vue";
+import modelInstance from "../../../components/ModelContent/components/ModelInstance.vue";
 import { mapState } from "vuex";
 import { errorNotification, successNotification } from "@/utils/notification";
 
@@ -162,7 +162,7 @@ import {
   getInstanceName,
   downloadData,
   startInvokeModel,
-} from "./configuration";
+} from "../../../components/ModelContent/configuration";
 
 export default {
   components: {
@@ -175,6 +175,9 @@ export default {
   props: {
     currentModel: {
       type: Object,
+    },
+    sliderData: {
+      type: Array,
     },
     initialScenarioId: {
       type: String,
@@ -195,10 +198,8 @@ export default {
   watch: {
     currentModel: {
       async handler(newVal) {
-        console.log(newVal, 1159);
-
         this.modelItem = newVal;
-        if (newVal && Object.hasOwnProperty.call(newVal, "md5")) {
+        if (Object.hasOwnProperty.call(newVal, "md5")) {
           this.canInvoke = true;
           await this.initModelTask();
         }
@@ -206,15 +207,6 @@ export default {
       deep: true,
       immediate: true,
     },
-    // reproducedScenarioId: {
-    //   async handler(newVal) {
-    //     if (newVal != "") {
-    //       await this.getAssessmentInstancesInScenario();
-    //     }
-    //   },
-    //   deep: true,
-    //   immediate: true,
-    // },
   },
   computed: {
     ...mapState({
@@ -241,25 +233,14 @@ export default {
       ],
       currentInstance: {},
       expandRows: [],
-      projectId: this.$route.params.id, //projectId
       modelInstanceName_input: "",
       modelInvokeDialogShow: false,
-
-      boundInstances: [],
-      boundInstanceObjects: [],
-      selectedDataName: "",
-      // selectedDataEvent: [],
       modelItem: this.currentEvent,
       modelInstance: {},
       modelInstanceList: [],
-      instanceDialogShow: false,
       currentEvent: "",
-      timer: {},
-      refreshForm: {},
-      boundData: [],
       canInvoke: true,
       // modelWithCurrentAllEvents: [],
-
       invokeForm: {
         ip: "",
         port: "",
@@ -373,7 +354,6 @@ export default {
           }
         }
       });
-      // this.instanceDialogShow = true;
     },
 
     // 运行invoke
@@ -394,7 +374,8 @@ export default {
         this.modelInstanceName_input,
         this.invokingType,
         this.initialScenarioId,
-        this.reproducedScenarioId
+        this.reproducedScenarioId,
+        this.sliderData
       );
     },
 
@@ -420,8 +401,8 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
+  
+  <style lang="scss" scoped>
 .selectData {
   :deep(.el-dialog) {
     height: 800px;
@@ -458,3 +439,4 @@ export default {
   }
 }
 </style>
+  

@@ -595,13 +595,13 @@ public class PythonEnvironmentalService {
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");
         dataInfo.put("url","http://" + dataContainer + ":8083/data/"+url);
         if (folderId.equals("intermediate")) {
-            return ResultUtils.success("http://112.4.132.6:8083/data/" + url);
+            return ResultUtils.success("http://221.224.35.86:38083/data/" + url);
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://112.4.132.6:8083/data/" + url)
+                    .value("http://221.224.35.86:38083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)
@@ -714,9 +714,8 @@ public class PythonEnvironmentalService {
         String stderr = stderrStream.toString();
         boolean hasErrors = false;
 
-
         for (String line : stderr.split("\\n")) {
-            if (line.startsWith("ERROR:")) {
+            if (line.matches("(?i)^ERROR:")) {
                 hasErrors = true;
             }
         }

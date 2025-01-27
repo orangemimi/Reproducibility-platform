@@ -152,13 +152,13 @@ public class DataItemController {
         String url = jsonObjectResponseEntity.getBody().getJSONObject("data").getStr("id");//获得上传数据的URL
 
         if (storedFolderId.equals("intermediate")) {
-            return ResultUtils.success("http://112.4.132.6:8083/data/" + url);
+            return ResultUtils.success("http://221.224.35.86:38083/data/" + url);
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://112.4.132.6:8083/data/" + url)
+                    .value("http://221.224.35.86:38083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)

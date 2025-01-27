@@ -156,7 +156,7 @@ export default {
       if (this.pictureFile != null && this.pictureFile != "") {
         form.append("datafile", this.pictureFile.raw);
         let picData = await postFile(form);
-        pictureData = "http://112.4.132.6:8083/data/" + picData.data.data.id;
+        pictureData = "http://221.224.35.86:38083/data/" + picData.data.data.id;
       }
       let jsonData = {
         project: {

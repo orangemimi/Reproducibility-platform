@@ -6,9 +6,9 @@
         :span="8"
         v-for="(instance, index) in modelInstanceList"
         :key="index"
-        style="padding: 5px; width: 100%"
+        style="padding: 5px"
       >
-        <el-card style="width: 100%">
+        <el-card class="assessCard">
           <el-form
             ref="instance"
             :model="instance"
@@ -17,7 +17,7 @@
           >
             <el-form-item label="Effect size: ">
               <el-tag
-                type="info"
+                type="success"
                 disable-transitions
                 v-if="getAssessmentMethod(instance.behavior) == 'Pearson'"
                 >Pearson r</el-tag
@@ -27,22 +27,33 @@
               </el-tag>
             </el-form-item>
             <el-form-item label="Calculation: ">
-              <el-tag type="info" disable-transitions>
+              <el-tag type="primary" disable-transitions>
                 {{
-                  instance.behavior[0].outputs[0].datasetItem?.assessmentValue
+                  instance.behavior[0].outputs[0].datasetItem.assessmentValue
                 }}
+              </el-tag>
+            </el-form-item>
+            <el-form-item label="Start probe: ">
+              <el-tag type="info" disable-transitions>
+                {{ "Step " + instance.probes[0] }}
+              </el-tag>
+            </el-form-item>
+            <el-form-item label="End probe: ">
+              <el-tag type="info" disable-transitions>
+                {{ "Step " + instance.probes[1] }}
               </el-tag>
             </el-form-item>
             <el-form-item label="Initial Resource: ">
               <el-tag type="info" disable-transitions>
-                {{ instance.behavior[0].inputs[0]?.datasetItem.dataName }}
+                {{ instance.behavior[0].inputs[0].datasetItem.dataName }}
               </el-tag>
             </el-form-item>
             <el-form-item label="Reproduced Resource: ">
               <el-tag type="info" disable-transitions>
-                {{ instance.behavior[0].inputs[1]?.datasetItem.dataName }}
+                {{ instance.behavior[0].inputs[1].datasetItem.dataName }}
               </el-tag>
             </el-form-item>
+
             <el-form-item label="Status: ">
               <el-tag
                 :type="
@@ -75,8 +86,8 @@
     </el-row>
   </div>
 </template>
-
-<script>
+  
+  <script>
 export default {
   props: {
     modelInstanceList: {
@@ -96,8 +107,8 @@ export default {
       this.$emit("refreshInstance", true);
     },
     getAssessmentMethod(behavior) {
-      return behavior[0]?.parameters[4]?.datasetItem?.UdxDeclarationNew[0]
-        ?.parameterValue;
+      return behavior[0].parameters[4].datasetItem.UdxDeclarationNew[0]
+        .parameterValue;
     },
     filterCurrentAllEventsWithStates(state) {
       let array = [];
@@ -142,9 +153,13 @@ export default {
     },
   },
 
-  mounted() {
-    console.log(this.modelInstanceList, 1757);
-  },
+  mounted() {},
 };
 </script>
-<style lang="scss" scoped></style>
+  <style lang="scss" scoped>
+.assessCard {
+  :deep(.el-form-item) {
+    margin-bottom: 5px;
+  }
+}
+</style>

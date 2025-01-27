@@ -59,12 +59,12 @@
 </template>
 
 <script>
-import { $on, $off, $once, $emit } from '../../../utils/gogocodeTransfer'
+import { $on, $off, $once, $emit } from "../../../utils/gogocodeTransfer";
 // import addImage from '_com/AddImage';
-import addImage from '_com/AddImage/index1.vue'
-import wangEditor from '_com/WangEditor/WangEditor.vue'
+import addImage from "_com/AddImage/index1.vue";
+import wangEditor from "_com/WangEditor/WangEditor.vue";
 
-import { updateProject, postFile } from '@/api/request'
+import { updateProject, postFile } from "@/api/request";
 export default {
   props: {
     projectInfo: {
@@ -86,50 +86,50 @@ export default {
   data() {
     return {
       form: JSON.parse(JSON.stringify(this.projectInfo)),
-      inputTagValue: '',
-      pictureFile: '',
-    }
+      inputTagValue: "",
+      pictureFile: "",
+    };
   },
   methods: {
     async submitEdit() {
-      if (this.pictureFile != '') {
-        let temp = new FormData()
-        temp.append('datafile', this.pictureFile.raw)
-        temp.append('name', this.form.name)
-        let pictureData = await postFile(temp)
+      if (this.pictureFile != "") {
+        let temp = new FormData();
+        temp.append("datafile", this.pictureFile.raw);
+        temp.append("name", this.form.name);
+        let pictureData = await postFile(temp);
         this.form.picture =
-          'http://112.4.132.6:8083/data/' + pictureData.data.data.id
-        console.log(this.form)
+          "http://221.224.35.86:38083/data/" + pictureData.data.data.id;
+        console.log(this.form);
       }
 
-      let data = await updateProject(this.projectInfo.id, this.form)
-      console.log(data)
-      let result = { data: data, flag: true }
-      $emit(this, 'editProjectInfoResponse', result)
+      let data = await updateProject(this.projectInfo.id, this.form);
+      console.log(data);
+      let result = { data: data, flag: true };
+      $emit(this, "editProjectInfoResponse", result);
     },
 
     handleClose(val) {
-      this.form.tags.splice(this.form.tags.indexOf(val), 1)
+      this.form.tags.splice(this.form.tags.indexOf(val), 1);
     },
 
     handleInputConfirm() {
-      let inputTagValue = this.inputTagValue
+      let inputTagValue = this.inputTagValue;
       if (inputTagValue) {
-        this.form.tags.push(inputTagValue)
+        this.form.tags.push(inputTagValue);
       }
-      this.inputTagValue = ''
+      this.inputTagValue = "";
     },
 
     getfile(val) {
-      this.pictureFile = val
+      this.pictureFile = val;
     },
 
     textChange(val) {
-      this.form.description = val
+      this.form.description = val;
     },
   },
-  emits: ['editProjectInfoResponse'],
-}
+  emits: ["editProjectInfoResponse"],
+};
 </script>
 
 <style lang="scss" scoped>

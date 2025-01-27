@@ -10,7 +10,7 @@
         class="relative m-0 w-2/5 shrink-0 overflow-hidden rounded-xl rounded-r-none bg-white bg-clip-border text-gray-700"
       >
         <img
-          src="http://112.4.132.6:8083/data/f67c1b01-4e34-4839-bfa6-51f9419bc4f6"
+          src="http://221.224.35.86:38083/data/f67c1b01-4e34-4839-bfa6-51f9419bc4f6"
           alt="image"
           class="object-cover"
         />

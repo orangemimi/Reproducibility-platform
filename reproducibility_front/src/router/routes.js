@@ -50,8 +50,7 @@ export default [
     meta: {
       title: "envy",
     },
-    component: () =>
-      import("@/views/builder/construction/ConstructionMain.vue"),
+    component: () => import("@/views/rebuilder/info/index.vue"),
   },
   {
     path: "/upload",

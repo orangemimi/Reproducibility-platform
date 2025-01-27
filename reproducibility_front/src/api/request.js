@@ -253,7 +253,7 @@ export async function getDataItems(dataItemIds) {
 }
 
 export async function postFile(form) {
-  return await axios.post("http://112.4.132.6:8083/data", form);
+  return await axios.post("http://221.224.35.86:38083/data", form);
 }
 
 //-----------------------------------------------dataContainer---------------------------------------------
@@ -332,8 +332,8 @@ export async function updateInstance(id, formData) {
 
 //===============================assessment=================================================
 
-export async function getAssessment(id) {
-  return await patch(`/assessment/${id}`);
+export async function saveAssessment(form) {
+  return await post(`/assessment`, form);
 }
 
 export async function startAssessment(formData) {
@@ -342,6 +342,14 @@ export async function startAssessment(formData) {
 
 export async function autoAssessment(reproducedScenarioId) {
   return await patch(`/assessment/${reproducedScenarioId}`);
+}
+
+export async function getAssessment(reproducedScenarioId) {
+  return await get(`/assessment/${reproducedScenarioId}`);
+}
+
+export async function updateAssessment(assessmentId, form) {
+  return await patch(`/assessment/${assessmentId}`, form);
 }
 
 //===============================docker-codeOnline=================================================

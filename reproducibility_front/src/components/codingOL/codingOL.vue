@@ -26,7 +26,11 @@
         >
           <el-row>
             <el-col :span="12">
-              <el-input v-model="modelName" placeholder="model name" label="modelName"></el-input>
+              <el-input
+                v-model="modelName"
+                placeholder="model name"
+                label="modelName"
+              ></el-input>
             </el-col>
             <el-col :span="10" :offset="2">
               <el-switch
@@ -40,7 +44,7 @@
               ></el-switch>
             </el-col>
           </el-row>
-          <br>
+          <br />
           <el-row>
             <el-col :span="24">
               <el-input
@@ -126,7 +130,7 @@ export default {
   watch: {
     content: {
       handler(val) {
-        if(val){
+        if (val) {
           this.codeMirrorInstance = val;
         }
       },
@@ -153,41 +157,38 @@ export default {
   },
   methods: {
     async saveCode() {
-      let privacy
-      if(this.privacy == true){
-        privacy = 'private'
-      }else{
-        privacy = 'public'
+      let privacy;
+      if (this.privacy == true) {
+        privacy = "private";
+      } else {
+        privacy = "public";
       }
-      let form = {}
+      let form = {};
       form.name = this.modelName;
       form.description = this.modelDescription;
       form.privacy = privacy;
       form.content = this.codeMirrorInstance;
 
-      await saveNewCodeModel(form).then((result)=>{
-        if(result == "Save Error."){
+      await saveNewCodeModel(form).then((result) => {
+        if (result == "Save Error.") {
           this.$message({
-            message:'Save error',
-            type:'error'
-          })
-        }else{
+            message: "Save error",
+            type: "error",
+          });
+        } else {
           this.$message({
-            message:'Save success',
-            type:'success'
-          })
-          this.scenario.resourceCollection.modelList.push(result)
+            message: "Save success",
+            type: "success",
+          });
+          this.scenario.resourceCollection.modelList.push(result);
         }
-      })
+      });
       this.addNewModelVisible = false;
 
-      this.scenario = await updateresourceCollection(
-        this.scenario.id,
-        {
-          modelList: this.scenario.resourceCollection.modelList,
-          dataList: this.scenario.resourceCollection.dataList,
-        }
-      )
+      this.scenario = await updateresourceCollection(this.scenario.id, {
+        modelList: this.scenario.resourceCollection.modelList,
+        dataList: this.scenario.resourceCollection.dataList,
+      });
     },
     //下载按钮
     saveOutputDialogue() {
@@ -255,6 +256,7 @@ export default {
       // 先用url替换掉获取数据的标识符
       while ((match = regex.exec(line)) !== null) {
         var relativePath = match[1];
+
         var fileContent = this.changeData(relativePath);
         // 如果changeData发现这个路径不指向特定的数据文件，就在这里退出，并返回错误原因
         if (this.pathError) {
@@ -336,6 +338,7 @@ export default {
       }
       let fileName = segments[segments.length - 1];
       let url = null;
+
       // 访问数据文件,获取数据文件url
       if (currentFolder.children) {
         currentFolder.children.some((child, i) => {
@@ -362,11 +365,15 @@ export default {
       // if(segments[i]=='.'||segments[i]=='..'){
       //     continue;
       //   }
+      console.log(data, path, currentCodeLines, 159984);
+
       var currentCodeBlock = currentCodeLines.join("\n");
       // console.log(data,path,'11');
       currentCodeBlock += '\nprint("start");';
       currentCodeBlock += "\nprint(" + data + ");";
       var code = { code: currentCodeBlock };
+      console.log(code, 19126);
+
       var responseOutput = await codingPython(code);
       var lines = responseOutput.split("\n");
 
@@ -382,6 +389,8 @@ export default {
           }
         }
       }
+      console.log(dataContent, 1591526);
+
       // 先处理path，获取指定的文件拓展名
       var state = 0;
       var suffix;
@@ -459,8 +468,8 @@ export default {
       }
     }
     this.project = await getProjectById(this.projectId);
-    if(this.content){
-      this.codeMirrorInstance = this.content
+    if (this.content) {
+      this.codeMirrorInstance = this.content;
     }
   },
   beforeUnmount() {},

@@ -59,7 +59,7 @@ public class PythonExecutionService {
     ScenarioRepository scenarioRepository;
 
 
-    private static final String UPLOAD_API_URL = "http://112.4.132.6:8083/data";
+    private static final String UPLOAD_API_URL = "http://221.224.35.86:38083/data";
     private static final String DATA_FOLDER_PATH = "E:/dockerData/works";
 
     public String executePythonCodeInDocker(String pythonCode, String folderId, String userId) throws Exception {
@@ -250,7 +250,7 @@ public class PythonExecutionService {
                 .contributorId(userId)
                 .name(filename)
                 .suffix(suffix)
-                .value("http://112.4.132.6:8083/data/" + url)
+                .value("http://221.224.35.86:38083/data/" + url)
                 .fileSize(fileSize)
                 .isInitial(true)
                 .isIntermediate(false)

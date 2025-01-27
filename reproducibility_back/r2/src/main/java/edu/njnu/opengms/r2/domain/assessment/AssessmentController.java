@@ -5,6 +5,7 @@ import edu.njnu.opengms.common.utils.JsonResult;
 import edu.njnu.opengms.common.utils.ResultUtils;
 import edu.njnu.opengms.r2.annotation.JwtTokenParser;
 import edu.njnu.opengms.r2.domain.assessment.dto.AddAssessmentDTO;
+import edu.njnu.opengms.r2.domain.assessment.dto.UpdateAssessmentDTO;
 import edu.njnu.opengms.r2.domain.dataItem.DataItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,19 @@ public class AssessmentController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public JsonResult create(@RequestBody AddAssessmentDTO add, @JwtTokenParser(key = "userId") String userId) {
-        return ResultUtils.success(assessmentService.create(add, userId));
+        return ResultUtils.success(assessmentService.create(add,userId));
+    }
+    @RequestMapping(value = "/{scenarioId}", method = RequestMethod.GET)
+    public JsonResult get( @JwtTokenParser(key = "userId") String userId, @PathVariable("scenarioId") String scenarioId) {
+        return ResultUtils.success(assessmentService.get(userId,scenarioId));
     }
 
-    @RequestMapping(value = "/{assessmentId}", method = RequestMethod.GET)
-    public JsonResult get(@PathVariable("assessmentId") String assessmentId) {
-        return ResultUtils.success(assessmentService.get(assessmentId));
+    @RequestMapping(value = "/{assessmentId}", method = RequestMethod.PATCH)
+    public JsonResult update(@JwtTokenParser(key = "userId") String userId, @PathVariable("assessmentId") String assessmentId, @RequestBody UpdateAssessmentDTO update) {
+        return ResultUtils.success(assessmentService.update(update,userId,assessmentId));
     }
+
+
 
     @RequestMapping(value = "/start", method = RequestMethod.GET)
     public JsonResult startAssessOut(@RequestBody JSONObject form) {
@@ -45,9 +52,5 @@ public class AssessmentController {
         return ResultUtils.success(assessmentService.autoAssessment(reproducedScenarioId));
     }
 
-//    @RequestMapping(value = "/{scenarioId}", method = RequestMethod.GET)
-//    public JsonResult getByUserId(@PathVariable("scenarioId") String scenarioId, String userId) {
-//        return ResultUtils.success(assessmentService.getByScenarioId(scenarioId));
-//    }
 
 }

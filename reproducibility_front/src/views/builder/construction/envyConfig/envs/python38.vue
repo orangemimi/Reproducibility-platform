@@ -771,7 +771,7 @@ const createNewInstance = async (tempCode: string, outputDataInfo: any) => {
       name: outputName,
       description: "output data",
       dataId: data[0].id,
-      value: "http://112.4.132.6:8083/data/" + data[0].url, //数据url
+      value: "http://221.224.35.86:38083/data/" + data[0].url, //数据url
       datasetItem: {},
     };
   });

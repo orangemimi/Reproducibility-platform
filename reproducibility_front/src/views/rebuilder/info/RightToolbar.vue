@@ -41,7 +41,17 @@
             :span="12"
             style="padding: 20px; background-color: rgb(255, 253, 240)"
           >
-            <div style="font-size: 18px; font-weight: 600">
+            <div
+              style="font-size: 18px; font-weight: 600"
+              @click="
+                console.log(
+                  this.currentModel,
+                  this.initialScenario,
+                  this.reproducedScenario,
+                  1928
+                )
+              "
+            >
               Reproduced computational processes:
             </div>
             <el-row>
@@ -184,9 +194,16 @@ export default {
       this.initialScenario = await getScenarioById(
         this.project.scenarioList[0]
       );
+      console.log(this.initialScenario.id, 1574);
       this.reproducedScenario = await getScenariosByScenarioId(
         this.initialScenario.id
       );
+      console.log(
+        this.reproducedScenario,
+        this.reproducedScenario.instanceObjectList,
+        159159
+      );
+
       if (this.reproducedScenario != null) {
         this.reproduceShow = true;
         if (
@@ -227,7 +244,10 @@ export default {
   },
 
   created() {
+    console.log("right1");
+
     this.getExpectedInstances();
+    console.log("right2");
   },
 };
 </script>

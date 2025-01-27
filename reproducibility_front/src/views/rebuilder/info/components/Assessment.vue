@@ -1,12 +1,7 @@
 <!-- assessment table -->
 <template>
   <div>
-    <el-tabs
-      v-model="activeName"
-      type="card"
-      class="demo-tabs"
-      @tab-click="handleClick"
-    >
+    <el-tabs v-model="activeName" type="card" class="demo-tabs">
       <el-tab-pane label="workflow" name="workflow">
         <el-row>
           <div style="font-size: 18px; font-weight: 600">
@@ -21,7 +16,11 @@
                 v-model="sliderDataWhole"
                 range
                 :marks="marks"
-                :max="reproducedInstanceObjectList.length - 1"
+                :max="
+                  reproducedInstanceObjectList
+                    ? reproducedInstanceObjectList.length - 1
+                    : 3
+                "
                 :format-tooltip="formatTooltip"
               />
             </div>
@@ -68,6 +67,7 @@
           </div>
           <br />
           <br />
+
           <el-col :span="20">
             <div class="slider-demo-block">
               <el-slider
@@ -79,6 +79,7 @@
               />
             </div>
           </el-col>
+
           <el-col :span="2" :offset="1">
             <el-button type="primary" @click="confirmIntancesSelection"
               >Confirm</el-button
@@ -120,7 +121,7 @@
 </template>
 
 <script>
-import { getAssessmentMethod } from "@/api/request";
+import { getAssessmentMethod, getInstancesByIds } from "@/api/request";
 import modelContent from "_com/ModelContent/assessment.vue";
 import assessmentInstance from "./AssessmentInstance.vue";
 import wholeWorkflow from "./WholeWorkflow.vue";
@@ -153,7 +154,9 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        if (val.length != 0) {
+        console.log(val, 6158);
+
+        if (val && val.length != 0) {
           this.getSliderData();
         }
       },
@@ -209,9 +212,15 @@ export default {
       this.$forceUpdate();
     },
     async getAssessmentInstance() {
-      this.modelInstanceList = await getAssessmentInstancesInScenario(
-        this.scenarioId
+      console.log(this.scenarioId, "in");
+      // this.modelInstanceList = await getAssessmentInstancesInScenario(
+      //   this.scenarioId
+      // );
+      this.modelInstanceList = await getInstancesByIds(
+        this.initialInstanceObjectList
       );
+      console.log(this.modelInstanceList, 159);
+
       //refresh the instances
       this.modelInstanceList.forEach(async (instance) => {
         if (instance.status == 0 || instance.status == 1) {
@@ -227,6 +236,7 @@ export default {
       return this.reproducedInstanceObjectList[val].name;
     },
     getSliderData() {
+      console.log(this.reproducedInstanceObjectList, 15952);
       this.reproducedInstanceObjectList.forEach((instance, index) => {
         this.sliderData.push(index);
         let obj = { label: "Step" + index };
@@ -262,9 +272,19 @@ export default {
     },
   },
 
-  mounted() {
-    this.getAssessmentMethod();
-    // this.refreshAssessInstance();
+  async mounted() {
+    console.log(this.scenarioId, 15941);
+    // this.modelInstanceList = await getAssessmentInstancesInScenario(
+    //   this.scenarioId
+    // );
+    this.modelInstanceList = await getInstancesByIds(
+      this.initialInstanceObjectList
+    );
+    console.log(this.modelInstanceList, 15942);
+
+    await this.getAssessmentMethod();
+    await this.refreshAssessInstance();
+    console.log("Assessment Mounted");
   },
 };
 </script>
@@ -283,3 +303,4 @@ export default {
   margin-left: 12px;
 }
 </style>
+ 

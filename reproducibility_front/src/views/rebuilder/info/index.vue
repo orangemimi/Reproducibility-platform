@@ -37,6 +37,8 @@ export default {
       // debugger;
     },
   },
-  mounted() {},
+  mounted() {
+    console.log(198156);
+  },
 };
 </script>

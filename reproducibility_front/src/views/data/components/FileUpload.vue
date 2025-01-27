@@ -292,7 +292,7 @@ export default {
         privacy: "",
         suffix: getSuffix(param.file.name),
         fileSize: renderSize(param.file.size),
-        address: `http://112.4.132.6:8083/data/${data.id}`,
+        address: `http://221.224.35.86:38083/data/${data.id}`,
         projectId: this.projectId,
         userUpload: true,
         children: [],

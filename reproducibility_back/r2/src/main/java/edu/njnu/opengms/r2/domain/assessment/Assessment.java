@@ -1,5 +1,6 @@
 package edu.njnu.opengms.r2.domain.assessment;
 
+import cn.hutool.json.JSONObject;
 import edu.njnu.opengms.common.entity.BaseEntity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -17,16 +18,11 @@ import java.util.List;
 public class Assessment extends BaseEntity {
     @Id
     String id;
-    String projectId;
-    String initialScenarioId;
     String reproducedScenarioId;
     String purpose;//reperformability/consistency
-    String object;// assessment object:data/model
-    String comparasionMethodId;//assessment method id for example r/r2/mse....
-    String initialResourceId;// the assessment object/resource
-    String reproducedResourceId;// the comparasion object/resource
-    List<String> outputs;//outputs of assessment
+    String object;// model/all/
+    String modelId;// the assessment object/resource/allprocess
+    Integer step;
+    List<JSONObject> outputs;//outputs of assessment
     String creatorId;
-
-
 }

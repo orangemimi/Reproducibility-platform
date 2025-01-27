@@ -162,7 +162,7 @@ export default {
   watch: {
     currentScenario: {
       handler(newVal) {
-        if (Object.hasOwnProperty.call(newVal, "name")) {
+        if (newVal && Object.hasOwnProperty.call(newVal, "name")) {
           this.expectedInstances = newVal.instanceObjectList;
           this.dataTable = newVal.resourceCollectionObjects.dataList;
           this.modelTable = newVal.resourceCollectionObjects.modelList;

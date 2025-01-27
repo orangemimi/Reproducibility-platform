@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 @Service
 public class AiService {
 
-    private String uploadUrl = "http://112.4.132.6:8083/data";
+    private String uploadUrl = "http://221.224.35.86:38083/data";
 
     private String openaiApiKey = "sb-ccc08d92c8d641e071e73c047508bce558f84178e7906c45";
 

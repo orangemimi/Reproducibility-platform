@@ -81,13 +81,13 @@ public class DataItemService {
         String url = uploadToDataContainer(request);
 
         if (storedFolderId.equals("intermediate")) {
-            return "http://112.4.132.6:8083/data/" + url;
+            return "http://221.224.35.86:38083/data/" + url;
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://112.4.132.6:8083/data/" + url)
+                    .value("http://221.224.35.86:38083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)
@@ -160,13 +160,13 @@ public class DataItemService {
 
 
         if (storedFolderId.equals("intermediate")) {
-            return "http://112.4.132.6:8083/data/" + url;
+            return "http://221.224.35.86:38083/data/" + url;
         } else {
             AddDataItemDTO add = AddDataItemDTO.builder()
                     .contributorId(userId)
                     .name(filename)
                     .suffix(suffix)
-                    .value("http://112.4.132.6:8083/data/" + url)
+                    .value("http://221.224.35.86:38083/data/" + url)
                     .fileSize(fileSize)
                     .isInitial(true)
                     .isIntermediate(false)

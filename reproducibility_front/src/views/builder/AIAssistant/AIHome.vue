@@ -57,6 +57,22 @@
       ></searchCard>
     </div>
   </el-drawer>
+
+  <el-drawer v-model="visiblePop" size="50%">
+    <!-- @ts-ignore  -->
+    <assessment
+      :initialInstanceObjectList="instanceObjectList"
+      :reproducedInstanceObjectList="instanceObjectList"
+      :scenarioId="currentId"
+    ></assessment>
+  </el-drawer>
+  <div class="affix">
+    <div icon="Connection" class="circleBtn" @click="changeVisiblePop">
+      <div class="circleText">
+        <el-icon><Pointer /></el-icon>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,19 +83,39 @@ import VuePdfApp from "vue3-pdf-app";
 import "vue3-pdf-app/dist/icons/main.css";
 // @ts-ignore
 import QA from "_com/chatgpt/QACom.vue";
-// import { VueMermaidRender } from "vue-mermaid-render";
-// import mermaid from "mermaid";
-// @ts-ignore
-import { getPdfContent, modelQuery } from "@/api/request.js";
+import assessment from "@/views/rebuilder/info/components/Assessment.vue";
+import {
+  getPdfContent,
+  modelQuery,
+  getScenariosByProjectId,
+  // @ts-ignore
+} from "@/api/request.js";
 // @ts-ignore
 import vueFlow from "./vueFlow/vueFlow.vue";
 // @ts-ignore
 import searchCard from "./vueFlow/OpenGMSModelCard.vue";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 // import VueFlow from "vueflow";
+const visiblePop = ref(false);
+const currentScenario = ref({});
+const currentId = ref("");
+const instanceObjectList = ref({});
+const projectId = ref(route.params.id);
+const changeVisiblePop = () => {
+  visiblePop.value = true;
+};
 
-onMounted(() => {
+onMounted(async () => {
   // mermaidInitial();
+  let result = await getScenariosByProjectId(projectId.value);
+  // @ts-ignore
+  currentScenario.value = result[0];
+  // @ts-ignore
+  instanceObjectList.value = result[0].instances;
+  // @ts-ignore
+  currentId.value = result[0].id;
 });
 
 /**
@@ -322,12 +358,10 @@ const searchModel = (modelName: string) => {
   drawerState.value = true;
   // 在这里执行搜索操作
   queryForResource(modelName);
-  console.log(modelName, "modelName");
 };
 
 const viewDrawer = (state: boolean) => {
   drawerState.value = state;
-  console.log(modelCache.value, "1111");
 };
 
 // 自定义事件：接收gpt返回的mermaidCode
@@ -348,8 +382,6 @@ const queryForResource = async (
   if (typeof result === "string") {
     // @ts-ignore
     const jsonString = result.replace(/'/g, '"').replace(/None/g, "null");
-    // console.log(jsonString, "jsonString");
-
     const newJson = JSON.parse(jsonString);
     let newModelInfo: modelInfo = {
       query: query,
@@ -436,7 +468,6 @@ const parseMermaidToJson = (mermaidText: string) => {
         target: nodeMap[target].id,
         targetLabel: nodeMap[target].label,
         type: "animation",
-        // type: "",
       });
     }
   });
@@ -444,7 +475,6 @@ const parseMermaidToJson = (mermaidText: string) => {
     nodes: nodes,
     links: links,
   };
-  // console.log(reproduceDoc, "reproduceDoc");
 
   // 输出JSON格式的数据
   return reproduceDoc;
@@ -461,7 +491,7 @@ const uploadPaper = ref<UploadInstance>();
 
 // pdfLoader初试状态
 const uploadPaperLink = ref(
-  "http://112.4.132.6:8083/data/385614f9-86ec-4e24-9a91-0772d15b0b3b"
+  "http://221.224.35.86:38083/data/385614f9-86ec-4e24-9a91-0772d15b0b3b"
 );
 
 const pdfContent = ref("");
@@ -486,7 +516,6 @@ const submitFile = (file: any) => {
 
     pdfContent.value = words;
   });
-  // console.log(file, "submitFile");
 };
 
 // 超出了就提醒一下，确定是否替换
@@ -500,6 +529,26 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
 </script>
 
 <style scoped lang="scss">
+.affix {
+  text-align: right;
+  left: 35px;
+  bottom: 35px;
+  position: fixed;
+  z-index: 100;
+  .circleBtn {
+    background: rgb(226, 127, 29);
+    border-radius: 25px;
+
+    width: 50px;
+    height: 50px;
+    .circleText {
+      line-height: 50px;
+      text-align: center;
+      font-size: 30px;
+      color: #ffffff;
+    }
+  }
+}
 .drawer {
   .modelPanel {
     width: 100%;

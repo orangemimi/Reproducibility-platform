@@ -168,9 +168,14 @@ export default {
           this.reproducedScenarioId,
           "reproduction"
         );
+        console.log(intermediateReproduced, 1);
 
         dataInitial = await getFoldersByTagId(this.initialScenarioId);
-        dataReproduce = await getFoldersByTagId(this.reproducedScenarioId);
+        console.log(dataInitial, 2);
+
+        // dataReproduce = await getFoldersByTagId(this.reproducedScenarioId);
+        console.log(dataReproduce, 3);
+
         this.dataFolderList = [
           ...dataInitial,
           ...intermediateInitial,

@@ -177,7 +177,8 @@ public class FunctionUtils {
         //get initial scenario
 //        String scenarioId = scenario.getInitialScenarioId();
         if (scenario.getInitialScenarioId() != null) {
-            scenarioNew.put("initialScenarioObject", scenarioRepository.findById(scenario.getInitialScenarioId()));
+            Scenario initialScenario = scenarioRepository.findById(scenario.getInitialScenarioId()).orElse(null);
+            scenarioNew.put("initialScenarioObject", initialScenario != null ? new JSONObject(initialScenario) : null);
         } else {
             scenarioNew.put("initialScenarioObject", null);
         }

@@ -39,6 +39,7 @@ export default {
   methods: {
     async init() {
       let data = await getProjectById(this.$route.params.id);
+
       this.allScenarioList = data.scenarioObjectList;
       this.chosenScenario = this.allScenarioList[0];
     },

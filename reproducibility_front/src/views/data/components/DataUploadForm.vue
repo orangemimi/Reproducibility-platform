@@ -264,7 +264,7 @@ export default {
       this.fileForm.folder = false;
       this.fileForm.userUpload = true;
 
-      this.fileForm.address = `http://112.4.132.6:8083/data/${data.id}`;
+      this.fileForm.address = `http://221.224.35.86:38083/data/${data.id}`;
 
       this.$forceUpdate();
     },

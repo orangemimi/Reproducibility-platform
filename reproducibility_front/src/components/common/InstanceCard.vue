@@ -6,7 +6,7 @@
     <div>
       <el-row style="height: 30px">
         <el-col :span="24">
-          <div class="title">
+          <div class="title" @click="console.log(cardData)">
             <!-- <a href="#" @click.prevent="reTry(cardData)"> -->
             <i style="font-weight: 600; font-size: 18px; color: #2b85e4"
               >Step {{ stepIndex }} :</i
@@ -18,21 +18,21 @@
         </el-col>
       </el-row>
       <el-row style="height: 110px">
-        <div v-if="cardData.description != null" class="cmpItemDesc">
-          {{ cardData.description }}
+        <div v-if="cardData.modelDescription != null" class="cmpItemDesc">
+          {{ cardData.modelDescription }}
         </div>
         <div v-else class="noDes">No Description !</div>
       </el-row>
       <el-row style="height: 20px">
-        <el-col :span="4" :offset="1">
-          <div style="float: right">
+        <el-col :span="6" :offset="1">
+          <div style="float: left">
             <i class="iconfont icon-model" color="#daa520" />
             <span style="font-size: 18px; color: #daa520">{{
               cardData.instanceEnum
             }}</span>
           </div>
         </el-col>
-        <el-col :span="19">
+        <el-col :span="17">
           <div style="float: right; margin-bottom: 0">
             <el-row>
               <el-icon><Alarm-clock /></el-icon>
@@ -131,12 +131,13 @@ export default {
   font-size: 12px;
 }
 .cmpItemDesc {
+  margin-top: 15px;
   height: 115px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  font-size: 12px;
+  font-size: 14px;
   text-overflow: ellipsis;
   padding: 5px 0;
   word-break: break-all;

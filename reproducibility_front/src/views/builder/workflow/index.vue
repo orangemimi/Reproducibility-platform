@@ -111,11 +111,17 @@ export default {
                   ? "failed"
                   : "running";
               instance.stateEnum = stateEnum;
-              instance.instanceEnum = "MODEL";
+              // 这里挖坑实在是无奈之举，最开始设计在线编程模块的时候就没有设计model type，也没有model instance
+              if (instance.modelName == "OnlineProgramming") {
+                instance.instanceEnum = "CODE";
+              } else {
+                instance.instanceEnum = "MODEL";
+              }
             });
           }
 
           this.expectedInstances = newVal.instanceObjectList;
+
           this.resourceCollectionObjects = newVal.resourceCollectionObjects;
         }
       },

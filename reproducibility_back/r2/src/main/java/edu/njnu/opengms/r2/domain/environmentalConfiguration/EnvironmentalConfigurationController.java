@@ -81,7 +81,6 @@ public class EnvironmentalConfigurationController {
         }
     }
 
-
     // 分步式做法2、接收数据、代码等文件
     @PostMapping("/uploadDataAndCode")
     public JsonResult uploadDataAndCode(@RequestParam("files") List<MultipartFile> files ,@RequestParam("path") String relativePath ,@RequestParam("scenarioId") String scenarioId) throws IOException {
