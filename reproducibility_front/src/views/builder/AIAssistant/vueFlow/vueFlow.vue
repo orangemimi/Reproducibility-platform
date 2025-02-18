@@ -76,18 +76,38 @@ onMounted(() => {});
       @nodes-initialized="layoutGraph('TB')"
     >
       <!-- process的自定义模版 -->
-      <template #node-process="props">
+      <template #node-model="props">
         <Handle type="target" :position="props.targetPosition" />
-        <div class="processNode" @click="search(props.label)">
+        <div
+          class="processNode"
+          @click="search(props.label)"
+          style="background-color: #87cefa"
+        >
           <span>{{ props.label }}</span>
         </div>
         <Handle type="source" :position="props.sourcePosition" />
       </template>
 
       <!-- data的自定义模版 -->
-      <template #node-data="props">
+      <template #node-inputData="props">
         <Handle type="target" :position="props.targetPosition" />
-        <div class="dataNode">
+        <div class="dataNode" style="background-color: #ffab2d">
+          {{ props.label }}
+        </div>
+        <Handle type="source" :position="props.sourcePosition" />
+      </template>
+
+      <template #node-outputData="props">
+        <Handle type="target" :position="props.targetPosition" />
+        <div class="dataNode" style="background-color: #b9e6d3">
+          {{ props.label }}
+        </div>
+        <Handle type="source" :position="props.sourcePosition" />
+      </template>
+
+      <template #node-intermediateData="props">
+        <Handle type="target" :position="props.targetPosition" />
+        <div class="dataNode" style="background-color: #ffe6d3">
           {{ props.label }}
         </div>
         <Handle type="source" :position="props.sourcePosition" />
@@ -136,11 +156,14 @@ onMounted(() => {});
         <div class="tips">Click layout to fix issues.</div>
       </Panel>
       <div class="legend">
-        <div class="processNode"></div>
+        <div class="processNode" style="background-color: #87cefa"></div>
         <span>Model node</span>
-
-        <div class="dataNode"></div>
-        <span>Data node</span>
+        <div class="dataNode" style="background-color: #ffab2d"></div>
+        <span>Input Data</span>
+        <div class="dataNode" style="background-color: #ffe6d3"></div>
+        <span>Intermediate Data</span>
+        <div class="dataNode" style="background-color: #b9e6d3"></div>
+        <span>Output Data</span>
       </div>
     </VueFlow>
   </div>
@@ -154,10 +177,11 @@ onMounted(() => {});
   height: 100%;
   width: 100%;
   .legend {
+    z-index: 99;
     position: relative;
     top: 20px;
     left: 50px;
-    width: 100px;
+    width: 140px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -167,10 +191,12 @@ onMounted(() => {});
       font-weight: 500;
     }
     .processNode {
+      margin-top: 10px;
       width: 70px;
       height: 25px;
     }
     .dataNode {
+      margin-top: 10px;
       width: 70px;
       height: 25px;
     }
@@ -221,6 +247,7 @@ onMounted(() => {});
 
 .process-panel,
 .layout-panel {
+  opacity: 0.8;
   display: flex;
   gap: 10px;
 }

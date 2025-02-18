@@ -134,9 +134,14 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { ElMessage } from "element-plus";
 import axios from "axios";
-import { getDataItems, saveData, getFolderIdByDataItemId , saveDocument ,replaceDocument } from "@/api/request";
-import { renderSize } from '@/utils/utils'
-
+import {
+  getDataItems,
+  saveData,
+  getFolderIdByDataItemId,
+  saveDocument,
+  replaceDocument,
+} from "@/api/request";
+import { renderSize } from "@/utils/utils";
 
 /** 全局参数与通用方法 */
 // 加载遮蔽动画的布尔值
@@ -164,9 +169,10 @@ const readDocument = async (currentRow) => {
     });
 
     // 获取 Content-Disposition 头部中的文件名
-    const fileName = response.headers
-      .get("content-disposition")
-      .split("fileName=")[1];
+    const fileName = "test.csv";
+    // const fileName = response.headers
+    //   .get("content-disposition")
+    //   .split("fileName=")[1];
 
     // 直接创建 Blob 和 File 对象
     const blob = new Blob([response.data], {
@@ -314,12 +320,15 @@ const replaceDocumentNotes = ref("");
 const replaceDialogShow = ref(false);
 
 const replaceOldDocument = async () => {
-  var file = await exportExcel(luckysheet.getAllSheets(), `${currentDocument.value.name}.xlsx`);
+  var file = await exportExcel(
+    luckysheet.getAllSheets(),
+    `${currentDocument.value.name}.xlsx`
+  );
   let uploadFileForm = new FormData();
   uploadFileForm.append("file", file);
   var historyId = [];
   historyId.push(currentDocument.value.id);
-  for(var id of currentDocument.value.history){
+  for (var id of currentDocument.value.history) {
     historyId.push(id);
   }
   let notes = replaceDocumentNotes.value;
@@ -329,14 +338,14 @@ const replaceOldDocument = async () => {
   let data = await replaceDocument(
     uploadFileForm,
     renderSize(file.size),
-    await getFolderIdByDataItemId(currentDocument.value.id),
-  )
-  if(data){
+    await getFolderIdByDataItemId(currentDocument.value.id)
+  );
+  if (data) {
     replaceDialogShow.value = false;
     ElMessage({
-      'type':'success',
-      'message':"Replacement successful"
-    })
+      type: "success",
+      message: "Replacement successful",
+    });
   }
 };
 
@@ -346,12 +355,15 @@ const SaveNewDocumentName = ref("");
 const saveAsDialogShow = ref(false);
 
 const saveAsNewDocument = async () => {
-  var file = await exportExcel(luckysheet.getAllSheets(), `${SaveNewDocumentName.value}.xlsx`);
+  var file = await exportExcel(
+    luckysheet.getAllSheets(),
+    `${SaveNewDocumentName.value}.xlsx`
+  );
   let uploadFileForm = new FormData();
   uploadFileForm.append("file", file);
   var historyId = [];
   historyId.push(currentDocument.value.id);
-  for(var id of currentDocument.value.history){
+  for (var id of currentDocument.value.history) {
     historyId.push(id);
   }
   let notes = SaveNewDocumentNotes.value;
@@ -360,14 +372,14 @@ const saveAsNewDocument = async () => {
   let data = await saveDocument(
     uploadFileForm,
     renderSize(file.size),
-    await getFolderIdByDataItemId(currentDocument.value.id),
-  )
-  if(data){
+    await getFolderIdByDataItemId(currentDocument.value.id)
+  );
+  if (data) {
     saveAsDialogShow.value = false;
     ElMessage({
-      'type':'success',
-      'message':"Save as successful"
-    })
+      type: "success",
+      message: "Save as successful",
+    });
   }
 };
 

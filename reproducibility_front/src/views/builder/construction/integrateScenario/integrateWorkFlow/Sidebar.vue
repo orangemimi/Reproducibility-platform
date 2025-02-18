@@ -50,9 +50,9 @@
                 fixed="right"
                 prop="version"
                 label="Version"
-                width="80"
+                width="63"
               ></el-table-column>
-              <el-table-column fixed="right" label="Operation" width="100">
+              <el-table-column fixed="right" label="Operation" width="80">
                 <template #default="scope">
                   <el-button
                     link
@@ -100,7 +100,7 @@ const props = defineProps({
 // 调整一下表格格式，以适应小屏
 const cellStyle = () => {
   return {
-    "font-size": "12px",
+    "font-size": "10px",
     padding: "0 10px",
   };
 };
@@ -252,11 +252,11 @@ onMounted(async () => {
     opacity: 0.7;
   }
   .installedList {
-    width: 90%;
+    width: 95%;
     padding-bottom: 5%;
-    margin-left: 5%;
+    margin-left: 2.5%;
     opacity: 0.85;
-    font-size: 12px;
+    font-size: 6px;
     display: flex;
     justify-content: center;
   }

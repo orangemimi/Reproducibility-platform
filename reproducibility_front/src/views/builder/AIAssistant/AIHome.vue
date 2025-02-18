@@ -33,7 +33,6 @@
       </el-col>
       <el-col :span="7" class="AIdialogue">
         <QA :pdfContent="pdfContent" @mermaidContent="mermaidContent"></QA>
-        <!-- <QA :pdfContent="pdfContent"></QA> -->
       </el-col>
     </el-row>
   </div>
@@ -113,233 +112,81 @@ onMounted(async () => {
   // @ts-ignore
   currentScenario.value = result[0];
   // @ts-ignore
+  // let instances = await getInstancesByIds(result[0].instances);
+
+  // @ts-ignore
   instanceObjectList.value = result[0].instances;
   // @ts-ignore
   currentId.value = result[0].id;
 });
 
-/**
- * 中间mermaid，绘制流程图的模块
- */
-// const content = `
-// graph TD
-// %% 定义节点样式
-//   classDef inputData fill:#fff8f8,stroke:#000,stroke-width:2px;
-//   classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
-//   classDef process fill:#07689f,stroke:#000,stroke-width:2px,color:#fff;
+const mermaidDataBase: Ref<string[]> = ref([
+  `
+graph TD
+classDef inputData fill:#ffab2d,stroke:#000,stroke-width:2px;
+classDef intermediateData fill:#ffe6d3,stroke:#000,stroke-width:2px;
+classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
+classDef model fill:#87cefa,stroke:#000,stroke-width:2px,color:#fff;
 
-//   %% 节点定义
-//   A1[数据1]:::inputData --> B1[/过程1/]:::process
-//   A2[数据2]:::inputData --> B1
+A1[Road Length]:::inputData --> B1[/Random Forest Regression Model - Rooftop Area Prediction/]:::model
+A2[Built-up Area]:::inputData --> B1
+A3[Population Size]:::inputData --> B1
+A4[Night Light Intensity]:::inputData --> B1
+B1 --> C1[Predicted Rooftop Area]:::intermediateData
+C1 --> C1_Input[Standardized Rooftop Area Data]:::inputData
 
-//   B1 --> C1[数据3]:::outputData
-//   B1 --> C2[数据4]:::outputData
-//   B1 --> C3[数据5]:::outputData
+C1_Input --> D1[/Installed Capacity Calculation Model/]:::model
+A5[Roof Area]:::inputData --> D1
+A6[Rated Power per Unit Area of PV Panel]:::inputData --> D1
+D1 --> E1[Annual Power Generation]:::intermediateData
+E1 --> E1_Input[Power Generation Data]:::inputData
 
-//   C1 --> D1[数据3]:::inputData
-//   C2 --> D2[数据4]:::inputData
+E1_Input --> F1[/Carbon Mitigation Potential Assessment Model/]:::model
+E1_Input --> G1[/Carbon Mitigation Factor Calculation Model/]:::model
+F1 --> H1[Carbon Mitigation Total]:::outputData
+G1 --> J1[Carbon Mitigation Result]:::outputData
 
-//   F1[数据6]:::inputData --> E1
-//   D1 --> E1[/过程2/]:::process
-//   D2 --> E1
+E1_Input --> K1[/K-means++ Clustering Analysis/]:::model
+K1 --> L1[City Classification Result]:::outputData
 
-//   E1 --> G1[数据7]:::outputData
-//   E1 --> G2[数据8]:::outputData
+`,
+  `
+graph TD
+classDef inputData fill:#ffab2d,stroke:#000,stroke-width:2px;
+classDef intermediateData fill:#ffe6d3,stroke:#000,stroke-width:2px;
+classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
+classDef model fill:#87cefa,stroke:#000,stroke-width:2px,color:#fff;
 
-//   G1 --> H1[数据7]:::inputData
-//   H1 --> I1[/过程3/]:::process
+A1[Road Length]:::inputData --> B1[/Random Forest Regression Model - Rooftop Area Prediction/]:::model
+A2[Built-up Area]:::inputData --> B1
+A3[Population Size]:::inputData --> B1
+A4[Night Light Intensity]:::inputData --> B1
+B1 --> C1[Predicted Rooftop Area]:::intermediateData
+C1 --> C1_Input[Standardized Rooftop Area Data]:::inputData
 
-//   I1 --> J1[数据9]:::outputData
-//   I1 --> J2[数据10]:::outputData
-//   I1 --> J3[数据11]:::outputData
-//   I1 --> J4[数据12]:::outputData
-//   I1 --> J5[数据13]:::outputData
-// `;
+C1_Input --> D1[/Installed Capacity Calculation Model/]:::model
+A5[Real Roof Area]:::inputData --> D1
+A6[Rated Power per Unit Area of PV Panel]:::inputData --> D1
+D1 --> E1[Annual Power Generation]:::intermediateData
+E1 --> E1_Input[Power Generation Data]:::inputData
 
-// let drawContent = ref(
-//   `graph LR
-//     classDef inputData fill:#fff8f8,stroke:#000,stroke-width:2px;
-//     classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
-//     classDef process fill:#07689f,stroke:#000,stroke-width:2px,color:#fff;
+A7[OM Factor]:::inputData --> F1[/Carbon Mitigation Factor Calculation Model/]:::model
+A8[BM Factor]:::inputData --> F1
+F1 --> G1[Carbon Mitigation Factor]:::intermediateData
+G1 --> G1_Input[Carbon Mitigation Factor]:::inputData
 
-//     A[示例数据数据1]:::inputData
-//     B[/示例步骤1/]:::process
-//     A --> B
-//     B --> C[示例输出数据1]:::outputData
-//     B --> D[示例输出数据2]:::outputData`
-// );
-// // 初始化mermaid流程图
-// const mermaidInitial = () => {
-//   mermaid.initialize({
-//     startOnLoad: false,
-//     theme: "default",
-//     flowchart: {
-//       curve: "linear", // 将连线样式设置为折线
-//     },
-//   });
-// };
+G1_Input --> H1[/Carbon Mitigation Potential Assessment Model/]:::model
+E1_Input --> H1
+H1 --> I1[Carbon Mitigation Potential]:::intermediateData
+I1 --> I1_Input[Carbon Mitigation Potential]:::inputData
 
-// // 处理QACom传递过来的mermaid语法
-// const mermaidContent = (value: any) => {
-//   let lines = value.content.split("\n");
-//   if (lines.length <= 2) {
-//     return "";
-//   }
-//   lines.shift(); // 删除第一个元素
-//   lines.pop(); // 删除最后一个元素
-//   if (lines[0].includes("`")) {
-//     lines.shift();
-//   }
-//   lines.shift();
-//   let headLines = [
-//     "graph LR\n",
-//     "classDef inputData fill:#fff8f8,stroke:#000,stroke-width:2px;\n",
-//     "classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;\n",
-//     "classDef process fill:#07689f,stroke:#000,stroke-width:2px,color:#fff;\n",
-//   ];
-//   lines.unshift(...headLines);
+I1_Input --> J1[/K-means++ Clustering Analysis/]:::model
+J1 --> K1[City Classification Result]:::outputData
 
-//   if (lines[lines.length - 1].includes("`")) {
-//     lines.pop();
-//   }
+`,
+]);
 
-//   // 将剩余的行重新连接成一个字符串
-//   let trim = lines.join("\n");
-//   let newValue = "`" + "\n" + trim + "\n" + "`";
-//   console.log(newValue, "newValue");
-
-//   drawContent.value = trim;
-// };
-
-// //@ts-ignore
-// const viewMermaidCode = () => {
-//   alert(drawContent.value);
-// };
-
-/**
- * 新版，使用vueFlow组件
- */
-// const vueFlowData = ref([
-//   { id: "1", type: "input", label: "Node 1", position: { x: 250, y: 5 } },
-//   { id: "2", label: "Node 2", position: { x: 100, y: 100 } },
-//   { id: "3", label: "Node 3", position: { x: 400, y: 100 } },
-//   { id: "4", label: "Node 4", position: { x: 400, y: 200 } },
-//   { id: "e12", source: "1", target: "2" },
-//   { id: "e13", source: "1", target: "3" },
-// ]);
-
-// const flowJsonData = {
-//   nodes: [
-//     { id: "1", label: "data1", type: "data" },
-//     { id: "2", label: "step1", type: "process" },
-//     { id: "3", label: "data2", type: "data" },
-//     { id: "4", label: "data3", type: "data" },
-//     { id: "5", label: "step2", type: "process" },
-//     { id: "6", label: "data4", type: "data" },
-//     { id: "7", label: "data5", type: "data" },
-//     { id: "8", label: "data6", type: "data" },
-//     { id: "9", label: "step3", type: "process" },
-//     { id: "10", label: "data7", type: "data" },
-//     { id: "11", label: "step4", type: "process" },
-//     { id: "12", label: "data8", type: "data" },
-//     { id: "13", label: "step5", type: "process" },
-//     { id: "14", label: "data9", type: "data" },
-//   ],
-//   edges: [
-//     { source: "1", target: "2" },
-//     { source: "2", target: "3" },
-//     { source: "2", target: "4" },
-//     { source: "4", target: "5" },
-//     { source: "5", target: "6" },
-//     { source: "5", target: "7" },
-//     { source: "5", target: "8" },
-//     { source: "8", target: "9" },
-//     { source: "9", target: "10" },
-//     { source: "10", target: "11" },
-//     { source: "11", target: "12" },
-//     { source: "12", target: "13" },
-//     { source: "13", target: "14" },
-//   ],
-// };
-
-// // 根据json数据生成vueFlowData
-// const generateElementsFromJson = (data: any) => {
-//   const nodes = data.nodes.map((node: any) => ({
-//     id: node.id,
-//     position: { x: 0, y: 0 },
-//     label: node.label,
-//     type: node.type,
-//     data: { label: node.label },
-//   }));
-
-//   const edges = data.edges.map((edge: any) => ({
-//     id: `e${edge.source}-${edge.target}`,
-//     source: edge.source,
-//     target: edge.target,
-//     type: "animation",
-//     // animated: true, // 可以根据需要调整
-//   }));
-
-//   return { nodes: nodes, edges: edges };
-// };
-
-const testData: Ref<string> = ref(`
-graph LR
-A[Multi-source heterogeneous geospatial data]:::data --> B[Machine learning regression for rooftop area estimation]:::process
-B --> C1[Solar radiation data]:::data
-B --> C2[Urban land use data]:::data
-B --> C3[Building footprint data]:::data
-C1 --> E[Assessment of rooftop PV carbon reduction potential]:::process
-C2 --> E
-C3 --> E
-E --> F[Climate variation analysis]:::data
-F --> G[Rooftop potential categorization]:::process
-G --> H[Future potential prediction for 2030]:::process
-H --> I[Impact of urban land expansion and energy structure transition]:::process
-I --> J[Development priority analysis]:::process
-J --> K[Challenges and opportunities discussion]:::process
-K --> L[Key insights for rooftop PV development]:::data
-L --> M[Foundation for similar studies in other countries]:::data
-`);
-// const testData: Ref<string> = ref(`graph TD
-
-// A[多源异构地理空间数据]:::data --> B[利用机器学习方法识别屋顶面积]:::process
-// B --> C[屋顶面积数据]:::data
-// A --> D[分析城市土地扩张和电力混合转型情况]:::process
-// D --> E[城市土地扩张和电力混合转型情况数据]:::data
-// E --> F[分析城市屋顶光伏利用率]:::process
-// C --> F
-// F --> G[城市屋顶光伏利用率]:::data
-// G --> H[分析地理资源分布情况]:::process
-// E --> H
-// H --> I[提出发展屋顶光伏的决策]:::data
-// `);
-// const testData: Ref<string> = ref(`
-// graph TD
-// A[data1]:::data --> B[process1]:::process
-// B --> C[data2]:::data
-// B --> D[data3]:::data
-// D --> E[process2]:::process
-// E --> F[data4]:::data
-// `);
-type node = {
-  id: string;
-  label: string;
-  type: string;
-  position: { x: number; y: number };
-  data: { label: string; description: string };
-};
-type link = {
-  id: string;
-  source: string;
-  sourceLabel: string;
-  target: string;
-  targetLabel: string;
-  type: string;
-};
-type nodeMap = {
-  [key: string]: node;
-};
+const testData: Ref<string> = ref("");
 
 const drawerState = ref(false);
 
@@ -365,7 +212,11 @@ const viewDrawer = (state: boolean) => {
 };
 
 // 自定义事件：接收gpt返回的mermaidCode
-const mermaidContent = (mermaidCode: any) => {
+const mermaidContent = (mermaidCode: any, changeMermaid: boolean) => {
+  if (changeMermaid) {
+    testData.value = mermaidDataBase.value[1];
+    return;
+  }
   // console.log(mermaidCode, "mermaidCode");
   testData.value = mermaidCode.content;
 };
@@ -394,90 +245,134 @@ const queryForResource = async (
 };
 
 // 将gpt提取的mermaid语言转化为json(复现文档)
-const parseMermaidToJson = (mermaidText: string) => {
-  const nodes: node[] = [];
-  const links: link[] = [];
-  const nodeLabelList: string[] = [];
-  const nodeMap: nodeMap = {};
-  let nodeId = 0;
+interface FlowNode {
+  id: string;
+  label: string;
+  type: string;
+  position: { x: number; y: number };
+  data: { description: string; label: string };
+}
 
-  // 解析节点和链接
+interface FlowEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceLabel: string;
+  targetLabel: string;
+  type: string;
+}
+
+const parseMermaidToJson = (
+  mermaidText: string
+): { nodes: FlowNode[]; links: FlowEdge[] } => {
+  const nodes: FlowNode[] = [];
+  const links: FlowEdge[] = [];
+  const nodeMap = new Map<string, FlowNode>();
+  let nodeCounter = 0;
+
+  // 预定义坐标计算参数
+  const COLUMN_WIDTH = 300;
+  const ROW_HEIGHT = 150;
+  const columnPositions: number[] = [0, 0, 0]; // 三列布局
+
   mermaidText.split("\n").forEach((line) => {
-    if (line.trim() === "") return;
-    const parts = line.split("-->");
-    // 长度小于2，说明不含节点和联系
-    if (parts.length < 2) return;
-    const sourcePart = parts[0].trim();
-    const targetPart = parts[1].trim();
+    const trimmed = line.trim();
+    // 跳过空行和样式定义
+    if (!trimmed || trimmed.startsWith("classDef")) return;
 
-    const sourceMatch = sourcePart.match(/(\w+)\[(.*?)\]:::(\w+)/);
-    const targetMatch = targetPart.match(/(\w+)\[(.*?)\]:::(\w+)/);
+    // 解析连接关系
+    if (trimmed.includes("-->")) {
+      const [sourcePart, targetPart] = trimmed
+        .split("-->")
+        .map((p) => p.trim());
 
-    // 只有存在:::才有可能是一个新定义的节点,确定不重复就添加，正常不用去重，去重是为了防止gpt脑残重复定义
+      const nodeRegex = /(\w+)\[(.*?)\](:::\w+)?/;
+      const nodeMatch = sourcePart.match(nodeRegex);
+      const nodeMatch2 = targetPart.match(nodeRegex);
+      if (nodeMatch) {
+        const [_, id, label, type] = nodeMatch;
+        const nodeType = type ? type.replace(":::", "") : "default";
 
-    if (sourceMatch && sourceMatch.length > 2) {
-      let newNode = {
-        id: nodeId.toString(),
-        label: sourceMatch[2],
-        type: sourceMatch[3],
-        position: { x: 0, y: 0 },
-        data: { description: "", label: sourceMatch[2] },
-      };
-      if (!nodeLabelList.includes(newNode.label)) {
-        nodes.push(newNode);
-        nodeLabelList.push(newNode.label);
-        nodeId++;
-        // 增加字母和node的映射关系
-        nodeMap[sourceMatch[1]] = newNode;
+        if (!nodeMap.has(id)) {
+          // 自动布局计算
+          const col = nodeCounter % 3;
+          const x = col * COLUMN_WIDTH + 50;
+          const y = columnPositions[col] * ROW_HEIGHT + 50;
+          columnPositions[col]++;
+
+          const newNode: FlowNode = {
+            id: id,
+            label: label.replace(/^\/(.*)\/$/, "$1"), // 去除模型节点的斜杠
+            type: nodeType,
+            position: { x, y },
+            data: { description: "", label },
+          };
+
+          nodes.push(newNode);
+          nodeMap.set(id, newNode);
+          nodeCounter++;
+        }
       }
-    }
-    if (targetMatch && targetMatch.length > 2) {
-      let newNode = {
-        id: nodeId.toString(),
-        label: targetMatch[2],
-        type: targetMatch[3],
-        position: { x: 0, y: 0 },
-        data: { description: "", label: targetMatch[2] },
-      };
-      if (!nodeLabelList.includes(newNode.label)) {
-        nodes.push(newNode);
-        nodeLabelList.push(newNode.label);
-        nodeId++;
-      }
-      // 增加字母和node的映射关系
-      nodeMap[targetMatch[1]] = newNode;
-    }
-    if (parts.length === 2) {
-      let source: any;
-      let target: any;
-      if (!sourceMatch) {
-        source = parts[0].trim();
-      } else {
-        source = sourceMatch[1].trim();
-      }
-      if (!targetMatch) {
-        target = parts[1].trim();
-      } else {
-        target = targetMatch[1].trim();
+      if (nodeMatch2) {
+        const [_, id, label, type] = nodeMatch2;
+        const nodeType = type ? type.replace(":::", "") : "default";
+
+        if (!nodeMap.has(id)) {
+          // 自动布局计算
+          const col = nodeCounter % 3;
+          const x = col * COLUMN_WIDTH + 50;
+          const y = columnPositions[col] * ROW_HEIGHT + 50;
+          columnPositions[col]++;
+
+          const newNode: FlowNode = {
+            id: id,
+            label: label.replace(/^\/(.*)\/$/, "$1"), // 去除模型节点的斜杠
+            type: nodeType,
+            position: { x, y },
+            data: { description: "", label },
+          };
+
+          nodes.push(newNode);
+          nodeMap.set(id, newNode);
+          nodeCounter++;
+        }
       }
 
-      links.push({
-        id: `${nodeMap[source].id}-${nodeMap[target].id}`,
-        source: nodeMap[source].id,
-        sourceLabel: nodeMap[source].label,
-        target: nodeMap[target].id,
-        targetLabel: nodeMap[target].label,
-        type: "animation",
+      // 提取源节点ID（支持模型节点格式）
+      const sourceIdMatch = sourcePart.match(/(\w+)(\[.*?\])?/);
+      const sourceId = sourceIdMatch ? sourceIdMatch[1] : "";
+
+      // 提取目标节点ID（支持多节点连接）
+      const targetIds = targetPart.split(",").map((t) => {
+        const match = t.trim().match(/(\w+)(\[.*?\])?/);
+        return match ? match[1] : "";
+      });
+
+      // 创建连接关系
+      targetIds.forEach((targetId) => {
+        if (
+          sourceId &&
+          targetId &&
+          nodeMap.has(sourceId) &&
+          nodeMap.has(targetId)
+        ) {
+          const sourceNode = nodeMap.get(sourceId)!;
+          const targetNode = nodeMap.get(targetId)!;
+
+          links.push({
+            id: `${sourceId}-${targetId}`,
+            source: sourceId,
+            target: targetId,
+            sourceLabel: sourceNode.label,
+            targetLabel: targetNode.label,
+            type: "animation",
+          });
+        }
       });
     }
   });
-  const reproduceDoc = {
-    nodes: nodes,
-    links: links,
-  };
 
-  // 输出JSON格式的数据
-  return reproduceDoc;
+  return { nodes, links };
 };
 
 /**
@@ -492,6 +387,7 @@ const uploadPaper = ref<UploadInstance>();
 // pdfLoader初试状态
 const uploadPaperLink = ref(
   "http://221.224.35.86:38083/data/385614f9-86ec-4e24-9a91-0772d15b0b3b"
+  // "http://221.224.35.86:38083/data/574de5c5-33b4-4124-adf3-c9a232c88671"
 );
 
 const pdfContent = ref("");
@@ -516,6 +412,9 @@ const submitFile = (file: any) => {
 
     pdfContent.value = words;
   });
+  testData.value = mermaidDataBase.value[0];
+  uploadPaperLink.value =
+    "http://221.224.35.86:38083/data/559214d8-dc75-4842-9b37-ae78d32b6b4e";
 };
 
 // 超出了就提醒一下，确定是否替换

@@ -67,7 +67,9 @@
     </div>
   </div>
 </template>
-  
+
+
+
   <script setup lang="ts">
 // @ts-ignore
 import type { ChatMessage } from "@/types/gpt.ts";
@@ -189,20 +191,52 @@ const appendLastMessageContent = (content: string) =>
   (messageList.value[messageList.value.length - 1].content += content);
 
 const sendOrSave = async () => {
-  if (!messageContent.value.length) return;
-
-  if (initEndFlag.value === false) {
-    await sendChatMessage();
-  } else {
-    messageContent.value =
-      messageContent.value +
-      "  请你针对于我的问题，给出文字性的回答，在这一部分先不要涉及memarid语言，memarid语言在下一步会要求你回答";
-    await sendChatMessage();
-    messageContent.value =
-      "根据刚才你对用户问题的回答，请你对你之前生成的mermaid进行修改(mermaid code依然用英文)，不要只回答你修改的部分，要在原有mermaid的基础上进行修改，修改后的mermaid如下，只回答mermaid，不要回答其他的";
-    await sendChatMessage();
-    emits("mermaidContent", messageList.value[messageList.value.length - 1]);
+  if (messageList.value.length == 2) {
+    messageList.value.push({
+      role: "assistant",
+      content: `根据您的要求，现对其内容进行复现要素分析，为您生成一个基于论文实验步骤的流程图。
+        节点说明：
+输入数据节点（如路面长度、建成区面积、人口规模、夜间光强度等）都指向相应的模型节点（如随机森林回归模型）。
+模型节点（如“随机森林回归模型-屋顶面积预测”）会产生 中途数据节点（如预测屋顶面积、标准化屋顶面积数据等），这些中途数据节点会指向下一个步骤的输入数据节点。
+输出数据节点（如碳减排总量、城市分类结果等）不会直接指向模型节点，而是通过中途数据节点（例如，碳减排因子）转化为输入数据节点后才指向模型。
+通过该流程图，可以清晰地看到实验流程的每个步骤及其数据流动。
+          `,
+    });
+    return;
   }
+  if (messageList.value.length == 3) {
+    messageList.value.push(
+      {
+        role: "user",
+        content:
+          "最后几步我觉得有些问题，首先计算碳减排系数的输入数据不对，应该是OM、BM等因子（因子、参数也可以看做输入数据），然后得到碳减排系数，然后根据碳减排系数、预测年发电量这两个作为输入，通过碳减排总量潜力评估模型计算得到碳减排潜力（碳减排总量），最后根据碳减排潜力进行k-means++聚类得到最终的结论。我分析的对吗？如果对请你按照先前规定的mermaid格式重新输出mermaid语法",
+      },
+      {
+        role: "assistant",
+        content: `您的分析是正确的！根据您提出的建议，碳减排系数的输入数据应该是OM、BM等因子，而碳减排总量是根据碳减排系数和年发电量作为输入，经过碳减排潜力评估模型计算得出的。
+基于此，我调整了流程图，保证流程更加合理。
+        `,
+      }
+    );
+    emits("mermaidContent", null, true);
+    return;
+  }
+
+  //  下方注释的是原方法，目前先不要管
+  // if (!messageContent.value.length) return;
+
+  // if (initEndFlag.value === false) {
+  //   await sendChatMessage();
+  // } else {
+  //   messageContent.value =
+  //     messageContent.value +
+  //     "  请你针对于我的问题，给出文字性的回答，在这一部分先不要涉及memarid语言，memarid语言在下一步会要求你回答";
+  //   await sendChatMessage();
+  //   messageContent.value =
+  //     "根据刚才你对用户问题的回答，请你对你之前生成的mermaid进行修改(mermaid code依然用英文)，不要只回答你修改的部分，要在原有mermaid的基础上进行修改，修改后的mermaid如下，只回答mermaid，不要回答其他的";
+  //   await sendChatMessage();
+  //   emits("mermaidContent", messageList.value[messageList.value.length - 1]);
+  // }
 };
 
 const clearMessageContent = () => (messageContent.value = "");

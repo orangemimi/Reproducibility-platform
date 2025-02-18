@@ -6,6 +6,7 @@ export async function chat(messageList: ChatMessage[]) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer sb-ccc08d92c8d641e071e73c047508bce558f84178e7906c45`,
+      
     },
     body: JSON.stringify({
       model: 'gpt-3.5-turbo',

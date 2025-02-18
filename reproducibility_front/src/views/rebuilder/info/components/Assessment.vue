@@ -37,27 +37,96 @@
         <br />
         <el-divider />
         <div style="font-size: 18px; font-weight: 600">
-          Calculation of effect size :
+          Calculation of similarity probability :
         </div>
         <br />
         <el-row style="width: 100%">
           <assessmentInstance
+            :outputShow="outputShow"
             :modelInstanceList="modelInstanceList"
             @refreshAssessInstance="refreshAssessInstance"
           ></assessmentInstance>
+          <img v-if="outputShow" src="./output2.png" />
+          <img v-if="outputShow" src="./output1.png" />
         </el-row>
         <el-divider />
         <el-row>
           <div style="font-size: 18px; font-weight: 600">
-            Select effect size for calculation :
+            Select similarity probability for calculation :
           </div>
-          <model-content
+          <div class="container">
+            <el-table
+              :data="tableData"
+              border
+              :row-style="setRowStyle"
+              style="width: 100%"
+            >
+              <el-table-column
+                prop="event"
+                label="Event Name"
+              ></el-table-column>
+              <el-table-column
+                prop="description"
+                label="Description"
+              ></el-table-column>
+              <el-table-column prop="type" label="Type"></el-table-column>
+              <el-table-column label="value">
+                <template v-slot="{ row, $index }">
+                  <el-upload
+                    v-if="$index === 0"
+                    class="upload-demo"
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :file-list="row.fileList"
+                  >
+                    <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+                  <el-select
+                    v-else-if="row.event === 'AssessmentMethod'"
+                    v-model="row.value"
+                    placeholder="Please enter here"
+                  >
+                    <el-option
+                      v-for="method in assessmentMethods"
+                      :key="method"
+                      :label="method"
+                      :value="method"
+                    ></el-option>
+                  </el-select>
+
+                  <el-input
+                    v-else-if="row.type === 'parameters'"
+                    v-model="row.value"
+                    placeholder="Please enter here"
+                  ></el-input>
+
+                  <span v-else>
+                    <el-select
+                      v-model="row.value"
+                      placeholder="Please enter here"
+                    >
+                      <el-option
+                        v-for="method in assessmentMethods"
+                        :key="method"
+                        :label="method"
+                        :value="method"
+                      ></el-option>
+                    </el-select>
+                  </span>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <el-button type="primary" @click="startAssessment"
+              >invoke</el-button
+            >
+          </div>
+          <!-- <model-content
             :currentModel="assessMethod"
             :reproducedScenarioId="scenarioId"
             :invokingType="'assessment'"
             :initialInstanceObjectList="initialInstanceObjectList"
             :reproducedInstanceObjectList="reproducedInstanceObjectList"
-          ></model-content>
+          ></model-content> -->
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="individual" name="individual">
@@ -88,32 +157,118 @@
         </el-row>
         <br />
         <el-divider />
-        <wholeWorkflow :isWhole="false"></wholeWorkflow>
+        <div style="font-size: 18px; font-weight: 600">
+          Indicators of metrics :
+        </div>
+        <br />
+        <div v-if="selectedReproducedInstances.length == 0">
+          <el-empty description="Confirm computational processes to assess" />
+        </div>
+        <div
+          v-show="selectedReproducedInstances.length != 0"
+          style="margin: 20px 20px 0 20px"
+        >
+          <wholeWorkflow
+            :isWhole="false"
+            :reproducedInstanceObjectList="selectedReproducedInstances"
+            :initialInstanceObjectList="selectedInitialInstances"
+            :sliderData="sliderData"
+            :scenarioId="scenarioId"
+          ></wholeWorkflow>
+        </div>
         <br />
         <el-divider />
         <div style="font-size: 18px; font-weight: 600">
-          Calculation of effect size :
+          Calculation of similarity probability :
         </div>
         <br />
         <el-row style="width: 100%">
           <assessmentInstance
+            :outputShow="outputShow"
             :modelInstanceList="modelInstanceList"
             @refreshAssessInstance="refreshAssessInstance"
           ></assessmentInstance>
         </el-row>
+
         <el-divider />
 
         <el-row>
           <div style="font-size: 18px; font-weight: 600">
-            Select effect size for calculation :
+            Select similarity probability for calculation :
           </div>
-          <model-content
+          <div class="container">
+            <el-table
+              :data="tableData"
+              border
+              :row-style="setRowStyle"
+              style="width: 100%"
+            >
+              <el-table-column
+                prop="event"
+                label="Event Name"
+              ></el-table-column>
+              <el-table-column
+                prop="description"
+                label="Description"
+              ></el-table-column>
+              <el-table-column prop="type" label="Type"></el-table-column>
+              <el-table-column label="value">
+                <template v-slot="{ row, $index }">
+                  <el-upload
+                    v-if="$index === 0"
+                    class="upload-demo"
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :file-list="row.fileList"
+                  >
+                    <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+                  <el-select
+                    v-else-if="row.event === 'AssessmentMethod'"
+                    v-model="row.value"
+                    placeholder="Please enter here"
+                  >
+                    <el-option
+                      v-for="method in assessmentMethods"
+                      :key="method"
+                      :label="method"
+                      :value="method"
+                    ></el-option>
+                  </el-select>
+
+                  <el-input
+                    v-else-if="row.type === 'parameters'"
+                    v-model="row.value"
+                    placeholder="Please enter here"
+                  ></el-input>
+
+                  <span v-else>
+                    <el-select
+                      v-model="row.value"
+                      placeholder="Please enter here"
+                    >
+                      <el-option
+                        v-for="method in assessmentMethods"
+                        :key="method"
+                        :label="method"
+                        :value="method"
+                      ></el-option>
+                    </el-select>
+                  </span>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <el-button type="primary" @click="startAssessment"
+              >invoke</el-button
+            >
+          </div>
+          <!-- <model-content
             :currentModel="assessMethod"
             :reproducedScenarioId="scenarioId"
             :invokingType="'assessment'"
             :initialInstanceObjectList="selectedInitialInstances"
             :reproducedInstanceObjectList="selectedReproducedInstances"
-          ></model-content>
+          ></model-content> -->
         </el-row>
       </el-tab-pane>
     </el-tabs>
@@ -173,6 +328,7 @@ export default {
   },
   data() {
     return {
+      outputShow: false,
       startLabel: "",
       endLabel: "",
       sliderDataWhole: [0, 5],
@@ -203,10 +359,98 @@ export default {
       activeName: "workflow",
       selectedInitialInstances: [],
       selectedReproducedInstances: [],
+      tableData: [
+        {
+          event: "InitialResource",
+          description: "Initial resource for assessment",
+          type: "inputs",
+          value: "ExtrapolationResults.csv",
+        },
+        {
+          event: "ReproducedResource",
+          description: "Reproduced resource for assessment",
+          type: "inputs",
+          value: "ExtrapolationResults.csv",
+        },
+        {
+          event: "SelectedAttributeInInitialResource",
+          description: "Selected attribute for assessment",
+          type: "parameters",
+          value: "",
+        },
+        {
+          event: "SelectedAttributeInReproducedResource",
+          description: "Selected attribute for assessment",
+          type: "parameters",
+          value: "",
+        },
+        {
+          event: "TypeOfInitialResource",
+          description: "Type of initial resource, like .csv and .xlsx",
+          type: "parameters",
+          value: "",
+        },
+        {
+          event: "TypeOfReproducedResource",
+          description: "Type of reproduced resource, like .csv and .xlsx",
+          type: "parameters",
+          value: "",
+        },
+        // {
+        //   event: "AssessmentMethod",
+        //   description: "Choose a method for calculation",
+        //   type: "parameters",
+        //   value: "Pearson",
+        // },
+        {
+          event: "OutputType",
+          description:
+            "Data types and organization of output data such as scattered/continuous field/points/lines",
+          type: "parameters",
+          value: "scattered points",
+        },
+      ],
+      assessmentMethods: [
+        "Cohen's d",
+        "Hedges' g",
+        "Cohen's w",
+        "Pearson",
+        "MSE",
+        "MAE",
+        "RMSE",
+        "r²",
+        "R_squared",
+        "Eta-squared",
+      ],
     };
   },
 
   methods: {
+    delay(ms) {},
+    async startAssessment() {
+      setTimeout(() => {
+        // 3 秒后修改数据
+        this.outputShow = true;
+      }, 1500);
+    },
+    setRowStyle({ rowIndex }) {
+      // 为前两行设置背景色（索引 0 和 1）
+      if (rowIndex < 2) {
+        return {
+          backgroundColor: "#f2f9ec",
+          // 需要 !important 覆盖默认样式
+          "--bg-color": "#f2f9ec !important",
+        };
+      }
+      if (rowIndex > 5) {
+        return {
+          backgroundColor: "#fef6d5",
+          // 需要 !important 覆盖默认样式
+          "--bg-color": "#fef6d5 !important",
+        };
+      }
+      return {};
+    },
     async refreshAssessInstance() {
       await this.getAssessmentInstance();
       this.$forceUpdate();
@@ -237,6 +481,8 @@ export default {
     },
     getSliderData() {
       console.log(this.reproducedInstanceObjectList, 15952);
+      this.sliderData = [];
+      this.marks = {};
       this.reproducedInstanceObjectList.forEach((instance, index) => {
         this.sliderData.push(index);
         let obj = { label: "Step" + index };
@@ -252,22 +498,30 @@ export default {
       this.assessMethod = await getAssessmentMethod();
     },
     confirmIntancesSelection() {
+      console.log(this.sliderData, this.marks, 101);
+
       let start = this.sliderData[0];
       let end = this.sliderData[1];
       let selectedInstances1 = [];
       let selectedInstances2 = [];
-      this.reproducedInstanceObjectList.forEach((instance, index) => {
+      // this.reproducedInstanceObjectList.forEach((instance, index) => {
+      //   if (index >= start && index <= end) {
+      //     selectedInstances1.push(instance);
+      //   }
+      // });
+      // this.initialInstanceObjectList.forEach((instance, index) => {
+      //   if (index >= start && index <= end) {
+      //     selectedInstances2.push(instance);
+      //   }
+      // });
+      this.modelInstanceList.forEach((instance, index) => {
         if (index >= start && index <= end) {
           selectedInstances1.push(instance);
         }
       });
-      this.initialInstanceObjectList.forEach((instance, index) => {
-        if (index >= start && index <= end) {
-          selectedInstances2.push(instance);
-        }
-      });
+
       this.selectedReproducedInstances = selectedInstances1;
-      this.selectedInitialInstances = selectedInstances2;
+      this.selectedInitialInstances = selectedInstances1;
       this.$forceUpdate();
     },
   },
@@ -289,6 +543,18 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.container {
+  padding: 20px;
+}
+
+.info-box {
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.el-button {
+  margin-top: 10px;
+}
 .rate {
   :deep(.Rate__star) {
     padding: 0;

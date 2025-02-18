@@ -46,7 +46,7 @@ const handleMousemove = (e: MouseEvent) => {
     let percentageValue = ((e.y - 180) * 100) / containerHeight.value;
     // 限制最小和最大拖动范围
     if (percentageValue < 10) percentageValue = 10;
-    if (percentageValue > 95) percentageValue = 95;
+    // if (percentageValue > 95) percentageValue = 95;
 
     activeSplitPane.value.style.top = percentageValue + "%";
     document.getElementById("codeContainer")!.style.height =
