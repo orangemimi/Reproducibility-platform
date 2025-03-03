@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%; width: 100%; display: flex" @drop="handleDrop">
     <Sidebar
-      style="width: 25%; height: 100%"
+      style="width: 40%; height: 100%"
       v-if="!nodeEdit"
       :scenarioId="currentScenario.id"
       :containerId="currentScenario.containerId"
@@ -336,7 +336,7 @@ const bindToNode = (modelNode) => {
       id: parameterNodeId,
       data: {
         label: parameter.name,
-        dataType: "input",
+        dataType: "parameter",
         isParams: true,
         affiliation: modelNode.id,
         description: parameter.description,
@@ -493,6 +493,7 @@ const redoFlow = () => {
     nodes.value = nextState.nodes;
     edges.value = nextState.edges;
   }
+  console.log(nodes.value, edges.value);
 };
 
 // 清空
@@ -506,7 +507,29 @@ const clear = () => {
 const printInfo = async () => {
   let result = await checkRunningFlow(currentScenario.value.id);
   emit("addInfo", result.modelExecutionInfo);
+  // 将nodes.value中所有state为success的model的所属节点的state也变成success
+  let modelNodes = getAllTasks(nodes.value);
+  let doneModelNodes = modelNodes.filter((modelNode) => {
+    return modelNode.data.state == "success";
+  });
 
+  // 将运行完成的模型节点所属节点都变绿
+  doneModelNodes.forEach((doneModelNode) => {
+    nodes.value.forEach((node) => {
+      if (node.data.affiliation == doneModelNode.id) {
+        changeNodesState([node.id], nodes.value, "success");
+      }
+    });
+  });
+  changeNodesState("all", nodes.value, "init");
+
+  // 蒋nodes中所有node.id这个字符串中含有“parameter”字符的节点的dataType设置为“parameter”
+  nodes.value.forEach((node) => {
+    if (node.id.includes("parameter")) {
+      node.data.dataType = "parameter";
+    }
+  });
+  // changeNodesState(nodes.value, result.modelExecutionInfo);
   console.log("nodes.value", nodes.value);
   console.log("edges.value", edges.value);
   console.log("dependencies.value", dependencies.value);

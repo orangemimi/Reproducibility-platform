@@ -213,17 +213,17 @@ onMounted(() => {});
   line-height: 8px;
   text-align: center;
   font-weight: 600;
-  border: 1px solid grey;
+  border: 1px solid gray;
   // border-radius: 5px;
   background-color: #b9e6d3;
-  transform: skew(20deg);
-  span {
-    transform: skew(-20deg); /* 反向倾斜，抵消父元素的倾斜 */
-  }
+  // transform: skew(20deg);
+  // span {
+  //   transform: skew(-20deg); /* 反向倾斜，抵消父元素的倾斜 */
+  // }
 }
 .dataNode {
   width: 90px;
-  height: 40px;
+  height: 35px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -232,8 +232,8 @@ onMounted(() => {});
   line-height: 8px;
   text-align: center;
   font-weight: 600;
-  border: 1px solid grey;
-  border-radius: 5px;
+  border: 1px solid gray;
+  // border-radius: 5px;
   background-color: #f4d160;
 }
 /* 控制连接点隐藏，不然好丑 */

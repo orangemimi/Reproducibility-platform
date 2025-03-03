@@ -46,8 +46,12 @@
             :modelInstanceList="modelInstanceList"
             @refreshAssessInstance="refreshAssessInstance"
           ></assessmentInstance>
-          <img v-if="outputShow" src="./output2.png" />
-          <img v-if="outputShow" src="./output1.png" />
+          <!-- case1 -->
+          <!-- <img v-if="outputShow" src="./output2.png" />
+          <img v-if="outputShow" src="./output1.png" /> -->
+
+          <!-- case2 -->
+          <img v-if="outputShow" src="./output3.png" />
         </el-row>
         <el-divider />
         <el-row>
@@ -370,7 +374,7 @@ export default {
           event: "ReproducedResource",
           description: "Reproduced resource for assessment",
           type: "inputs",
-          value: "ExtrapolationResults.csv",
+          value: "repro-outputs-1000.csv",
         },
         {
           event: "SelectedAttributeInInitialResource",
@@ -543,6 +547,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+:deep(.el-slider__marks-text) {
+  margin-left: 6px;
+}
 .container {
   padding: 20px;
 }

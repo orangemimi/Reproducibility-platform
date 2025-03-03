@@ -35,6 +35,9 @@ export function getAllTasks(nodes) {
 
 //改变节点状态
 export function changeNodesState(nodeIdList, nodes, state) {
+  if (nodeIdList == "all") {
+    nodeIdList = nodes.map((node) => node.id);
+  }
   nodeIdList.forEach((nodeId) => {
     const targetNode = nodes.find((node) => node.id === nodeId);
     if (targetNode) {

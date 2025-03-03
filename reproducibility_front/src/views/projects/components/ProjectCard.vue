@@ -18,7 +18,11 @@
 
       <!-- <el-button class="config-btn" type="text" @click="view(project.id)">View</el-button> -->
       <div v-show="project.userRole == 'visitor'">
-        <el-button class="config-btn" type="primary" link @click="joinProjectCommand"
+        <el-button
+          class="config-btn"
+          type="primary"
+          link
+          @click="joinProjectCommand"
           >Join</el-button
         >
 
@@ -40,8 +44,8 @@
 </template>
 
 <script>
-import { imgBase64 } from '@/lib/utils'
-import { mapState } from 'vuex'
+import { imgBase64 } from "@/lib/utils";
+import { mapState } from "vuex";
 // import { saveNotice } from '@/api/request'
 export default {
   props: {
@@ -62,20 +66,20 @@ export default {
   },
 
   data() {
-    return {}
+    return {};
   },
 
   methods: {
     imgPath(picture, name) {
-      if (picture != undefined && picture != '') {
-        return picture
+      if (picture != undefined && picture != "") {
+        return picture;
       }
-      return imgBase64(name)
+      return imgBase64(name);
     },
     view(id) {
       this.$router.push({
         path: `/project/${id}/info`,
-      })
+      });
     },
     async joinProjectCommand() {
       // let notice = {
@@ -92,16 +96,16 @@ export default {
     },
 
     async judgeRole(project) {
-      await this.$store.dispatch('permission/getRole', {
+      await this.$store.dispatch("permission/getRole", {
         project: project,
         userId: this.userId,
-      })
-      this.view(project.id)
+      });
+      this.view(project.id);
     },
   },
 
   mounted() {},
-}
+};
 </script>
 
 <style lang="scss" scoped>

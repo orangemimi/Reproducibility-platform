@@ -1,6 +1,6 @@
 <template>
-  <aside style="width: 25%">
-    <el-collapse v-model="activeName" accordion>
+  <aside style="width: 30%">
+    <el-collapse v-model="activeName" accordion style="height: 100%">
       <el-collapse-item title="Model List" name="1">
         <div class="modelList">
           <div
@@ -9,7 +9,7 @@
             :draggable="true"
             @dragstart="onDragStart($event, model, 'codeModel')"
           >
-            add a code model
+            Add a code model
           </div>
           <div
             class="modelNode"
@@ -34,7 +34,7 @@
             <el-input v-model="packageName"></el-input>
 
             version:
-            <el-input v-model="packageVersion"></el-input>
+            <el-input v-model="packageVersion" style="width: 120px"></el-input>
             <el-button type="primary" @click="installPackage" link>
               install
             </el-button>
@@ -199,12 +199,12 @@ onMounted(async () => {
 
 .modelList {
   width: 100%;
-
-  // height: calc((100vh - 260px) * 0.9);
+  height: calc((100vh - 260px) * 0.9 - 96px);
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto;
   background: linear-gradient(
       45deg,
       transparent 33.33%,
@@ -216,10 +216,11 @@ onMounted(async () => {
   background-size: 30px 30px;
   .modelNode {
     width: 70%;
-    aspect-ratio: 5; //设置宽高比
+    aspect-ratio: 2;
     background-color: white;
     margin: 10px;
     border-radius: 5px;
+    overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: center;
@@ -227,6 +228,9 @@ onMounted(async () => {
     cursor: grab;
     font-weight: 600;
     font-size: 14px;
+    word-wrap: break-word; /* 允许长单词换行 */
+    word-break: break-word; /* 强制在需要的地方换行 */
+    text-align: center; /* 水平居中文本 */
   }
 }
 

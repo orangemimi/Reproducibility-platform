@@ -274,7 +274,7 @@ export default {
           type: "model",
           id: this.index,
           style:
-            "fillColor=#07689f;fontColor=#f6f6f6;shape=hexagon;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;",
+            "fillColor=#87cefa;fontColor=000000;strokeColor=#000000;shape=rounded;rounded=true;arcSize=50;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;",
           mxGeometry: {
             x: x * 220,
             y: y * 200,
@@ -299,7 +299,7 @@ export default {
               value: input.value,
               id: this.index,
               style:
-                "fillColor=#fff8f8;fontColor=#e43a3a;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;",
+                "fillColor=#ffab2d;fontColor=#000000;strokeColor=#000000;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;",
               optional: input.isOptional,
               mxGeometry: {
                 x: x * 200,
@@ -314,7 +314,7 @@ export default {
               this.dataItemList.push(addItem);
             } else {
               addItem.style =
-                "fillColor=#fff8f8;fontColor=#b7685a;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;";
+                "fillColor=#ffab2d;fontColor=#000000;strokeColor=#000000;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top;whiteSpace=wrap;";
               this.dataItemList.push(addItem);
             }
 
@@ -336,7 +336,7 @@ export default {
                 value: parameter.value,
                 id: this.index,
                 style:
-                  "fillColor=#ffcc99;fontColor=#b7685a;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top",
+                  "fillColor=#fce08f;fontColor=#000000;strokeColor=#000000;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top",
                 optional: "true",
                 mxGeometry: {
                   x: x * 200,
@@ -361,7 +361,7 @@ export default {
               value: output.value,
               id: this.index,
               style:
-                "fillColor=#b9e6d3;fontColor=#24292E;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top",
+                "fillColor=#b9e6d3;fontColor=#000000;strokeColor=#000000;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top",
               optional: output.isOptional,
               mxGeometry: {
                 x: x * 200,
@@ -419,7 +419,7 @@ export default {
             // debugger;
             output.type = "intermediate";
             output.style =
-              "fillColor=#f4d160;fontColor=#24292E;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top";
+              "fillColor=#ffe6d3;fontColor=#000000;strokeColor=#000000;shape=parallelogram;fixedSize=1;strokeWidth=1.5;align=center;imageAlign=center;imageVerticalAlign=top";
             this.linkEdgeList.push({
               id: this.index,
               source: output.id,
@@ -513,38 +513,6 @@ export default {
         }
       });
     },
-    //     getDocument() {
-    //       let getExpectedInstances = this.expectedInstances;
-    //       this.procedureContent = `<AgentInfo>
-    // <Add name="xxx" title="Mr." type="Creator" email="xxx@xxx" insititution="xxxx"/>
-    // </AgentInfo>
-    // <Configuration>`;
-    //       getExpectedInstances.forEach((model) => {
-    //         this.procedureContent += `<TaskInstance id="${model.id}" name="${model.name}" description="" modelServiceId="${service.id}"><Behavior>`;
-    //         model.behavior.forEach((behavior) => {
-    //           this.procedureContent += "<Behavior><Inputs>";
-    //           behavior.inputs.forEach((input) => {
-    //             this.procedureContent += ` <Input name="${input.name}" isOptional="${input.isOptional}" dataServiceId="${input.value}"/>`;
-    //           });
-
-    //           if (behavior.parameters != undefined) {
-    //             this.procedureContent += `<Parameters>`;
-    //             behavior.parameters.forEach((parameter) => {
-    //               this.procedureContent += `<Parameter name="${parameter.name}" type="${parameter.type}" value="${parameter.value}"/>`;
-    //             });
-    //             this.procedureContent += `</Parameters>`;
-    //           }
-    //           this.procedureContent += `<Outputs>`;
-    //           behavior.outputs.forEach((output) => {
-    //             this.procedureContent += `<Output name="${output.name}" isOptional="${output.isOptional}" dataServiceId="${output.value}"/>`;
-    //           });
-    //         });
-
-    //         this.procedureContent += `</Outputs></Behavior>`;
-    //       });
-    //       this.procedureContent += ` </Behaviors></TaskInstance></Configuration>`;
-    //       console.log(this.procedureContent);
-    //     },
 
     generateMxXml() {
       let dataItemList = this.dataItemList;

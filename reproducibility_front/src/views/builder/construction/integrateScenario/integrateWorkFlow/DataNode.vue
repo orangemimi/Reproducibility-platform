@@ -17,8 +17,15 @@ const props = defineProps(["dataNodeProps"]);
 
 // //定义背景颜色
 const bgColor = computed(() => {
+  if (props.dataNodeProps.data.state == "success") {
+    return "#51ec7b";
+  } else if (props.dataNodeProps.data.state == "error") {
+    return "#ffab2d";
+  }
   if (props.dataNodeProps.data.dataType == "input") {
     return "#ffab2d";
+  } else if (props.dataNodeProps.data.dataType == "parameter") {
+    return "#fce08f";
   } else if (props.dataNodeProps.data.dataType == "output") {
     return "#b9e6d3";
   } else if (props.dataNodeProps.data.dataType == "intermediate") {

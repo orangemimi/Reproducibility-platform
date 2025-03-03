@@ -74,12 +74,15 @@
             :cell-style="{
               color: '#666',
               fontFamily: 'Arial',
-              fontSize: '10px',
+              fontSize: '14px',
               padding: '0',
             }"
             :header-cell-style="{
               fontFamily: 'Arial',
-              fontSize: '14px',
+              fontSize: '16px',
+            }"
+            :row-style="{
+              height: '40px',
             }"
           >
             <el-table-column

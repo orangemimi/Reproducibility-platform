@@ -3,7 +3,7 @@
   <div style="width: 100%">
     <el-row style="width: 100%">
       <el-col
-        :span="8"
+        :span="12"
         v-for="(instance, index) in modelInstanceListNew"
         :key="index"
         style="padding: 5px; width: 100%"
@@ -23,7 +23,10 @@
               >
               </el-tag> -->
               <el-tag type="success" disable-transitions>
-                <div v-if="outputShow">99.4215%</div>
+                <!-- case1 -->
+                <!-- <div v-if="outputShow">99.4215%</div> -->
+                <!-- case2 -->
+                <div v-if="outputShow">100%</div>
               </el-tag>
             </el-form-item>
             <el-form-item label="Calculation: ">
@@ -31,18 +34,23 @@
                 <!-- {{
                   instance.behavior[0].outputs[0].datasetItem?.assessmentValue
                 }} -->
-                <div v-if="outputShow">99.4215</div>
+                <!-- case1 -->
+                <!-- <div v-if="outputShow">99.4215</div> -->
+                <!-- case2 -->
+                <div v-if="outputShow">100</div>
               </el-tag>
             </el-form-item>
             <el-form-item label="Initial Resource: ">
               <el-tag type="info" disable-transitions>
                 <!-- {{ instance.behavior[0].inputs[0]?.datasetItem.dataName }} -->
-                ExtrapolationResults.csv
+                <!-- ExtrapolationResults.csv -->
+                initial-outputs.csv
               </el-tag>
             </el-form-item>
             <el-form-item label="Reproduced Resource: ">
               <el-tag type="info" disable-transitions>
-                ExtrapolationResults.csv
+                <!-- ExtrapolationResults.csv -->
+                repro-outputs-1000.csv
                 <!-- {{ instance.behavior[0].inputs[1]?.datasetItem.dataName }} -->
               </el-tag>
             </el-form-item>

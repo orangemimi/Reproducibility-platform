@@ -184,6 +184,58 @@ I1_Input --> J1[/K-means++ Clustering Analysis/]:::model
 J1 --> K1[City Classification Result]:::outputData
 
 `,
+
+  `
+graph TD
+classDef inputData fill:#ffab2d,stroke:#000,stroke-width:2px;
+classDef intermediateData fill:#ffe6d3,stroke:#000,stroke-width:2px;
+classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
+classDef model fill:#87cefa,stroke:#000,stroke-width:2px,color:#fff;
+
+A1[Time Series Data Xt]:::inputData --> B1[/GRU Network for Temporal Correlation/]:::model
+A2[Previous Time Series Xt-T to Xt-1]:::inputData --> B1
+B1 --> C1[Temporal Feature Output]:::intermediateData
+C1 --> C1_Input[Temporal Features for Spatial Modelling]:::inputData
+
+C1_Input --> D1[/Graph Construction for Spatial Correlation/]:::model
+A3[Spatial Adjacency and Distance Matrices]:::inputData --> D1
+D1 --> E1[Spatial Feature Output]:::intermediateData
+E1 --> E1_Input[Spatial Features for Prediction]:::inputData
+
+E1_Input --> F1[/GRU-GCN Spatiotemporal Prediction/]:::model
+F1 --> G1[Predicted Carbon Emissions Xt+1]:::outputData
+E1_Input --> H1[/GRU-GCN Multi-step Prediction/]:::model
+H1 --> I1[Multi-step Predicted Carbon Emissions]:::outputData
+
+E1_Input --> J1[/Performance Evaluation Model/]:::model
+A4[MAE, RMSE, MAPE Metrics]:::inputData --> J1
+J1 --> K1[Evaluation Results]:::outputData
+
+`,
+  `
+graph TD
+classDef inputData fill:#ffab2d,stroke:#000,stroke-width:2px;
+classDef intermediateData fill:#ffe6d3,stroke:#000,stroke-width:2px;
+classDef outputData fill:#b9e6d3,stroke:#000,stroke-width:2px;
+classDef model fill:#87cefa,stroke:#000,stroke-width:2px,color:#fff;
+
+A1[Time Series Data Xt]:::inputData --> B1[/GRU-GCN Spatiotemporal Prediction Model/]:::model
+A2[Previous Time Series Xt-T to Xt-1]:::inputData --> B1
+A3[Spatial Adjacency and Distance Matrices]:::inputData --> B1
+
+B1 --> C1[Predicted Carbon Emissions Xt+1]:::intermediateData
+C1 --> D1[Predicted Carbon Emissions Xt+1]:::inputData
+
+D1 --> E1[/Recursive Multi-step Prediction/]:::model
+E1 --> F1[Multi-step Predicted Carbon Emissions]:::intermediateData
+F1 --> G1[Multi-step Predicted Carbon Emissions]:::inputData
+
+
+C1_input[Predicted Carbon Emissions Xt+1]:::inputData --> H1[/Performance Evaluation Model/]:::model
+G1 --> H1
+A4[MAE, RMSE, MAPE Metrics]:::inputData --> H1
+H1 --> I1[Evaluation Results for Single-step and Multi-step Predictions]:::outputData
+`,
 ]);
 
 const testData: Ref<string> = ref("");
@@ -212,9 +264,29 @@ const viewDrawer = (state: boolean) => {
 };
 
 // 自定义事件：接收gpt返回的mermaidCode
-const mermaidContent = (mermaidCode: any, changeMermaid: boolean) => {
+const mermaidContent = (
+  mermaidCode: any,
+  changeMermaid: boolean,
+  caseNum: number
+) => {
   if (changeMermaid) {
-    testData.value = mermaidDataBase.value[1];
+    if (caseNum == 1) {
+      if (testData.value.length == 0) {
+        testData.value = mermaidDataBase.value[0];
+        uploadPaperLink.value =
+          "http://221.224.35.86:38083/data/559214d8-dc75-4842-9b37-ae78d32b6b4e";
+      } else {
+        testData.value = mermaidDataBase.value[1];
+      }
+    } else if (caseNum == 2) {
+      if (testData.value.length == 0) {
+        testData.value = mermaidDataBase.value[2];
+        uploadPaperLink.value =
+          "http://221.224.35.86:38083/data/d11bff62-fac7-4ee8-9168-f66fe782d9f6";
+      } else {
+        testData.value = mermaidDataBase.value[3];
+      }
+    }
     return;
   }
   // console.log(mermaidCode, "mermaidCode");
@@ -412,9 +484,6 @@ const submitFile = (file: any) => {
 
     pdfContent.value = words;
   });
-  testData.value = mermaidDataBase.value[0];
-  uploadPaperLink.value =
-    "http://221.224.35.86:38083/data/559214d8-dc75-4842-9b37-ae78d32b6b4e";
 };
 
 // 超出了就提醒一下，确定是否替换

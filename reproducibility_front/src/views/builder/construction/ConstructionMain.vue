@@ -6,7 +6,7 @@
     @mousedown="handleMousedown($event)"
     @mouseup="handleMouseup($event)"
   >
-    <div class="code-container" id="codeContainer">
+    <div v-if="showAIFunction" class="code-container" id="codeContainer">
       <div class="middle-container" id="middleContainer">
         <AIfunction />
       </div>
@@ -28,6 +28,7 @@ import modelContent from "@/views/builder/construction/index.vue";
 const activeSplitPane = ref<HTMLElement | null>(null);
 const containerHeight = ref(0);
 const mouseActTag = ref(false);
+const showAIFunction = ref(true);
 
 const handleMousedown = (e: MouseEvent) => {
   refreshContainerSize();
@@ -44,9 +45,13 @@ const handleMousemove = (e: MouseEvent) => {
   ) {
     // 减去的180是容器上方固定内容的高度
     let percentageValue = ((e.y - 180) * 100) / containerHeight.value;
+    showAIFunction.value = true;
     // 限制最小和最大拖动范围
-    if (percentageValue < 10) percentageValue = 10;
-    // if (percentageValue > 95) percentageValue = 95;
+    if (percentageValue < 1) {
+      percentageValue = 0;
+      showAIFunction.value = false;
+    }
+    if (percentageValue > 99) percentageValue = 100;
 
     activeSplitPane.value.style.top = percentageValue + "%";
     document.getElementById("codeContainer")!.style.height =

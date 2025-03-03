@@ -4,9 +4,7 @@
     :style="{ backgroundColor: bgColor }"
     @dblclick="bindingModel"
   >
-    <div class="label">
-      {{ modelNodeProps.data.label }}
-    </div>
+    <div class="label">{{ modelNodeProps.data.label }}</div>
     <Handle type="target" :position="Position.Top" @connection="onConnection" />
     <Handle
       type="source"
@@ -41,7 +39,10 @@ const bgColor = computed(() => {
   }
 
   if (props.modelNodeProps.data.state == "success") {
-    return "#93fc69";
+    // return "#00A86B";
+    // return "#23d96e";
+    return "#51ec7b";
+    return "#0bc261";
   }
 
   if (props.modelNodeProps.data.state == "init") {
@@ -67,16 +68,15 @@ function onConnection(params) {
 <style scoped>
 .custom-model {
   display: flex;
-  border-radius: 30px;
+  /* border-radius: 30px; */
   width: 100px;
   height: 30px;
   font-size: 12px;
   justify-content: center;
   align-items: center;
-  border: 1px solid #777;
   background-color: #eeeeee;
   box-shadow: 2px 2px 5px #ddd;
-  border: 2px solid #000000;
+  border: 1px solid #000000;
 }
 
 .custom-model .vue-flow__handle {
@@ -92,6 +92,7 @@ function onConnection(params) {
   width: 100px;
   display: flex;
   /* word-break: break-all; */
+  white-space: nowrap;
   color: #000;
   font-size: 10px;
   justify-content: center;

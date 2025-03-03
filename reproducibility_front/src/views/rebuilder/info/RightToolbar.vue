@@ -191,6 +191,8 @@ export default {
 
     async getExpectedInstances() {
       this.project = await getProjectById(this.$route.params.id);
+      console.log(this.project, 1159);
+
       this.initialScenario = await getScenarioById(
         this.project.scenarioList[0]
       );
@@ -243,10 +245,10 @@ export default {
     },
   },
 
-  created() {
+  async mounted() {
     console.log("right1");
 
-    this.getExpectedInstances();
+    await this.getExpectedInstances();
     console.log("right2");
   },
 };

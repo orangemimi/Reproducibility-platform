@@ -152,7 +152,7 @@ export default {
         font-weight: 400;
       }
       .project {
-        width: 500px;
+        width: 700px;
         white-space: wrap;
         overflow: hidden;
         text-overflow: ellipsis;

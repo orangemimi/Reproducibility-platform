@@ -14,10 +14,7 @@
               <el-icon><DocumentAdd /></el-icon>
             </el-button>
           </div>
-          <el-input
-            placeholder="Please enter the content"
-            size="small"
-          >
+          <el-input placeholder="Please enter the content" size="small">
             <template #prepend>
               <el-icon><Search /></el-icon>
             </template>

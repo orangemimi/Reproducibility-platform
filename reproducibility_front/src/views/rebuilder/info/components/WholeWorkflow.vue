@@ -75,6 +75,7 @@
                   <tr>
                     <div>
                       <rate
+                        @click="console.log(scope.row, index)"
                         :length="scope.row.level.length"
                         v-model="scope.row.selectLevel"
                         class="rate"
@@ -493,12 +494,16 @@ export default {
           individualMetrics[4].selectLevel = out[4].selectLevel;
           individualMetrics[5].selectLevel = out[5].selectLevel;
 
+          console.log(individualMetrics, index, "11");
+
           return individualMetrics;
         }
       } else {
         this.currentAssessStep = 0;
         // this.assessReproducibilityIndividual();
-        return this.assessReproducibilityIndividual();
+        console.log(22);
+
+        return this.assessReproducibilityIndividual(index);
       }
 
       // if (this.currentMetrics != undefined && this.currentMetrics.length != 0) {
@@ -644,7 +649,7 @@ export default {
       });
     },
 
-    assessReproducibilityIndividual() {
+    assessReproducibilityIndividual(step) {
       // let startProbe;
       // let endProbe;
       let assess = {};
@@ -652,9 +657,10 @@ export default {
       //   startProbe = this.sliderData[0];
       //   endProbe = this.sliderData[1];
       // }
-      let currentAssessStep = this.currentAssessStep;
+      // let currentAssessStep = this.currentAssessStep;
+      let currentAssessStep = step;
       // debugger;
-      console.log(currentAssessStep);
+      console.log(currentAssessStep, 33);
       if (currentAssessStep == undefined) {
         return;
       }
@@ -780,8 +786,9 @@ export default {
           }
         } else {
           if (
-            iniInput.datasetItem.UdxDeclarationNew[0].parameterValue !=
-            reinput.datasetItem.UdxDeclarationNew[0].parameterValue
+            false &&
+            iniInput.datasetItem?.UdxDeclarationNew[0]?.parameterValue !=
+              reinput.datasetItem?.UdxDeclarationNew[0]?.parameterValue
           ) {
             flagConsistency = false; //judge the Consistency of resource preparation
           }

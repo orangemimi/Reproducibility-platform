@@ -82,6 +82,8 @@ import Loading from "./LoadingCom.vue";
 import Copy from "./CopyCom.vue";
 // @ts-ignore
 import { md } from "@/lib/markdown.ts";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 let isTalking = ref(false);
 let messageContent = ref("");
@@ -191,35 +193,86 @@ const appendLastMessageContent = (content: string) =>
   (messageList.value[messageList.value.length - 1].content += content);
 
 const sendOrSave = async () => {
-  if (messageList.value.length == 2) {
-    messageList.value.push({
-      role: "assistant",
-      content: `根据您的要求，现对其内容进行复现要素分析，为您生成一个基于论文实验步骤的流程图。
+  // @ts-ignore
+  let caseNum = route.params.id == "67b7e09f35f57521107bbfd1" ? 2 : 1;
+  emits("mermaidContent", null, true, caseNum);
+
+  if (caseNum == 1) {
+    if (messageList.value.length == 2) {
+      messageList.value.push({
+        role: "assistant",
+        content: `根据您的要求，现对其内容进行复现要素分析，为您生成一个基于论文实验步骤的流程图。
         节点说明：
 输入数据节点（如路面长度、建成区面积、人口规模、夜间光强度等）都指向相应的模型节点（如随机森林回归模型）。
 模型节点（如“随机森林回归模型-屋顶面积预测”）会产生 中途数据节点（如预测屋顶面积、标准化屋顶面积数据等），这些中途数据节点会指向下一个步骤的输入数据节点。
 输出数据节点（如碳减排总量、城市分类结果等）不会直接指向模型节点，而是通过中途数据节点（例如，碳减排因子）转化为输入数据节点后才指向模型。
 通过该流程图，可以清晰地看到实验流程的每个步骤及其数据流动。
           `,
-    });
-    return;
-  }
-  if (messageList.value.length == 3) {
-    messageList.value.push(
-      {
-        role: "user",
-        content:
-          "最后几步我觉得有些问题，首先计算碳减排系数的输入数据不对，应该是OM、BM等因子（因子、参数也可以看做输入数据），然后得到碳减排系数，然后根据碳减排系数、预测年发电量这两个作为输入，通过碳减排总量潜力评估模型计算得到碳减排潜力（碳减排总量），最后根据碳减排潜力进行k-means++聚类得到最终的结论。我分析的对吗？如果对请你按照先前规定的mermaid格式重新输出mermaid语法",
-      },
-      {
-        role: "assistant",
-        content: `您的分析是正确的！根据您提出的建议，碳减排系数的输入数据应该是OM、BM等因子，而碳减排总量是根据碳减排系数和年发电量作为输入，经过碳减排潜力评估模型计算得出的。
+      });
+      return;
+    }
+    if (messageList.value.length == 3) {
+      messageList.value.push(
+        {
+          role: "user",
+          content:
+            "最后几步我觉得有些问题，首先计算碳减排系数的输入数据不对，应该是OM、BM等因子（因子、参数也可以看做输入数据），然后得到碳减排系数，然后根据碳减排系数、预测年发电量这两个作为输入，通过碳减排总量潜力评估模型计算得到碳减排潜力（碳减排总量），最后根据碳减排潜力进行k-means++聚类得到最终的结论。我分析的对吗？如果对请你重新输出。",
+        },
+        {
+          role: "assistant",
+          content: `您的分析是正确的！根据您提出的建议，碳减排系数的输入数据应该是OM、BM等因子，而碳减排总量是根据碳减排系数和年发电量作为输入，经过碳减排潜力评估模型计算得出的。
 基于此，我调整了流程图，保证流程更加合理。
         `,
-      }
-    );
-    emits("mermaidContent", null, true);
-    return;
+        }
+      );
+
+      // console.log(JSON.stringify(messageList.value, null, 2));
+
+      return;
+    }
+  } else if (caseNum == 2) {
+    if (messageList.value.length == 2) {
+      messageList.value.push({
+        role: "assistant",
+        content: `根据您的要求，现对其内容进行复现要素分析，为您生成一个基于论文实验步骤的流程图。
+        解释：
+输入数据节点（如 A1, A2, A3）表示论文中给出的历史时间序列数据、时间窗口及空间相关矩阵等。
+模型节点（如 B1, D1, F1, H1）分别是GRU网络（用于时间相关建模）、图构建（用于空间相关建模）以及GRU-GCN模型（用于时空预测）等。
+中途数据节点（如 C1, E1）表示中间步骤的输出数据，这些数据会作为后续步骤的输入数据。
+输出数据节点（如 G1, I1, K1）则是最终的预测结果和评估指标。
+这个流程图从时间序列数据开始，通过GRU进行时间特征建模，再通过图卷积网络（GCN）进行空间特征建模，最终进行时空预测和多步预测。最后使用性能评估模型评估预测结果。
+          `,
+      });
+      return;
+    }
+    if (messageList.value.length == 3) {
+      messageList.value.push(
+        {
+          role: "user",
+          content: `我认为有些问题
+1、GRU Network for Temporal Correlation和Graph Construction for Spatial Correlation都只是建模过程，他们合起来组成了本篇论文所用到的基于随机森林的时空预测分析模型，我认为不能分开而应该是一个模型。
+2、多步预测模型是使用之前的预测值作为输入数据，通过递归来实现的进一步输出结果，即多步预测数据，而不是直接根据Spatial Features for Prediction得到的。
+3、基于MAE、RMSE、MAPE三个评估指标的预测效果评估，应该是同时针对单步预测和多步预测的，也就是其输入应该包括单步预测和多步预测的结果。`,
+        },
+        {
+          role: "assistant",
+          content: `感谢你的反馈！根据你的修正要求，我已经重新调整了流程图，做了以下更改：
+时空预测模型（GRU Network for Temporal Correlation 和 Graph Construction for Spatial Correlation）已经合并为一个整体模型，因为它们共同构成了基于随机森林的时空预测分析模型。
+多步预测模型的输入是之前的预测值，通过递归来实现进一步的输出，而不是直接依赖于空间特征。
+预测效果评估的输入包括了单步预测和多步预测的结果，针对这两者进行综合评估。
+关键改动：
+GRU-GCN Spatiotemporal Prediction Model合并了时间序列处理（GRU）和空间特征建模（GCN），成为一个整体模型。
+多步预测是基于单步预测结果的递归输入，实现多步预测，而不是基于直接的空间特征。
+预测效果评估现在包含了对单步预测和多步预测结果的综合评估。
+这样结构应该更符合你的要求。如果有任何进一步的调整需要，随时告诉我！
+        `,
+        }
+      );
+
+      // console.log(JSON.stringify(messageList.value, null, 2));
+
+      return;
+    }
   }
 
   //  下方注释的是原方法，目前先不要管
